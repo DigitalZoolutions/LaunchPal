@@ -1,0 +1,23 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using LaunchPal.Model.CacheModel;
+using Newtonsoft.Json;
+
+namespace LaunchPal.Helper
+{
+    public static class JsonConverterExtension
+    {
+        public static T ConvertToObject<T>(this string objectString) where T : CacheBase
+        {
+            return JsonConvert.DeserializeObject<T>(objectString);
+        }
+
+        public static string ConvertToString<T>(this T jsonObject) where T : CacheBase
+        {
+            return JsonConvert.SerializeObject(jsonObject);
+        }
+    }
+}
