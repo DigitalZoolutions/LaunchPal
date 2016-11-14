@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using LaunchPal.Manager;
 using Xamarin.Forms;
 using LaunchPal.Extension;
+using LaunchPal.ExternalApi.LaunchLibrary.JsonObject;
 using LaunchPal.Helper;
+using LaunchPal.Model;
 using LaunchPal.Properties;
+using LaunchPal.Template;
 
 namespace LaunchPal.ViewModel
 {
@@ -15,6 +19,7 @@ namespace LaunchPal.ViewModel
         public event PropertyChangedEventHandler PropertyChanged;
 
         public int LaunchId { get; set; }
+
         public string LaunchTimerText
         {
             get { return _launchTimerText; }
@@ -26,24 +31,41 @@ namespace LaunchPal.ViewModel
         }
 
         public string LaunchName { get; set; }
-        public string LaunchesThisWeek { get; set; }
-        public string LaunchesThisMonth { get; set; }
+        public string LaunchesThisWeekLabel { get; set; }
+        public List<LaunchData> LaunchesThisWeek { get; set; }
+        public string LaunchesThisMonthLabel { get; set; }
+        public List<LaunchData> LaunchesThisMonth { get; set; }
         public string CurrentMonth { get; set; }
+        public ListView TrackedLaunches { get; set; }
+        public ErrorViewModel Error { get; set; }
 
         private DateTime _endDate;
         private string _launchTimerText;
 
         public OverviewViewModel()
         {
+            Launch nextLaunch = new Launch();
+            List<LaunchData> upcomingLaunches = new List<LaunchData>();
+            try
+            {
+                nextLaunch = CacheManager.TryGetNextLaunch().Result.Launch;
+                upcomingLaunches = CacheManager.TryGetUpcomingLaunches().Result;
+            }
+            catch (Exception ex)
+            {
+                Error = new ErrorViewModel(ex);
+            }
+
             Device.StartTimer(TimeSpan.FromMilliseconds(100), OnTimerTick);
-            var nextLaunch = CacheManager.TryGetNextLaunch().Launch;
-            LaunchName = nextLaunch.Name;
-            LaunchId = nextLaunch.Id;
-            _endDate = TimeConverter.DetermineTimeSettings(nextLaunch.Net, App.Settings.UseLocalTime);
-            var upcomingLaunches = CacheManager.TryGetUpcomingLaunches();
+            LaunchName = nextLaunch?.Name;
+            LaunchId = nextLaunch?.Id ?? 0;
+            _endDate = TimeConverter.DetermineTimeSettings(nextLaunch?.Net ?? DateTime.MinValue, App.Settings.UseLocalTime);
             CurrentMonth = "Launches in " + DateTime.Now.NameOfMonth();
-            LaunchesThisWeek = upcomingLaunches.FindAll(x => x.Launch.Net > DateTime.Now.MondayOfWeek() && x.Launch.Net < DateTime.Now.MondayOfWeek().AddDays(7)).Count.ToString();
-            LaunchesThisMonth = upcomingLaunches.FindAll(x => x.Launch.Net > DateTime.Now.FirstDayOfMonth() && x.Launch.Net < DateTime.Now.LastDayOfMonth()).Count.ToString();
+            LaunchesThisWeek = upcomingLaunches.FindAll(x => x.Launch.Net > DateTime.Now.MondayOfWeek() && x.Launch.Net < DateTime.Now.MondayOfWeek().AddDays(7));
+            LaunchesThisMonth = upcomingLaunches.FindAll(x => x.Launch.Net > DateTime.Now.FirstDayOfMonth() && x.Launch.Net < DateTime.Now.LastDayOfMonth());
+            LaunchesThisWeekLabel = LaunchesThisWeek.Count.ToString();
+            LaunchesThisMonthLabel = LaunchesThisMonth.Count.ToString();
+            TrackedLaunches = new SearchListTemplate(TrackingManager.TryGetTrackedLaunches());
         }
 
         private bool OnTimerTick()

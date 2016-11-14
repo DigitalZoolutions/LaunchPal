@@ -10,9 +10,9 @@ namespace LaunchPal.Interface
 {
     public interface INotify
     {
-        void AddNotification(Launch launch);
+        void AddNotification(LaunchData launch);
 
-        void UpdateNotification(int index);
+        void UpdateNotification(LaunchData launch);
 
         void DeleteNotification(int index);
 

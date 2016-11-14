@@ -17,9 +17,9 @@ namespace LaunchPal.Template
             List<MenuItem> data = new MenuListData();
             this.ItemsSource = data;
             this.VerticalOptions = LayoutOptions.FillAndExpand;
-            this.BackgroundColor = Color.Transparent;
+            this.BackgroundColor = Theme.NavBackgroundColor;
             this.SeparatorColor = Color.Black;
-            this.Margin = new Thickness(10);
+            this.Margin = new Thickness(5);
 
             var menuDataTemplate = new DataTemplate(() =>
             {
@@ -27,6 +27,7 @@ namespace LaunchPal.Template
                 {
                     VerticalOptions = LayoutOptions.Center,
                     HeightRequest = 30,
+                    Margin = new Thickness(0, 0, 10, 0)
                 };
                 var pageLabel = new Label
                 {
@@ -51,10 +52,10 @@ namespace LaunchPal.Template
 
                 var menuFrame = new Frame
                 {
-                    OutlineColor = Theme.FrameColor,
-                    BackgroundColor = Theme.FrameColor,
+                    OutlineColor = Theme.NavBackgroundColor,
+                    BackgroundColor = Theme.NavBackgroundColor,
                     VerticalOptions = LayoutOptions.Center,
-                    Padding = new Thickness(5),
+                    Padding = new Thickness(10),
                     Content = layout
                 };
 

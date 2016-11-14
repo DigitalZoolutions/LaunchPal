@@ -5,24 +5,19 @@ using System.Text;
 using System.Threading.Tasks;
 using LaunchPal.Interface;
 using LaunchPal.Model;
+using LaunchPal.View.HelperPages;
 using LaunchPal.ViewModel;
 using Xamarin.Forms;
 
 namespace LaunchPal.View
 {
-    class Web : WaitingPage
+    class Web : ContentPage
     {
         public Web(string urlString, LaunchViewModel launchData)
         {
             Title = "Web View";
 
-            this.SizeChanged += (sender, args) =>
-            {
-                if (Device.Idiom != TargetIdiom.Desktop)
-                    SetContent(urlString, launchData);
-            };
-
-            SetContent(urlString, launchData);
+            Content = GeneratePageContent(urlString, launchData);
         }
 
         protected override void OnDisappearing()
@@ -32,63 +27,11 @@ namespace LaunchPal.View
                 webView.Source = "about:blank";
         }
 
-
-
-        private void SetContent(string urlString, LaunchViewModel launchData)
-        {
-            var orientation = DependencyService.Get<IDeviceOrientation>().GetOrientation();
-
-            if (Device.Idiom == TargetIdiom.Desktop)
-            {
-                Content = ReturnDesktopView(urlString, launchData);
-            }
-            else if (orientation == DeviceOrientations.Portrait)
-            {
-                Content = ReturnDesktopView(urlString, launchData);
-                //Content = ReturnMobileDetailsView(urlString, launchData);
-            }
-            else
-            {
-                Content = ReturnMobileFullScreenView(urlString, launchData);
-            }
-        }
-
-        private Xamarin.Forms.View ReturnMobileDetailsView(string urlString, LaunchViewModel launchData)
-        {
-            //TODO set specific view for mobile portrait
-            var webView = new WebView
-            {
-                Source = urlString
-            };
-
-            return webView;
-        }
-
-        private static Xamarin.Forms.View ReturnMobileFullScreenView(string urlString, LaunchViewModel launchData)
+        private  Xamarin.Forms.View GeneratePageContent(string urlString, LaunchViewModel launchData)
         {
             var webView = new WebView
             {
                 Source = urlString
-            };
-
-            return webView;
-        }
-
-        private  Xamarin.Forms.View ReturnDesktopView(string urlString, LaunchViewModel launchData)
-        {
-            var webView = new WebView
-            {
-                Source = urlString
-            };
-
-            webView.Navigating += (sender, args) =>
-            {
-                this.IsWaiting = true;
-            };
-
-            webView.Navigated += (sender, args) =>
-            {
-                this.IsWaiting = false;
             };
 
             var launchInfo = new Grid
@@ -124,11 +67,6 @@ namespace LaunchPal.View
             layout.Children.Add(launchInfo, 0, 1);
 
             return layout;
-        }
-
-        private double GetHeightFromWidthBasedOnAspect169()
-        {
-            return this.Width*0.5625;
         }
     }
 }

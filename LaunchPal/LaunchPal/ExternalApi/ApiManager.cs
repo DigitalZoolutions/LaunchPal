@@ -5,10 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using LaunchPal.ExternalApi.LaunchLibrary.JsonObject;
 using LaunchPal.ExternalApi.LaunchLibrary.Request;
+using LaunchPal.ExternalApi.LaunchPal.JsonObject;
+using LaunchPal.ExternalApi.LaunchPal.Request;
+using LaunchPal.ExternalApi.OpenWeatherMap.JsonObject;
+using LaunchPal.ExternalApi.OpenWeatherMap.Request;
 
 namespace LaunchPal.ExternalApi
 {
-    class ApiManager
+    public class ApiManager
     {
         /// <summary>
         /// Returns the next launch closest by date
@@ -94,6 +98,17 @@ namespace LaunchPal.ExternalApi
         public static async Task<Mission> MissionByLaunchId(int id)
         {
             return await GetMission.NextMissionByLaunchId(id);
+        }
+
+        /// <summary>
+        /// Get weather forecast based on gps coordinates
+        /// </summary>
+        /// <param name="latitudeString">Latitude Coordinates</param>
+        /// <param name="longitudeString">Longitude Coordinates</param>
+        /// <returns>Returns a weather forecast object</returns>
+        public static async Task<Forecast> GetForecastByCoordinates(string latitude, string longitude)
+        {
+            return await GetForecast.GetForecastByCoordinates(latitude, longitude);
         }
     }
 }

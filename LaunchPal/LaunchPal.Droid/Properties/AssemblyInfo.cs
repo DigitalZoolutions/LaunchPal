@@ -9,7 +9,7 @@ using Android.App;
 [assembly: AssemblyTitle("LaunchPal.Droid")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Digitalzoolutions")]
 [assembly: AssemblyProduct("LaunchPal.Droid")]
 [assembly: AssemblyCopyright("Copyright ©  2014")]
 [assembly: AssemblyTrademark("")]

@@ -38,6 +38,7 @@ namespace LaunchPal.Helper
             return date1 < date2.Subtract(diff) && date1 > date2.Subtract(-diff);
         }
 
+
         private static DateTime CheckTimeSettings(DateTime time, bool useLocalTime)
         {
             if (!useLocalTime)

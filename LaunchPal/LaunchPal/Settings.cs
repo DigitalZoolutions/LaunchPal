@@ -12,35 +12,45 @@ namespace LaunchPal
 {
     public class Settings : CacheBase
     {
-        private Tile _tileData;
+        private SimpleLaunchData _simpleLaunchDataData;
         public Theme.AppTheme AppTheme { get; set; } = Theme.AppTheme.Light;
         public bool UseLocalTime { get; set; } = true;
-        public bool SuccessfullIAP { get; set; } = true;
+        public bool SuccessfullIap => DependencyService.Get<ICheckPurchase>().HasPurchasedPlus();
+        public bool UseNextLaunchOnTile => _simpleLaunchDataData == null || _simpleLaunchDataData.Net < DateTime.Now;
+        public bool NextLaunchNotifications { get; set; } = true;
+        public int NotifyBeforeLaunch { get; set; } = 30;
+        public bool AdvanceNotifications { get; set; } = true;
 
-        public bool UseNextLaunchOnTile => _tileData == null || _tileData.Net < DateTime.Now;
-
-        public Tile TileData
+        public SimpleLaunchData SimpleLaunchDataData
         {
             get
             {
                 if (UseNextLaunchOnTile)
                 {
-                    _tileData = new Tile(CacheManager.TryGetNextLaunch());
-                    return _tileData;
+                    try
+                    {
+                        _simpleLaunchDataData = new SimpleLaunchData(CacheManager.TryGetNextLaunch().Result);
+                    }
+                    catch (Exception)
+                    {
+                        _simpleLaunchDataData = new SimpleLaunchData
+                        {
+                            LaunchId = 0,
+                            Name = "Could not load launch",
+                            Message = "The requested launch could not be loaded, please check connection and try again.",
+                            Net = DateTime.Now
+                        };
+                    }
+                    
+                    return _simpleLaunchDataData;
                 }
                 else
                 {
-                    return _tileData;
+                    return _simpleLaunchDataData;
                 }
                 
             }
-            set { _tileData = value; }
-        }
-
-        public int NotifyBeforeLaunch { get; set; } = 30;
-
-        public Settings()
-        {
+            set { _simpleLaunchDataData = value; }
         }
 
         public static Settings LoadCache()

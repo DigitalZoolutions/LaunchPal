@@ -13,17 +13,12 @@ namespace LaunchPal.UWP.Helper
 {
     internal class NotificationImplementation : INotify
     {
-        public NotificationImplementation()
-        {
-            
-        }
-
-        public void AddNotification(Launch launch)
+        public void AddNotification(LaunchData launch)
         {
             throw new NotImplementedException();
         }
 
-        public void UpdateNotification(int index)
+        public void UpdateNotification(LaunchData launch)
         {
             throw new NotImplementedException();
         }

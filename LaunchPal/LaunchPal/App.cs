@@ -53,5 +53,6 @@ namespace LaunchPal
         {
             // Handle when your app resumes
         }
+
     }
 }

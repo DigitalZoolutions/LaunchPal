@@ -10,9 +10,15 @@ namespace LaunchPal.View
 {
     class MapPage : ContentPage
     {
-        public MapPage(double latitude, double longitude)
+        public MapPage(string latitudeString, string longitudeString)
         {
             Title = "Launch Site";
+
+            double latitude;
+            double longitude;
+
+            double.TryParse(latitudeString, out latitude);
+            double.TryParse(longitudeString, out longitude);
 
             var position = new Position(latitude, longitude);
 

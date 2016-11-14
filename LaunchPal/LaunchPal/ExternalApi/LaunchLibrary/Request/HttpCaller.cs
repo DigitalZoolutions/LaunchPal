@@ -35,16 +35,6 @@ namespace LaunchPal.ExternalApi.LaunchLibrary.Request
                 var requestTask = client.GetAsync(url);
                 var resultMessage = Task.Run(() => requestTask);
 
-                try
-                {
-                    if (resultMessage.Result == null)
-                        return null;
-                }
-                catch (Exception)
-                {
-                    return null;
-                }
-
                 var response = resultMessage.Result;
                 
                 if (response.IsSuccessStatusCode)

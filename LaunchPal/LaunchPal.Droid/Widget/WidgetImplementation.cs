@@ -20,21 +20,21 @@ namespace LaunchPal.Droid.Widget
 {
     internal class WidgetImplementation : ICreateTile
     {
-        private static Tile _launchTileData;
+        private static SimpleLaunchData _launchSimpleLaunchDataData;
 
         public void SetLaunch()
         {
-            _launchTileData = App.Settings.TileData;
+            _launchSimpleLaunchDataData = App.Settings.SimpleLaunchDataData;
         }
 
-        public Tile GetLaunch()
+        public SimpleLaunchData GetLaunch()
         {
-            if (_launchTileData != null)
-                return _launchTileData;
+            if (_launchSimpleLaunchDataData != null)
+                return _launchSimpleLaunchDataData;
 
             SetLaunch();
 
-            return _launchTileData;
+            return _launchSimpleLaunchDataData;
         }
     }
 }

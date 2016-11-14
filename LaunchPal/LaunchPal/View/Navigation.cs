@@ -27,13 +27,12 @@ namespace LaunchPal.View
             var menuLabel = new ContentView()
             {
                 VerticalOptions = LayoutOptions.Start,
-                Padding = new Thickness(10, 36, 0, 5),
+                Padding = new Thickness(15, 10, 0, 0),
                 Content = new Label
                 {
                     TextColor = Theme.HeaderColor,
-                    FontAttributes = FontAttributes.Bold,
-                    Text = "MENU",
-                    FontSize = 30
+                    Text = "Menu",
+                    FontSize = 22
                 }
             };
 

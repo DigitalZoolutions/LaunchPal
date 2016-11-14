@@ -1,5 +1,6 @@
 ﻿using System;
 using LaunchPal.Helper;
+using LaunchPal.ViewModel;
 using Xamarin.Forms;
 using MenuItem = LaunchPal.Model.MenuItem;
 
@@ -9,21 +10,29 @@ namespace LaunchPal.View
     {
         public MainPage()
         {
-            this.BackgroundColor = Theme.BackgroundColor;
+            BackgroundColor = Theme.BackgroundColor;
             var navPage = new Navigation();
             navPage.Menu.ItemTapped += (sender, arg) => NavigateTo((arg.Item as MenuItem)?.TargetType);
+            NavigationPage.SetHasNavigationBar(this, false);
             Master = navPage;
             Detail = new NavigationPage(new Overview())
             {
+                BackgroundColor = Theme.BackgroundColor,
                 BarBackgroundColor = Theme.NavBackgroundColor,
                 BarTextColor = Theme.HeaderColor,
-                BackgroundColor = Theme.BackgroundColor
             };
         }
 
         internal void NavigateTo(Type pageType)
         {
             Page page = (Page) Activator.CreateInstance(pageType);
+
+            SetPage(page);
+        }
+
+        internal void NavigateTo(Type pageType, ErrorViewModel error)
+        {
+            Page page = (Page)Activator.CreateInstance(pageType, error);
 
             SetPage(page);
         }
@@ -50,7 +59,7 @@ namespace LaunchPal.View
 
         public void ReloadAllPages()
         {
-            this.BackgroundColor = Theme.BackgroundColor;
+            BackgroundColor = Theme.BackgroundColor;
             var navPage = new Navigation();
             navPage.Menu.ItemTapped += (sender, arg) => NavigateTo((arg.Item as MenuItem)?.TargetType);
             Master = navPage;

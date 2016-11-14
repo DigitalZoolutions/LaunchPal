@@ -13,18 +13,18 @@ namespace LaunchPal.UWP.Helper
     {
         public void SetLaunch()
         {
-            var tileNotification = CreateLiveTile(LaunchPal.App.Settings.TileData);
+            var tileNotification = CreateLiveTile(LaunchPal.App.Settings.SimpleLaunchDataData);
             TileUpdateManager.CreateTileUpdaterForApplication().Update(tileNotification);
         }
 
-        private TileNotification CreateLiveTile(Tile tileInformation)
+        private TileNotification CreateLiveTile(SimpleLaunchData simpleLaunchDataInformation)
         {
             var tileXml = TileUpdateManager.GetTemplateContent(TileTemplateType.TileSquare150x150PeekImageAndText01);
 
             var tileTextAttributes = tileXml.GetElementsByTagName("text");
-            tileTextAttributes[0].InnerText = tileInformation.Name;
-            tileTextAttributes[1].InnerText = tileInformation.Message;
-            tileTextAttributes[2].InnerText = $"{tileInformation.Net.Day}-{tileInformation.Net.Month}-{tileInformation.Net.Year} {tileInformation.Net.Hour}:{tileInformation.Net.Minute}";
+            tileTextAttributes[0].InnerText = simpleLaunchDataInformation.Name;
+            tileTextAttributes[1].InnerText = simpleLaunchDataInformation.Message ?? "No mission description";
+            tileTextAttributes[2].InnerText = $"{simpleLaunchDataInformation.Net.Day}-{simpleLaunchDataInformation.Net.Month}-{simpleLaunchDataInformation.Net.Year} {simpleLaunchDataInformation.Net.Hour}:{simpleLaunchDataInformation.Net.Minute}";
 
 
             var tileImageAttributes = tileXml.GetElementsByTagName("image");
@@ -34,9 +34,9 @@ namespace LaunchPal.UWP.Helper
             var wideTileXml = TileUpdateManager.GetTemplateContent(TileTemplateType.TileWide310x150PeekImage02);
 
             var wideTileTextAttributes = wideTileXml.GetElementsByTagName("text");
-            wideTileTextAttributes[0].AppendChild(wideTileXml.CreateTextNode(tileInformation.Name));
-            wideTileTextAttributes[1].AppendChild(wideTileXml.CreateTextNode(tileInformation.Message));
-            wideTileTextAttributes[2].AppendChild(wideTileXml.CreateTextNode(tileInformation.Net.ToString(CultureInfo.CurrentCulture)));
+            wideTileTextAttributes[0].AppendChild(wideTileXml.CreateTextNode(simpleLaunchDataInformation.Name));
+            wideTileTextAttributes[1].AppendChild(wideTileXml.CreateTextNode(simpleLaunchDataInformation.Message ?? "No mission description"));
+            wideTileTextAttributes[2].AppendChild(wideTileXml.CreateTextNode(simpleLaunchDataInformation.Net.ToString(CultureInfo.CurrentCulture)));
 
             var wideTileImageAttributes = wideTileXml.GetElementsByTagName("image");
             ((XmlElement)wideTileImageAttributes[0]).SetAttribute("src", "ms-appx:///assets/Wide310x150Logo.scale-200.png");
@@ -45,7 +45,7 @@ namespace LaunchPal.UWP.Helper
             var node = tileXml.ImportNode(wideTileXml.GetElementsByTagName("binding").Item(0), true);
             tileXml.GetElementsByTagName("visual")?.Item(0)?.AppendChild(node);
 
-            return new TileNotification(tileXml) { ExpirationTime = tileInformation.Net };
+            return new TileNotification(tileXml) { ExpirationTime = simpleLaunchDataInformation.Net };
         }
     }
 }

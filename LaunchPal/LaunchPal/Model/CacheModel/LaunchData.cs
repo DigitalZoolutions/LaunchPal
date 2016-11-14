@@ -8,7 +8,8 @@ namespace LaunchPal.Model.CacheModel
 {
     public class LaunchData : CacheBase
     {
-        public LaunchPair NextLaunch { get; set; }
+        public Model.LaunchData NextLaunch { get; set; }
         public LaunchRangeList LaunchRangeList { get; set; }
+        public List<Model.LaunchData> TrackedLaunches { get; set; }
     }
 }

@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using LaunchPal.CustomElement;
 using LaunchPal.Helper;
+using LaunchPal.Interface;
+using LaunchPal.Manager;
+using LaunchPal.Model;
 using LaunchPal.ViewModel;
 using Xamarin.Forms;
 
@@ -26,6 +29,12 @@ namespace LaunchPal.View
             BackgroundColor = Theme.BackgroundColor;
             Padding = 10;
 
+            if (Context.Error != null)
+            {
+                Content = Context.Error.GenerateErrorView(this);
+                return;
+            }
+
             GenerateGrid();
             PopulateGrid();
 
@@ -40,11 +49,36 @@ namespace LaunchPal.View
             SetLaunchesThisWeek();
             SetLaunchesThisMonth();
             SetLaunchPalPlusButton();
+            SetTrackedLaunches();
+        }
+
+        private void SetTrackedLaunches()
+        {
+            if (Context.TrackedLaunches.ItemsSource != null)
+            {
+                _pageGrid.Children.Add(Context.TrackedLaunches, 0, 5);
+                Grid.SetColumnSpan(Context.TrackedLaunches, 6);
+            }
+            else
+            {
+                var noTrackedLaunchLabel = new Label
+                {
+                    HorizontalTextAlignment = TextAlignment.Center,
+                    VerticalTextAlignment = TextAlignment.Center,
+                    Text = "No launches tracked at this time.",
+                    TextColor = Theme.TextColor
+                };
+                _pageGrid.Children.Add(noTrackedLaunchLabel, 0, 5);
+                Grid.SetColumnSpan(noTrackedLaunchLabel, 6);
+            }        
         }
 
         private void SetLaunchPalPlusButton()
         {
-            if (App.Settings.SuccessfullIAP)
+            var test1 = App.Settings.SuccessfullIap;
+            var test2 = DependencyService.Get<ICheckPurchase>().CanPurchasePlus() == false;
+
+            if (test1 || test2)
                 return;
 
             var launchPalPlusButton = new Button
@@ -64,11 +98,12 @@ namespace LaunchPal.View
             var launchThisMonthLabel = new Label { HorizontalTextAlignment = TextAlignment.Center, TextColor = Theme.TextColor};
             launchThisMonthLabel.SetBinding(Label.TextProperty, new Binding("CurrentMonth"));
             var launchesThisMonthLabel = new Label { HorizontalTextAlignment = TextAlignment.Center, FontAttributes = FontAttributes.Bold, TextColor = Theme.LinkColor};
-            launchesThisMonthLabel.SetBinding(Label.TextProperty, new Binding("LaunchesThisMonth"));
+            launchesThisMonthLabel.SetBinding(Label.TextProperty, new Binding("LaunchesThisMonthLabel"));
             var launchesThisMonthFrame = new MarginFrame(10, Theme.BackgroundColor)
             {
                 Content = new Frame()
                 {
+                    GestureRecognizers = { NavigateToPageWhenTaped(typeof(Search), Context.LaunchesThisMonth) },
                     BackgroundColor = Theme.FrameColor,
                     OutlineColor = Theme.FrameBorderColor,
                     Content = new StackLayout
@@ -101,21 +136,22 @@ namespace LaunchPal.View
                 TextColor = Theme.LinkColor
             };
 
-            launchesThisMonthLabel.SetBinding(Label.TextProperty, new Binding("LaunchesThisWeek"));
+            launchesThisMonthLabel.SetBinding(Label.TextProperty, new Binding("LaunchesThisWeekLabel"));
 
             var launchesThisMonthFrame = new MarginFrame(10, Theme.BackgroundColor)
             {
                 Content = new Frame()
                 {
+                    GestureRecognizers = { NavigateToPageWhenTaped(typeof(Search), Context.LaunchesThisWeek) },
                     BackgroundColor = Theme.FrameColor,
                     OutlineColor = Theme.FrameBorderColor,
                     Content = new StackLayout
                     {
                         Children =
-                    {
-                        launchThisMonthLabel,
-                        launchesThisMonthLabel
-                    }
+                        {
+                            launchThisMonthLabel,
+                            launchesThisMonthLabel
+                        }
                     }
                 }
             };
@@ -182,6 +218,24 @@ namespace LaunchPal.View
             return tapGestureRecognizer;
         }
 
+        private TapGestureRecognizer NavigateToPageWhenTaped(Type page, List<LaunchData> launches)
+        {
+            var tapGestureRecognizer = new TapGestureRecognizer();
+            tapGestureRecognizer.Tapped += (s, e) => {
+
+                var displayPage = (Page)Activator.CreateInstance(page, launches);
+
+                var root = this.Parent.Parent as MainPage;
+
+                if (root?.GetType() != typeof(MainPage))
+                    return;
+
+                root.NavigateTo(displayPage);
+            };
+
+            return tapGestureRecognizer;
+        }
+
         private void GenerateGrid()
         {
             Grid newGrid = new Grid();
@@ -191,7 +245,7 @@ namespace LaunchPal.View
                 newGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             }
 
-            for (int i = 0; i < 11; i++)
+            for (int i = 0; i < 12; i++)
             {
                 newGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) });
             }

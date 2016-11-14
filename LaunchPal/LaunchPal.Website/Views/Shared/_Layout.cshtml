@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaunchPal - The premier rocket launch tracker</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+</head>
+<body>
+    <div class="container body-content" ng-app="myApp">
+        @RenderBody()
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    <!-- Added the Angular bundle in the template -->
+    @Scripts.Render("~/bundles/angularLibrary")
+    @Scripts.Render("~/bundles/angularApp")
+    @Scripts.Render("~/bundles/toastr")
+
+    @RenderSection("scripts", required: false)
+</body>
+</html>

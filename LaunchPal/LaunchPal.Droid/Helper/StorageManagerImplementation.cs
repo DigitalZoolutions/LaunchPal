@@ -19,9 +19,9 @@ using Environment = System.Environment;
 
 namespace LaunchPal.Droid.Helper
 {
-    class StorageManagerImplementation : IStoreCache
+    internal class StorageManagerImplementation : IStoreCache
     {
-        public async Task<bool> SaveCache(string objectToStore, CacheType type)
+        public Task<bool> SaveCache(string objectToStore, CacheType type)
         {
             var fileName = FileNameFromCacheType(type);
 
@@ -30,11 +30,11 @@ namespace LaunchPal.Droid.Helper
                 var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
                 var filePath = Path.Combine(documentsPath, fileName);
                 File.WriteAllText(filePath, objectToStore);
-                return true;
+                return Task.FromResult(true);
             }
             catch (Exception)
             {
-                return false;
+                return Task.FromResult(false);
             }
         }
 
@@ -56,7 +56,7 @@ namespace LaunchPal.Droid.Helper
             }
         }
 
-        public async Task<string> LoadCache(CacheType type)
+        public Task<string> LoadCache(CacheType type)
         {
             var fileName = FileNameFromCacheType(type);
             
@@ -65,16 +65,16 @@ namespace LaunchPal.Droid.Helper
                 var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
                 var filePath = Path.Combine(documentsPath, fileName);
                 return File.Exists(filePath) ?
-                    File.ReadAllText(filePath) :
-                    "";
+                    Task.FromResult(File.ReadAllText(filePath)) :
+                    Task.FromResult("");
             }
             catch (Exception)
             {
-                return "";
+                return Task.FromResult("");
             }
         }
 
-        public async Task ClearCache()
+        public Task ClearCache()
         {
             var fileName = FileNameFromCacheType(CacheType.LaunchData);
             var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
@@ -90,6 +90,8 @@ namespace LaunchPal.Droid.Helper
             documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
             filePath = Path.Combine(documentsPath, fileName);
             File.WriteAllText(filePath, "");
+
+            return Task.CompletedTask;
         }
 
         private static string FileNameFromCacheType(CacheType type)

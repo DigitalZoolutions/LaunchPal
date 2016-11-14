@@ -1,0 +1,67 @@
+﻿<!DOCTYPE html>
+<div class="jumbotron">
+    <div class="row text-center">
+        <p class="lead">{{Launch.name}} {{LoadMessage}}</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3 text-center">
+            <h2>{{day}}</h2>
+            <b>Days</b>
+        </div>
+        <div class="col-md-3 text-center">
+            <h2>{{hour}}</h2>
+            <b>Hours</b>
+        </div>
+        <div class="col-md-3 text-center">
+            <h2>{{minute}}</h2>
+            <b>Minutes</b>
+        </div>
+        <div class="col-md-3 text-center">
+            <h2>{{second}}</h2>
+            <b>Seconds</b>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 text-center">
+        <h3>Rocket information</h3>
+        <br />
+        <b>Name</b><br />
+        {{Launch.rocket.name}}<br /><br />
+        <b>Configuration</b><br />
+        {{Launch.rocket.configuration}}<br /><br />
+        <b>Family</b><br />
+        {{Launch.rocket.familyname}}<br /><br />
+    </div>
+
+    <div class="col-md-4 col-md-push-4 text-center">
+        <h3>Other information</h3>
+        <br />
+        <b>Launching from</b><br />
+        {{Launch.location.pads[0].name}}<br /><br />
+        <b>Pad agency</b><br />
+        {{Launch.location.pads[0].agencies[0].name}}<br /><br />
+        <b>Rocket agency</b><br />
+        {{Launch.rocket.agencies[0].name}}<br /><br />
+    </div>
+
+    <div class="col-md-4 col-md-pull-4 text-center">
+        <h3>Launchpal App</h3>
+        <br />
+        <div class="row">
+            <div class="col-md-6">
+                Out now!
+                <br /><br/>
+                <a href="https://www.microsoft.com/en-us/store/p/launchpal/9nblggh1xvhk" target="_blank"><img class="img-responsive" style="margin: 0 auto;" src="~/Pictures/windows-ad.png" /></a><br />
+            </div>
+            <div class="col-md-6">
+                Comming soon!
+                <a href="~/Home/Android" target="_blank"><img class="img-responsive" style="margin: 0 auto;" src="~/Pictures/android-ad.png" /></a><br />
+            </div>
+        </div>
+        <p>Get the latest information, reminders and view launches live! The app supports all Windows 10 devices such as desktop, mobile and Xbox One!</p>
+        <p><a href="/#/Privacy" >Privacy Policy</a></p>
+    </div>
+</div>
