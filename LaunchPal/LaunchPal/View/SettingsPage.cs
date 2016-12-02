@@ -12,9 +12,9 @@ using Xamarin.Forms;
 
 namespace LaunchPal.View
 {
-    internal class Settings : ContentPage
+    internal class SettingsPage : ContentPage
     {
-        public Settings()
+        public SettingsPage()
         {
             Title = "Settings";
             
@@ -44,16 +44,16 @@ namespace LaunchPal.View
             grid.Children.Add(new Label { Text = "Select the theme for the app", TextColor = Theme.TextColor, VerticalTextAlignment = TextAlignment.Center }, 1, 0);
             grid.Children.Add(GenerateLocalTimeToggle(), 0, 1);
             grid.Children.Add(new Label { Text = "Switch between using the device time or UTC", TextColor = Theme.TextColor, VerticalTextAlignment = TextAlignment.Center }, 1, 1);
-            grid.Children.Add(GenerateNotificationToggle(), 0, 2);
+            grid.Children.Add(GenerateNextLaunchNotificationToggle(), 0, 2);
             grid.Children.Add(new Label { Text = "Notify me 5 minutes before a rocket is scheduled to launch", TextColor = Theme.TextColor, VerticalTextAlignment = TextAlignment.Center }, 1, 2);
-            grid.Children.Add(GenerateAdvanceNotificationToggle(), 0, 3);
+            grid.Children.Add(GenerateTrackLaunchNotificationToggle(), 0, 3);
             grid.Children.Add(new Label { Text = "Extra notification for tracked launches", TextColor = Theme.TextColor, VerticalTextAlignment = TextAlignment.Center }, 1, 3);
             grid.Children.Add(GenerateNotifyBeforeLaunchTimePicker(), 0, 4);
             grid.Children.Add(new Label { Text = "Select when you want a extra reminder for a tracked launch", TextColor = Theme.TextColor, VerticalTextAlignment = TextAlignment.Center }, 1, 4);
             grid.Children.Add(GenerateClearCacheButton(), 0, 5);
             grid.Children.Add(new Label { Text = "Clear the app-cache", TextColor = Theme.TextColor, VerticalTextAlignment = TextAlignment.Center }, 1, 5);
-            grid.Children.Add(GenerateClearTrackingButton(), 0, 5);
-            grid.Children.Add(new Label { Text = "Clear all tracked launches and notifications", TextColor = Theme.TextColor, VerticalTextAlignment = TextAlignment.Center }, 1, 5);
+            grid.Children.Add(GenerateClearTrackingButton(), 0, 6);
+            grid.Children.Add(new Label { Text = "Clear all tracked launches and notifications", TextColor = Theme.TextColor, VerticalTextAlignment = TextAlignment.Center }, 1, 6);
 
             view.Content = new MarginFrame(10)
             {
@@ -63,7 +63,7 @@ namespace LaunchPal.View
             return view;
         }
 
-        private static StackLayout GenerateAdvanceNotificationToggle()
+        private static StackLayout GenerateTrackLaunchNotificationToggle()
         {
             var toggleStack = new StackLayout();
 
@@ -83,7 +83,18 @@ namespace LaunchPal.View
                 if (sender.GetType() != typeof(Switch))
                     return;
 
-                App.Settings.AdvanceNotifications = (sender as Switch)?.IsToggled ?? true;
+                var isToggled = (sender as Switch)?.IsToggled ?? true;
+
+                if (isToggled)
+                {
+                    App.Settings.TrackedLaunchNotifications = true;
+                    TrackingManager.GenerateNotificationsForAllTrackedLaunches();
+                }
+                else
+                {
+                    App.Settings.TrackedLaunchNotifications = false;
+                    DependencyService.Get<INotify>().ClearNotifications(NotificationType.TrackedLaunch);
+                }
             };
 
             toggleStack.Children.Add(label);
@@ -92,7 +103,7 @@ namespace LaunchPal.View
             return toggleStack;
         }
 
-        private static StackLayout GenerateNotificationToggle()
+        private static StackLayout GenerateNextLaunchNotificationToggle()
         {
             var toggleStack = new StackLayout();
 
@@ -107,12 +118,23 @@ namespace LaunchPal.View
                 IsToggled = App.Settings.UseLocalTime,
             };
 
-            toggle.Toggled += (sender, args) =>
+            toggle.Toggled += async (sender, args) =>
             {
                 if (sender.GetType() != typeof(Switch))
                     return;
 
-                App.Settings.NextLaunchNotifications = (sender as Switch)?.IsToggled ?? true;
+                var isToggled = (sender as Switch)?.IsToggled ?? true;
+
+                if (isToggled)
+                {
+                    App.Settings.NextLaunchNotifications = true;
+                    DependencyService.Get<INotify>().AddNotification(await CacheManager.TryGetNextLaunch(), NotificationType.NextLaunch);
+                }
+                else
+                {
+                    App.Settings.NextLaunchNotifications = false;
+                    DependencyService.Get<INotify>().ClearNotifications(NotificationType.NextLaunch);
+                }
             };
 
             toggleStack.Children.Add(label);
@@ -235,6 +257,7 @@ namespace LaunchPal.View
             button.Clicked += (sender, args) =>
             {
                 TrackingManager.ClearAllTrackedLaunches();
+                DependencyService.Get<INotify>().ClearNotifications(NotificationType.TrackedLaunch);
             };
 
             return button;

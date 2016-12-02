@@ -49,6 +49,21 @@ namespace LaunchPal.Droid.Widget
             updateViews.SetTextViewText(Resource.Id.bullet, launch.Net.ToString(CultureInfo.CurrentCulture));
             updateViews.SetTextViewText(Resource.Id.creator, launch.Message);
 
+            Intent intent = new Intent(context, typeof(LaunchWidget));
+            intent.SetAction("hej");
+
+            PendingIntent pendingIntent = PendingIntent.GetBroadcast(context, 0, intent, 0);
+            updateViews.SetOnClickPendingIntent(Resource.Id.blog_title,pendingIntent);
+            /*
+            TextView Title = updateViews.
+            AppWidgetManager manager = AppWidgetManager.GetInstance(context);
+            
+            manager.UpdateAppWidget(new ComponentName(this, Class.FromType(typeof(LaunchWidget)).Name), updateViews);
+            *///Intent intent = new Intent(context, typeof(UpdateService));
+            //intent.SetAction("asd")
+            //    PendingIntent pendingIntent = PendingIntent.GetActivity(context, 0, defineIntent, 0);
+            //updateViews.SetOnClickPendingIntent(Resource.Id.widget, pendingIntent);
+
             //// When user clicks on widget, launch to Wiktionary definition page
             //if (!string.IsNullOrEmpty(launch.Link))
             //{

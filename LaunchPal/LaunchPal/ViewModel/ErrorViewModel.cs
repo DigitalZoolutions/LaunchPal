@@ -11,7 +11,7 @@ using Xamarin.Forms;
 
 namespace LaunchPal.ViewModel
 {
-    class ErrorViewModel
+    public class ErrorViewModel
     {
         public Type ExceptionType { get; set; }
         public string ExceptionTitle { get; set; }
@@ -21,7 +21,17 @@ namespace LaunchPal.ViewModel
 
         private List<string> StackTraceList = new List<string>();
 
-        public ErrorViewModel(Exception exception)
+        public ErrorViewModel()
+        {
+            ExceptionType = null;
+            ExceptionTitle = "";
+            ExceptionMessage = "";
+            ExceptionOriginalMessage = "";
+            StackTrace = "";
+            StackTraceList = new List<string>();
+        }
+
+        public void SetError(Exception exception)
         {
             ExceptionType = exception.GetType();
 
@@ -54,14 +64,17 @@ namespace LaunchPal.ViewModel
         {
             Button reportExceptionButton = new Button
             {
-                Text = "Report issue"
+                Text = "Report issue",
+                BackgroundColor = Theme.ButtonBackgroundColor,
+                TextColor = Theme.ButtonTextColor,
+                Margin = new Thickness(10)
             };
 
             reportExceptionButton.Clicked += (sender, args) =>
             {
                 var mainPage = currentPage.Parent.Parent as MainPage;
 
-                mainPage?.NavigateTo(typeof(Feedback), this);
+                mainPage?.NavigateTo(typeof(FeedbackPage), this);
             };
 
             return new MarginFrame(20, Theme.BackgroundColor)

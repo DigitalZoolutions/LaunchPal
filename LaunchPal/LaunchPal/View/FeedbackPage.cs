@@ -13,10 +13,10 @@ using Xamarin.Forms;
 
 namespace LaunchPal.View
 {
-    class Feedback : ContentPage
+    class FeedbackPage : ContentPage
     {
 
-        public Feedback()
+        public FeedbackPage()
         {
             Title = "Feedback";
 
@@ -41,14 +41,6 @@ namespace LaunchPal.View
                 SelectedIndex = 0
             };
 
-
-
-            Entry from = new Entry
-            {
-                Placeholder = "contact@digitalzoolutions.com",
-                Keyboard = Keyboard.Email
-            };
-
             Editor body = new Editor
             {
                 VerticalOptions = LayoutOptions.FillAndExpand,
@@ -56,7 +48,7 @@ namespace LaunchPal.View
 
             sendButton.Clicked += async (sender, args) =>
             {
-                await DependencyService.Get<ISendMail>().SendMail(from.Text, title.Items[title.SelectedIndex], body.Text);
+                await DependencyService.Get<ISendMail>().SendMail(title.Items[title.SelectedIndex], body.Text);
             };
 
             Content = new ScrollView
@@ -69,8 +61,8 @@ namespace LaunchPal.View
                         {
                             new Label { Text = "Subject:", TextColor = Theme.TextColor},
                             title,
-                            new Label { Text = "From:", TextColor = Theme.TextColor},
-                            from,
+                            //new Label { Text = "From:", TextColor = Theme.TextColor},
+                            //from,
                             new Label { Text = "Message:", TextColor = Theme.TextColor},
                             body,
                             sendButton
@@ -84,7 +76,7 @@ namespace LaunchPal.View
         /// Generateds a view for reporting a issue or exception that occured
         /// </summary>
         /// <param name="error">The error view model where the issue is stored</param>
-        public Feedback(ErrorViewModel error)
+        public FeedbackPage(ErrorViewModel error)
         {
             Title = "Send error report";
 
@@ -101,12 +93,6 @@ namespace LaunchPal.View
                 Text = error.ExceptionTitle
             };
 
-            Entry from = new Entry
-            {
-                Placeholder = "contact@digitalzoolutions.com",
-                Keyboard = Keyboard.Email 
-            };
-
             Editor body = new Editor
             {
                 Text = "There were a issue in the app, this is the included information: \n\n" + error.ExceptionOriginalMessage + "\n\n" + error.StackTrace,
@@ -115,7 +101,7 @@ namespace LaunchPal.View
 
             sendButton.Clicked += async (sender, args) =>
             {
-                await DependencyService.Get<ISendMail>().SendMail(from.Text, title.Text, body.Text);
+                await DependencyService.Get<ISendMail>().SendMail(title.Text, body.Text);
             };
 
             Content = new ScrollView
@@ -128,8 +114,8 @@ namespace LaunchPal.View
                         {
                             new Label { Text = "Mail title:", TextColor = Theme.TextColor},
                             title,
-                            new Label { Text = "From:", TextColor = Theme.TextColor},
-                            from,
+                            //new Label { Text = "From:", TextColor = Theme.TextColor},
+                            //from,
                             new Label { Text = "Message:", TextColor = Theme.TextColor},
                             body,
                             sendButton

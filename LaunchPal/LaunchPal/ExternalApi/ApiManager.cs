@@ -9,6 +9,11 @@ using LaunchPal.ExternalApi.LaunchPal.JsonObject;
 using LaunchPal.ExternalApi.LaunchPal.Request;
 using LaunchPal.ExternalApi.OpenWeatherMap.JsonObject;
 using LaunchPal.ExternalApi.OpenWeatherMap.Request;
+using LaunchPal.ExternalApi.PeopleInSpace.Request;
+using LaunchPal.ExternalApi.SpaceNews.JsonObject;
+using LaunchPal.ExternalApi.SpaceNews.Request;
+using LaunchPal.ExternalApi.SpaceNews.XmlObject;
+using LaunchPal.Model;
 
 namespace LaunchPal.ExternalApi
 {
@@ -101,6 +106,16 @@ namespace LaunchPal.ExternalApi
         }
 
         /// <summary>
+        /// Returns a rocket by a rocket ID
+        /// </summary>
+        /// <param name="id">Rocket ID</param>
+        /// <returns>Rocket Object</returns>
+        public static async Task<Rocket> GetRocketById(int id)
+        {
+            return await GetRocket.ById(id);
+        }
+
+        /// <summary>
         /// Get weather forecast based on gps coordinates
         /// </summary>
         /// <param name="latitudeString">Latitude Coordinates</param>
@@ -109,6 +124,34 @@ namespace LaunchPal.ExternalApi
         public static async Task<Forecast> GetForecastByCoordinates(string latitude, string longitude)
         {
             return await GetForecast.GetForecastByCoordinates(latitude, longitude);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static async Task<List<NewsFeed>> GetNewsFromSpaceNews()
+        {
+            var result = await GetSpaceNews.FromSpaceNews();
+
+            return result.Channel.Item.Select(item => new NewsFeed(item)).ToList();
+        }
+
+
+        public static async Task<List<NewsFeed>> GetNewsFromSpaceFlightNow()
+        {
+            var result = await GetSpaceNews.FromSpaceFlightNow();
+
+            return result.Channel.Item.Select(item => new NewsFeed(item)).ToList();
+        }
+
+        public static async Task<PeopleInSpace.JsonObject.PeopleInSpace> GetNumberOfPeopleInSpace()
+        {
+            var result = await GetPeopleInSpace.GetAll();
+
+            result.People = result.People.OrderBy(x => x.DaysInSpace).ToList();
+
+            return result;
         }
     }
 }

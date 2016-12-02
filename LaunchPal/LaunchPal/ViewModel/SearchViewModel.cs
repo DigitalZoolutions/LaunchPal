@@ -13,7 +13,7 @@ using Xamarin.Forms;
 
 namespace LaunchPal.ViewModel
 {
-    class SearchViewModel : INotifyPropertyChanged
+    class SearchViewModel : ErrorViewModel, INotifyPropertyChanged
     {
         private ListView _searchResult;
 

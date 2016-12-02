@@ -6,6 +6,7 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Android.OS;
+using LaunchPal.Droid.Helper;
 
 namespace LaunchPal.Droid
 {
@@ -17,6 +18,8 @@ namespace LaunchPal.Droid
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
             base.OnCreate(bundle);
+
+            NotificationImplementation.Context = this;
 
             var appVersion = $"{PackageManager.GetPackageInfo(PackageName, 0).VersionName}.{PackageManager.GetPackageInfo(PackageName, 0).VersionCode}";
 

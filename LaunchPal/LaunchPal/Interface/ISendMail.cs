@@ -8,6 +8,6 @@ namespace LaunchPal.Interface
 {
     public interface ISendMail
     {
-        Task SendMail(string from, string title, string message);
+        Task SendMail(string title, string message);
     }
 }

@@ -5,33 +5,35 @@ using System.Text;
 using System.Threading.Tasks;
 using LaunchPal.Interface;
 using LaunchPal.Model;
+using LaunchPal.Model.CacheModel;
 using Xamarin.Forms;
 
 namespace LaunchPal.Manager
 {
-    class TrackingManager
+    internal static class TrackingManager
     {
-        private static List<LaunchData> _trackedLaunches = new List<LaunchData>();
+        private static CacheTracking _trackedLaunches = new CacheTracking {TrackingList = new List<LaunchData>()};
 
-        public static List<LaunchData> TryGetTrackedLaunches()
+        public static CacheTracking TryGetTrackedLaunches()
         {
-            foreach (var trackedLaunch in _trackedLaunches)
+            var itemsToRemove = _trackedLaunches.TrackingList
+                .Where(trackedLaunch => DateTime.Now > trackedLaunch.CacheTimeOut)
+                .ToList();
+
+            foreach (var launchToRemove in itemsToRemove)
             {
-                if (DateTime.Now > trackedLaunch.CacheTimeOut)
-                {
-                    _trackedLaunches.Remove(trackedLaunch);
-                }
+                _trackedLaunches.TrackingList.Remove(launchToRemove);
             }
 
-            return _trackedLaunches?.Count > 0 ? _trackedLaunches : new List<LaunchData>();
+            return _trackedLaunches?.TrackingList.Count > 0 ? _trackedLaunches : new CacheTracking { TrackingList = new List<LaunchData>() };
         }
 
         public static bool IsLaunchBeingTracked(int id)
         {
-            return _trackedLaunches.Exists(x => x.Launch.Id == id);
+            return _trackedLaunches.TrackingList.Exists(x => x.Launch.Id == id);
         }
 
-        public static void TrySetTrackedLaunches(List<LaunchData> newTrackingList)
+        public static void TrySetTrackedLaunches(CacheTracking newTrackingList)
         {
             _trackedLaunches = newTrackingList;
         }
@@ -43,8 +45,8 @@ namespace LaunchPal.Manager
             if (launchToTrack == null)
                 return;
 
-            _trackedLaunches.Add(launchToTrack);
-            //DependencyService.Get<INotify>().AddNotification(launchToTrack);
+            _trackedLaunches.TrackingList.Add(launchToTrack);
+            DependencyService.Get<INotify>().AddNotification(launchToTrack, NotificationType.TrackedLaunch);
         }
 
         public static async void RemoveTrackedLaunch(int id)
@@ -54,29 +56,50 @@ namespace LaunchPal.Manager
             if (launchToRemove == null)
                 return;
 
-            _trackedLaunches.Remove(_trackedLaunches.FirstOrDefault(x => x.Launch.Id == launchToRemove.Launch.Id));
-            //DependencyService.Get<INotify>().DeleteNotification(launchToRemove.Launch.Id);
+            _trackedLaunches.TrackingList.Remove(_trackedLaunches.TrackingList.FirstOrDefault(x => x.Launch.Id == launchToRemove.Launch.Id));
+            DependencyService.Get<INotify>().DeleteNotification(launchToRemove.Launch.Id, NotificationType.TrackedLaunch);
         }
 
-        public static void ClearAllTrackedLaunches()
+        public static async void ClearAllTrackedLaunches()
         {
-            _trackedLaunches = new List<LaunchData>();
-            //DependencyService.Get<INotify>().ClearNotifications();
+            _trackedLaunches = new CacheTracking { TrackingList = new List<LaunchData>() };
+            DependencyService.Get<INotify>().ClearNotifications(NotificationType.TrackedLaunch);
+            await DependencyService.Get<IStoreCache>().ClearCache(CacheType.TrackingData);
         }
 
-        public static async void UpdateTrackedLaunch(int id)
+        public static void GenerateNotificationsForAllTrackedLaunches()
         {
-            var launchToTrack = await CacheManager.TryGetLaunchById(id);
-            var trackedLaunch = _trackedLaunches.FirstOrDefault(x => x.Launch.Id == launchToTrack.Launch.Id);
+            foreach (var trackedLaunch in _trackedLaunches.TrackingList)
+            {
+                DependencyService.Get<INotify>().AddNotification(trackedLaunch, NotificationType.TrackedLaunch);
+            }
+        }
 
-            if (launchToTrack == null || trackedLaunch == null)
+        public static void UpdateTrackedLaunches(List<LaunchData> launches)
+        {
+            foreach (var launch in launches)
+            {
+                var trackedLaunch = _trackedLaunches.TrackingList.FirstOrDefault(x => x.Launch.Id == launch?.Launch?.Id);
+
+                if (trackedLaunch == null)
+                    continue;
+
+                trackedLaunch = launch;
+
+                DependencyService.Get<INotify>().UpdateNotification(trackedLaunch, NotificationType.TrackedLaunch);
+            }
+        }
+
+        public static void UpdateTrackedLaunches(LaunchData launch)
+        {
+            var trackedLaunch = _trackedLaunches.TrackingList.FirstOrDefault(x => x.Launch.Id == launch?.Launch?.Id);
+
+            if (trackedLaunch == null)
                 return;
 
-            if (launchToTrack.Launch.Net != trackedLaunch.Launch.Net)
-            {
-                _trackedLaunches[_trackedLaunches.FindIndex(x => x.Launch.Id == launchToTrack.Launch.Id)] = launchToTrack;
-                //DependencyService.Get<INotify>().UpdateNotification(launchToTrack);
-            }
+            trackedLaunch = launch;
+
+            DependencyService.Get<INotify>().UpdateNotification(trackedLaunch, NotificationType.TrackedLaunch);
         }
     }
 }

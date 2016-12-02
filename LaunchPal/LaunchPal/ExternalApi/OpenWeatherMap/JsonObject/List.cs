@@ -15,7 +15,7 @@ namespace LaunchPal.ExternalApi.OpenWeatherMap.JsonObject
             {
                 // Unix timestamp is seconds past epoch
                 System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
-                dtDateTime = TimeConverter.DetermineTimeSettings(dtDateTime.AddSeconds(value), App.Settings.UseLocalTime);
+                dtDateTime = TimeConverter.DetermineTimeSettings(dtDateTime.AddSeconds(value), App.Settings?.UseLocalTime ?? true);
                 Date = dtDateTime;
                 _dt = value;
             }

@@ -127,10 +127,14 @@
     <Content Include="Assets\Menu\LaunchBlack.png" />
     <Content Include="Assets\Menu\Overview.png" />
     <Content Include="Assets\Menu\OverviewBlack.png" />
+    <Content Include="Assets\Menu\PeopleInSpace.png" />
+    <Content Include="Assets\Menu\PeopleInSpaceBlack.png" />
     <Content Include="Assets\Menu\Search.png" />
     <Content Include="Assets\Menu\SearchBlack.png" />
     <Content Include="Assets\Menu\Settings.png" />
     <Content Include="Assets\Menu\SettingsBlack.png" />
+    <Content Include="Assets\Menu\SpaceNews.png" />
+    <Content Include="Assets\Menu\SpaceNewsBlack.png" />
     <Content Include="Assets\Menu\Support.png" />
     <Content Include="Assets\Menu\SupportBlack.png" />
     <Content Include="Assets\SplashScreen.scale-100.png" />

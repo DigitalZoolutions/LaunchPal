@@ -22,7 +22,22 @@ namespace LaunchPal.UWP
         public MainPage()
         {
             this.InitializeComponent();
+
+            ApplicationView.PreferredLaunchViewSize = new Size(1366, 768);
+            ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
+
             LoadApplication(new LaunchPal.App());
+            this.Loaded += OnLoaded;
+        }
+
+        public MainPage(string launchId)
+        {
+            this.InitializeComponent();
+
+            ApplicationView.PreferredLaunchViewSize = new Size(1366, 768);
+            ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
+
+            LoadApplication(new LaunchPal.App(int.Parse(launchId)));
             this.Loaded += OnLoaded;
         }
 

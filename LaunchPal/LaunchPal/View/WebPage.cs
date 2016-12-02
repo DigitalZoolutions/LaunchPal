@@ -11,11 +11,18 @@ using Xamarin.Forms;
 
 namespace LaunchPal.View
 {
-    class Web : ContentPage
+    class WebPage : ContentPage
     {
-        public Web(string urlString, LaunchViewModel launchData)
+        public WebPage(string urlString, string title)
         {
-            Title = "Web View";
+            Title = title;
+
+            Content = GenerateBasicPageContent(urlString);
+        }
+
+        public WebPage(string urlString, LaunchViewModel launchData)
+        {
+            Title = "Launch Coverage";
 
             Content = GeneratePageContent(urlString, launchData);
         }
@@ -25,6 +32,16 @@ namespace LaunchPal.View
             var webView = (Content as Grid)?.Children.FirstOrDefault(x => x.GetType() == typeof(WebView)) as WebView;
             if (webView != null)
                 webView.Source = "about:blank";
+        }
+
+        private Xamarin.Forms.View GenerateBasicPageContent(string urlString)
+        {
+            var webView = new WebView
+            {
+                Source = urlString
+            };
+
+            return webView;
         }
 
         private  Xamarin.Forms.View GeneratePageContent(string urlString, LaunchViewModel launchData)
@@ -49,6 +66,7 @@ namespace LaunchPal.View
 
             launchInfo.Children.Add(new Label { Text = launchData.Name }, 0, 0);
             launchInfo.Children.Add(new Label { Text = launchData.MissionClock }, 1, 0);
+            
 
             var layout = new Grid()
             {

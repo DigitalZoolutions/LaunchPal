@@ -8,6 +8,7 @@ using LaunchPal.View;
 using Xamarin.Forms;
 using System.Threading;
 using System.Threading.Tasks;
+using LaunchPal.ExternalApi;
 using LaunchPal.Manager;
 
 namespace LaunchPal
@@ -31,10 +32,28 @@ namespace LaunchPal
             MainPage = new MainPage();
         }
 
-        private static async void LoadAppSettingsAndCache()
+        public App(int id)
         {
-            Settings = Settings.LoadCache();
-            await CacheManager.LoadCache();
+            // Load Settings
+            LoadAppSettingsAndCache();
+
+            // Set startup theme
+            Theme.SetTheme(Settings.AppTheme);
+
+            // Set LiveTile
+            DependencyService.Get<ICreateTile>().SetLaunch();
+
+            // Start the app on the Launch Page
+            var mainPage = new MainPage();
+            mainPage.NavigateTo(new LaunchPage(id));
+
+            // The root page of your application
+            MainPage = mainPage;
+        }
+
+        private static void LoadAppSettingsAndCache()
+        {
+            CacheManager.LoadCache();
         }
 
         protected override void OnStart()
@@ -45,7 +64,6 @@ namespace LaunchPal
         protected override void OnSleep()
         {
             // Handle when your app sleeps
-            Settings.SaveCache(Settings);
             CacheManager.SaveCache();
         }
 

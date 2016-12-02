@@ -10,8 +10,9 @@ namespace LaunchPal.Interface
     public enum CacheType
     {
         LaunchData,
-        WeatherData,
-        SettingsData
+        SettingsData,
+        NewsData,
+        TrackingData
     }
     public interface IStoreCache
     {
@@ -19,8 +20,10 @@ namespace LaunchPal.Interface
 
         string LoadSettings(CacheType type);
 
-        Task<string> LoadCache(CacheType type);
+        string LoadCache(CacheType type);
 
-        Task ClearCache();
+        Task ClearAllCache();
+
+        Task ClearCache(CacheType type);
     }
 }

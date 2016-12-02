@@ -10,12 +10,18 @@ namespace LaunchPal.Interface
 {
     public interface INotify
     {
-        void AddNotification(LaunchData launch);
+        void AddNotification(LaunchData launch, NotificationType type);
 
-        void UpdateNotification(LaunchData launch);
+        void UpdateNotification(LaunchData launch, NotificationType type);
 
-        void DeleteNotification(int index);
+        void DeleteNotification(int index, NotificationType type);
 
-        void ClearNotifications();
+        void ClearNotifications(NotificationType type);
+    }
+
+    public enum NotificationType
+    {
+        NextLaunch,
+        TrackedLaunch
     }
 }

@@ -23,5 +23,14 @@ namespace LaunchPal.Droid.Widget
             // To prevent any ANR timeouts, we perform the update in a service
             context.StartService(new Intent(context, typeof(UpdateService)));
         }
+
+        public override void OnReceive(Context context, Intent intent)
+        {
+            if (intent.Action.Equals("hej"))
+            {
+                context.StartService(new Intent(context, typeof(UpdateService)));
+            }
+            base.OnReceive(context, intent);
+        }
     }
 }

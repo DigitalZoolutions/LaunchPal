@@ -86,7 +86,7 @@ namespace LaunchPal.WinPhone.Helper
             }
         }
 
-        public async Task ClearCache()
+        public async Task ClearAllCache()
         {
             try
             {
@@ -117,7 +117,7 @@ namespace LaunchPal.WinPhone.Helper
             switch (type)
             {
                 case CacheType.LaunchData:
-                    return "LaunchData.json";
+                    return "CacheData.json";
                 case CacheType.WeatherData:
                     return "WeatherData.Json";
                 case CacheType.SettingsData:

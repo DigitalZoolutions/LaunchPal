@@ -17,14 +17,13 @@ namespace LaunchPal.UWP.Helper
 {
     class MailSender : ISendMail
     {
-        public async Task SendMail(string from, string title, string message)
+        public async Task SendMail(string title, string message)
         {
             var emailMessage = new EmailMessage
             {
                 To = { new EmailRecipient("threezool@gmail.com") },
                 Subject = title,
-                Body = message,
-                Sender = new EmailRecipient(from)
+                Body = message
             };
 
             await EmailManager.ShowComposeNewEmailAsync(emailMessage);

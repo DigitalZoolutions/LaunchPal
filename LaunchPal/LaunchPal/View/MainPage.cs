@@ -11,11 +11,26 @@ namespace LaunchPal.View
         public MainPage()
         {
             BackgroundColor = Theme.BackgroundColor;
-            var navPage = new Navigation();
+            var navPage = new NavigationPage();
             navPage.Menu.ItemTapped += (sender, arg) => NavigateTo((arg.Item as MenuItem)?.TargetType);
-            NavigationPage.SetHasNavigationBar(this, false);
+            Xamarin.Forms.NavigationPage.SetHasNavigationBar(this, false);
             Master = navPage;
-            Detail = new NavigationPage(new Overview())
+            Detail = new Xamarin.Forms.NavigationPage(new OverviewPage())
+            {
+                BackgroundColor = Theme.BackgroundColor,
+                BarBackgroundColor = Theme.NavBackgroundColor,
+                BarTextColor = Theme.HeaderColor,
+            };
+        }
+
+        public MainPage(int launchId)
+        {
+            BackgroundColor = Theme.BackgroundColor;
+            var navPage = new NavigationPage();
+            navPage.Menu.ItemTapped += (sender, arg) => NavigateTo((arg.Item as MenuItem)?.TargetType);
+            Xamarin.Forms.NavigationPage.SetHasNavigationBar(this, false);
+            Master = navPage;
+            Detail = new Xamarin.Forms.NavigationPage(new LaunchPage(launchId))
             {
                 BackgroundColor = Theme.BackgroundColor,
                 BarBackgroundColor = Theme.NavBackgroundColor,
@@ -44,9 +59,9 @@ namespace LaunchPal.View
 
         private void SetPage(Page page)
         {
-            if (page.GetType() == typeof(Overview))
+            if (page.GetType() == typeof(OverviewPage))
             {
-                Detail.Navigation.PopToRootAsync();
+                Detail = new Xamarin.Forms.NavigationPage(new OverviewPage());
             }
             else
             {
@@ -60,16 +75,16 @@ namespace LaunchPal.View
         public void ReloadAllPages()
         {
             BackgroundColor = Theme.BackgroundColor;
-            var navPage = new Navigation();
+            var navPage = new NavigationPage();
             navPage.Menu.ItemTapped += (sender, arg) => NavigateTo((arg.Item as MenuItem)?.TargetType);
             Master = navPage;
-            Detail = new NavigationPage(new Overview())
+            Detail = new Xamarin.Forms.NavigationPage(new OverviewPage())
             {
                 BarBackgroundColor = Theme.NavBackgroundColor,
                 BarTextColor = Theme.HeaderColor,
                 BackgroundColor = Theme.BackgroundColor
             };
-            Detail.Navigation.PushAsync(new Settings());
+            Detail.Navigation.PushAsync(new SettingsPage());
         }
     }
 }

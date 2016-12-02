@@ -15,7 +15,7 @@ namespace LaunchPal.Helper
             return JsonConvert.DeserializeObject<T>(objectString);
         }
 
-        public static string ConvertToString<T>(this T jsonObject) where T : CacheBase
+        public static string ConvertToJsonString<T>(this T jsonObject) where T : CacheBase
         {
             return JsonConvert.SerializeObject(jsonObject);
         }

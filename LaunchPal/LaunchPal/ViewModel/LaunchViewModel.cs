@@ -16,13 +16,15 @@ using Xamarin.Forms;
 
 namespace LaunchPal.ViewModel
 {
-    class LaunchViewModel : INotifyPropertyChanged
+    public class LaunchViewModel : ErrorViewModel, INotifyPropertyChanged
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public string LaunchTime { get; set; }
         public string LaunchWindow { get; set; }
         public string Rocket { get; set; }
+        public int RocketId { get; set; }
+        public Image RocketImage { get; set; }
         public string Agency { get; set; }
         public string MissionType { get; set; }
 
@@ -46,18 +48,30 @@ namespace LaunchPal.ViewModel
         public string ForecastRain { get; set; }
         public string ForecastWind { get; set; }
         public string ForecastTemp { get; set; }
+
+        public string TrackingButtonText
+        {
+            get { return _trackingButtonText; }
+            set
+            {
+                _trackingButtonText = value;
+                OnPropertyChanged(nameof(TrackingButtonText));
+            }
+        }
+
         public ErrorViewModel Error { get; set; }
 
 
         public event PropertyChangedEventHandler PropertyChanged;
         private DateTime _endDate;
+        private string _trackingButtonText;
 
         public LaunchViewModel()
         {
             try
             {
                 var launchData = CacheManager.TryGetNextLaunch().Result;
-                if (launchData.Forecast == null)
+                if (launchData.Forecast == null && App.Settings.SuccessfullIap)
                 {
                     launchData.Forecast = ApiManager.GetForecastByCoordinates(launchData.Launch.Location.Pads[0].Latitude, launchData.Launch.Location.Pads[0].Longitude).GetAwaiter().GetResult();
                     CacheManager.TryStoreUpdatedLaunchData(launchData);
@@ -66,7 +80,7 @@ namespace LaunchPal.ViewModel
             }
             catch (Exception ex)
             {
-                Error = new ErrorViewModel(ex);
+                SetError(ex);
             } 
         }
 
@@ -75,7 +89,7 @@ namespace LaunchPal.ViewModel
             try
             {
                 var launchData = CacheManager.TryGetLaunchById(launchId).Result;
-                if (launchData.Forecast == null && (launchData.Launch.Net - DateTime.Now).TotalDays < 5)
+                if (launchData.Forecast == null && (launchData.Launch.Net - DateTime.Now).TotalDays < 5 && App.Settings.SuccessfullIap)
                 {
                     launchData.Forecast = ApiManager.GetForecastByCoordinates(launchData.Launch.Location.Pads[0].Latitude, launchData.Launch.Location.Pads[0].Longitude).GetAwaiter().GetResult();
                     CacheManager.TryStoreUpdatedLaunchData(launchData);
@@ -84,21 +98,36 @@ namespace LaunchPal.ViewModel
             }
             catch (Exception ex)
             {
-                Error = new ErrorViewModel(ex);
+                SetError(ex);
             }
         }
 
         private void PrepareViewModelData(LaunchData launchData)
         {
+            _endDate = TimeConverter.DetermineTimeSettings(launchData.Launch.Net, App.Settings.UseLocalTime);
+
+            if (launchData.Launch.Status == 2)
+            {
+                this.LaunchTime = "TBD";
+                this.MissionClock = "TBD";
+            }
+            else
+            {
+                this.LaunchTime = TimeConverter.SetStringTimeFormat(launchData.Launch.Net, App.Settings.UseLocalTime);
+                Device.StartTimer(TimeSpan.FromMilliseconds(100), OnTimerTick);
+            }
+
             this.Id = launchData.Launch.Id;
             this.Name = launchData.Launch.Name;
-            this.LaunchTime = TimeConverter.SetStringTimeFormat(launchData.Launch.Net, App.Settings.UseLocalTime);
             this.LaunchWindow = CalculateLaunchWindow(launchData.Launch.Windowstart, launchData.Launch.Windowend);
             this.Rocket = SetRocketType(launchData);
+            this.RocketId = launchData.Launch.Rocket.Id;
+            if (!launchData.Launch.Rocket.ImageUrl.Contains("placeholder"))
+            {
+                this.RocketImage = SetRocketImage(launchData);
+            }
             this.Agency = SetAgencyText(launchData);
             this.MissionType = SetMissionTypeText(launchData);
-            _endDate = TimeConverter.DetermineTimeSettings(launchData.Launch.Net, App.Settings.UseLocalTime);
-            Device.StartTimer(TimeSpan.FromMilliseconds(100), OnTimerTick);
             this.LaunchSite = SetLaunchSiteName(launchData);
             this.LaunchPad = SetLaunchPad(launchData);
             this.MissionDescription = SetMissionDescriptionText(launchData);
@@ -108,6 +137,17 @@ namespace LaunchPal.ViewModel
             {
                 this.VideoUrl.Add(launchVidUrL);
             }
+            bool beingTracked = TrackingManager.IsLaunchBeingTracked(launchData.Launch.Id);
+            TrackingButtonText = beingTracked ? "Remove Tracking" : "Track Launch";
+        }
+
+        private static Image SetRocketImage(LaunchData launchData)
+        {
+            var image = CacheManager.TryGetImageFromUriAndCache(launchData.Launch.Rocket.ImageUrl);
+
+            image.Opacity = 0.25;
+
+            return image;
         }
 
         private void SetLaunchWeatherPrediction(LaunchData launchData)
@@ -122,10 +162,10 @@ namespace LaunchPal.ViewModel
             var forecast = launchData.Forecast.List.OrderBy(t => Math.Abs((t.Date - launchData.Launch.Net).Ticks))
                              .First();
 
-            ForecastCloud = !string.IsNullOrEmpty(forecast?.Clouds?.All.ToString()) ? forecast.Clouds?.All + "% Cloud coverage" : "N/A" ;
-            ForecastRain = !string.IsNullOrEmpty(forecast?.Rain?.ThreeHours.ToString()) ? forecast.Rain?.ThreeHours + "mm Rain" : "N/A";
-            ForecastWind = !string.IsNullOrEmpty(forecast?.Wind?.Speed.ToString()) ? forecast.Wind?.Speed + "meter/sec Wind" : "N/A";
-            ForecastTemp = !string.IsNullOrEmpty(forecast?.Main?.Temp.ToString()) ? forecast.Main?.Temp + "°C" : "N/A";
+            ForecastCloud = !string.IsNullOrEmpty(forecast?.Clouds?.All.ToString()) ? "Clouds: " + forecast.Clouds?.All + "% coverage" : "Clouds: N/A" ;
+            ForecastRain = !string.IsNullOrEmpty(forecast?.Rain?.ThreeHours.ToString()) ? "Rain: " + forecast.Rain?.ThreeHours + "mm" : "Rain: 0mm";
+            ForecastWind = !string.IsNullOrEmpty(forecast?.Wind?.Speed.ToString()) ? "Wind: " + forecast.Wind?.Speed + " meter/sec" : "Wind: N/A";
+            ForecastTemp = !string.IsNullOrEmpty(forecast?.Main?.Temp.ToString()) ? "Temp: " + forecast.Main?.Temp + "°C" : "Temp: N/A";
         }
 
         private string SetRocketType(LaunchData launchData)
@@ -157,10 +197,6 @@ namespace LaunchPal.ViewModel
             if (launchData.Mission?.Agencies?.Length > 0 && !string.IsNullOrEmpty(launchData.Mission.Agencies?[0].Name))
             {
                 return launchData.Mission.Agencies[0].Name;
-            }
-            else if (launchData.Launch?.Rocket?.Agencies?.Length > 0 && !string.IsNullOrEmpty(launchData.Launch.Rocket.Agencies?[0].Name))
-            {
-                return launchData.Launch.Rocket.Agencies?[0].Name;
             }
             else
             {
@@ -203,7 +239,10 @@ namespace LaunchPal.ViewModel
                 days, hours, timeLeft.Minutes, timeLeft.Seconds, timePrefix);
 
             // Remove a second
-            _endDate.AddSeconds(-10);
+            if (_endDate != DateTime.MinValue)
+            {
+                _endDate.AddSeconds(-10);
+            }
 
             return true;
         }

@@ -16,13 +16,21 @@ namespace LaunchPal.Template
         {
             var simpleLaunchList = launchList.Select(launchPair => new SimpleLaunchData
             {
-                LaunchId = launchPair.Launch.Id, Name = launchPair.Launch.Name, Net = TimeConverter.DetermineTimeSettings(launchPair.Launch.Net, App.Settings.UseLocalTime)
+                LaunchId = launchPair.Launch.Id,
+                Name = launchPair.Launch.Name,
+                Net = launchPair.Launch.Status == 2 
+                    ? DateTime.Now.AddMonths(1).AddDays(-1) 
+                    : TimeConverter.DetermineTimeSettings(launchPair.Launch.Net, App.Settings.UseLocalTime),
+                LaunchNet = launchPair.Launch.Status == 2
+                ? "TBD"
+                : TimeConverter.SetStringTimeFormat(launchPair.Launch.Net, App.Settings.UseLocalTime)
             }).OrderBy(x => x.Net).ToList();
 
             ItemsSource = simpleLaunchList;
             VerticalOptions = LayoutOptions.FillAndExpand;
             BackgroundColor = Theme.BackgroundColor;
             SeparatorColor = Theme.FrameColor;
+            HasUnevenRows = true;
 
             var menuDataTemplate = new DataTemplate(() =>
             {
@@ -41,7 +49,7 @@ namespace LaunchPal.Template
                 };
 
                 nameLabel.SetBinding(Label.TextProperty, "Name");
-                netLabel.SetBinding(Label.TextProperty, "Net");
+                netLabel.SetBinding(Label.TextProperty, "LaunchNet");
 
                 var layout = new StackLayout
                 {
@@ -63,7 +71,7 @@ namespace LaunchPal.Template
                         VerticalOptions = LayoutOptions.Center,
                         Padding = new Thickness(5),
                         Content = layout,
-                        Margin = new Thickness(0, 0, 12, 0)
+                        Margin = new Thickness(0, 0, 12, 0),
                     }
                 };
 

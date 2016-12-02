@@ -18,59 +18,34 @@ namespace LaunchPal
         public bool SuccessfullIap => DependencyService.Get<ICheckPurchase>().HasPurchasedPlus();
         public bool UseNextLaunchOnTile => _simpleLaunchDataData == null || _simpleLaunchDataData.Net < DateTime.Now;
         public bool NextLaunchNotifications { get; set; } = true;
-        public int NotifyBeforeLaunch { get; set; } = 30;
-        public bool AdvanceNotifications { get; set; } = true;
+        public int NotifyBeforeLaunch { get; set; } = 15;
+        public bool TrackedLaunchNotifications { get; set; } = true;
 
         public SimpleLaunchData SimpleLaunchDataData
         {
             get
             {
-                if (UseNextLaunchOnTile)
-                {
-                    try
-                    {
-                        _simpleLaunchDataData = new SimpleLaunchData(CacheManager.TryGetNextLaunch().Result);
-                    }
-                    catch (Exception)
-                    {
-                        _simpleLaunchDataData = new SimpleLaunchData
-                        {
-                            LaunchId = 0,
-                            Name = "Could not load launch",
-                            Message = "The requested launch could not be loaded, please check connection and try again.",
-                            Net = DateTime.Now
-                        };
-                    }
-                    
+                if (!UseNextLaunchOnTile)
                     return _simpleLaunchDataData;
-                }
-                else
+
+                try
                 {
-                    return _simpleLaunchDataData;
+                    _simpleLaunchDataData = new SimpleLaunchData(CacheManager.TryGetNextLaunch().GetAwaiter().GetResult());
                 }
-                
+                catch (Exception)
+                {
+                    _simpleLaunchDataData = new SimpleLaunchData
+                    {
+                        LaunchId = 0,
+                        Name = "Could not load launch",
+                        Message = "The requested launch could not be loaded, please check connection and try again.",
+                        Net = DateTime.Now
+                    };
+                }
+
+                return _simpleLaunchDataData;
             }
             set { _simpleLaunchDataData = value; }
-        }
-
-        public static Settings LoadCache()
-        {
-            try
-            {
-                var settingsDataString = DependencyService.Get<IStoreCache>().LoadSettings(CacheType.SettingsData);
-                var settingsData = settingsDataString.ConvertToObject<Settings>();
-                return settingsData ?? new Settings();
-            }
-            catch (Exception)
-            {
-                return new Settings();
-            }
-        }
-
-        public static async void SaveCache(Settings settings)
-        {
-            var settingsDataString = settings.ConvertToString();
-            await DependencyService.Get<IStoreCache>().SaveCache(settingsDataString, CacheType.SettingsData);
         }
     }
 }

@@ -23,7 +23,7 @@ namespace LaunchPal.UWP.Helper
 
         public async Task<bool> SaveCache(string stringToStore, CacheType type)
         {
-            var fileName = FileNameFromCacheType(type);
+            var fileName = GetFileNameFromCacheType(type);
 
             try
             {
@@ -53,7 +53,7 @@ namespace LaunchPal.UWP.Helper
 
         public string LoadSettings(CacheType type)
         {
-            var fileName = FileNameFromCacheType(type);
+            var fileName = GetFileNameFromCacheType(type);
 
             try
             {
@@ -70,18 +70,18 @@ namespace LaunchPal.UWP.Helper
             }
         }
 
-        public async Task<string> LoadCache(CacheType type)
+        public string LoadCache(CacheType type)
         {
-            var fileName = FileNameFromCacheType(type);
+            var fileName = GetFileNameFromCacheType(type);
 
             try
             {
                 // Check if file exist and read from it
                 var file = type == CacheType.SettingsData ? 
-                    await LocalRoamingFolder.GetFileAsync(fileName) : 
-                    await LocalCacheFolder.GetFileAsync(fileName);
+                    LocalRoamingFolder.GetFileAsync(fileName).GetAwaiter().GetResult() : 
+                    LocalCacheFolder.GetFileAsync(fileName).GetAwaiter().GetResult();
 
-                return await FileIO.ReadTextAsync(file);
+                return FileIO.ReadTextAsync(file).GetAwaiter().GetResult();
             }
             catch (FileNotFoundException)
             {
@@ -89,23 +89,28 @@ namespace LaunchPal.UWP.Helper
             }
         }
 
-        public async Task ClearCache()
+        public async Task ClearAllCache()
         {
             try
             {
                 // Clear Settings data
-                var fileName = FileNameFromCacheType(CacheType.SettingsData);
+                var fileName = GetFileNameFromCacheType(CacheType.SettingsData);
                 var fileToClear = await LocalRoamingFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
                 await FileIO.WriteTextAsync(fileToClear, "");
 
-                // Clear Settings data
-                fileName = FileNameFromCacheType(CacheType.LaunchData);
+                // Clear Launch data
+                fileName = GetFileNameFromCacheType(CacheType.LaunchData);
                 fileToClear = await LocalCacheFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
                 await FileIO.WriteTextAsync(fileToClear, "");
 
-                // Clear Settings data
-                fileName = FileNameFromCacheType(CacheType.WeatherData);
-                fileToClear = await LocalCacheFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+                // Clear News data
+                fileName = GetFileNameFromCacheType(CacheType.NewsData);
+                fileToClear = await LocalRoamingFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+                await FileIO.WriteTextAsync(fileToClear, "");
+
+                // Clear Tracking data
+                fileName = GetFileNameFromCacheType(CacheType.TrackingData);
+                fileToClear = await LocalRoamingFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
                 await FileIO.WriteTextAsync(fileToClear, "");
             }
             catch (Exception ex)
@@ -115,16 +120,54 @@ namespace LaunchPal.UWP.Helper
             }
         }
 
-        private static string FileNameFromCacheType(CacheType type)
+        public async Task ClearCache(CacheType type)
+        {
+            string fileName;
+            StorageFile fileToClear;
+
+            switch (type)
+            {
+                case CacheType.LaunchData:
+                    // Clear Launch data
+                    fileName = GetFileNameFromCacheType(CacheType.LaunchData);
+                    fileToClear = await LocalCacheFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+                    await FileIO.WriteTextAsync(fileToClear, "");
+                    break;
+                case CacheType.SettingsData:
+                    // Clear Settings data
+                    fileName = GetFileNameFromCacheType(CacheType.SettingsData);
+                    fileToClear = await LocalRoamingFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+                    await FileIO.WriteTextAsync(fileToClear, "");
+                    break;
+                case CacheType.NewsData:
+                    // Clear News data
+                    fileName = GetFileNameFromCacheType(CacheType.NewsData);
+                    fileToClear = await LocalRoamingFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+                    await FileIO.WriteTextAsync(fileToClear, "");
+                    break;
+                case CacheType.TrackingData:
+                    // Clear Tracking data
+                    fileName = GetFileNameFromCacheType(CacheType.TrackingData);
+                    fileToClear = await LocalRoamingFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+                    await FileIO.WriteTextAsync(fileToClear, "");
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
+
+        private static string GetFileNameFromCacheType(CacheType type)
         {
             switch (type)
             {
                 case CacheType.LaunchData:
                     return "LaunchData.json";
-                case CacheType.WeatherData:
-                    return "WeatherData.Json";
                 case CacheType.SettingsData:
                     return "SettingsData.json";
+                case CacheType.NewsData:
+                    return "NewsData.json";
+                case CacheType.TrackingData:
+                    return "TrackingData.json";
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }

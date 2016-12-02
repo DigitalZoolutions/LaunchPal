@@ -31,8 +31,7 @@ namespace LaunchPal.ExternalApi.OpenWeatherMap.Request
                 client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.103 Safari/537.36");
 
                 // Get response from the API and process it
-                var requestTask = client.GetAsync(url);
-                var response = Task.Run(() => requestTask).Result;
+                var response = client.GetAsync(url).GetAwaiter().GetResult();
                 if (response.IsSuccessStatusCode)
                 {
                     // Reading the response and deserialize it to expected object

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using LaunchPal.Manager;
 using Xamarin.Forms;
@@ -14,7 +15,7 @@ using LaunchPal.Template;
 
 namespace LaunchPal.ViewModel
 {
-    class OverviewViewModel : INotifyPropertyChanged
+    class OverviewViewModel : ErrorViewModel, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -36,11 +37,22 @@ namespace LaunchPal.ViewModel
         public string LaunchesThisMonthLabel { get; set; }
         public List<LaunchData> LaunchesThisMonth { get; set; }
         public string CurrentMonth { get; set; }
-        public ListView TrackedLaunches { get; set; }
-        public ErrorViewModel Error { get; set; }
+
+        public ListView TrackedLaunches
+        {
+            get { return _trackedLaunches; }
+            set
+            {
+                _trackedLaunches = value;
+                OnPropertyChanged(nameof(TrackedLaunches));
+            }
+        }
 
         private DateTime _endDate;
         private string _launchTimerText;
+        public string AstronoutsInSpaceLabel { get; set; }
+        public int AstronautsInSpace { get; set; }
+        private ListView _trackedLaunches;
 
         public OverviewViewModel()
         {
@@ -53,19 +65,29 @@ namespace LaunchPal.ViewModel
             }
             catch (Exception ex)
             {
-                Error = new ErrorViewModel(ex);
+                SetError(ex);
             }
 
-            Device.StartTimer(TimeSpan.FromMilliseconds(100), OnTimerTick);
+            if (nextLaunch.Status == 2)
+            {
+                LaunchTimerText = "TBD";
+            }
+            else
+            {
+                Device.StartTimer(TimeSpan.FromMilliseconds(100), OnTimerTick);
+            }
+
             LaunchName = nextLaunch?.Name;
             LaunchId = nextLaunch?.Id ?? 0;
             _endDate = TimeConverter.DetermineTimeSettings(nextLaunch?.Net ?? DateTime.MinValue, App.Settings.UseLocalTime);
             CurrentMonth = "Launches in " + DateTime.Now.NameOfMonth();
-            LaunchesThisWeek = upcomingLaunches.FindAll(x => x.Launch.Net > DateTime.Now.MondayOfWeek() && x.Launch.Net < DateTime.Now.MondayOfWeek().AddDays(7));
+            LaunchesThisWeek = upcomingLaunches.FindAll(x => x.Launch.Net > DateTime.Now.MondayOfWeek() && x.Launch.Net < DateTime.Now.MondayOfWeek().AddDays(6) && x.Launch.Status != 2);
             LaunchesThisMonth = upcomingLaunches.FindAll(x => x.Launch.Net > DateTime.Now.FirstDayOfMonth() && x.Launch.Net < DateTime.Now.LastDayOfMonth());
-            LaunchesThisWeekLabel = LaunchesThisWeek.Count.ToString();
-            LaunchesThisMonthLabel = LaunchesThisMonth.Count.ToString();
-            TrackedLaunches = new SearchListTemplate(TrackingManager.TryGetTrackedLaunches());
+            LaunchesThisWeekLabel = LaunchesThisWeek.Where(x => x.Launch.Status != 2).ToList().Count.ToString();
+            LaunchesThisMonthLabel = LaunchesThisMonth.Where(x => x.Launch.Status != 2).ToList().Count.ToString();
+            AstronoutsInSpaceLabel = "Astronauts in space: ";
+            AstronautsInSpace = CacheManager.TryGetAstronautsInSpace().GetAwaiter().GetResult().Count;
+            TrackedLaunches = new SearchListTemplate(TrackingManager.TryGetTrackedLaunches().TrackingList);
         }
 
         private bool OnTimerTick()
@@ -75,20 +97,20 @@ namespace LaunchPal.ViewModel
 
             // Use UTC instead if local is off
             if (!App.Settings.UseLocalTime)
-            {
                 timeLeft = _endDate - DateTime.UtcNow;
-            }
+
             var days = timeLeft.Days == 0 ? "" : $"{timeLeft.Days:0#;0#} days, ";
             var hours = timeLeft.Hours == 0 ? "" : $"{timeLeft.Hours:0#;0#} hrs, ";
             var timePrefix = timeLeft.TotalSeconds < 0 ? "T+ " : "T- ";
 
             // Formating the date and time format
-            LaunchTimerText = string.Format(
-                "{4}{0}{1}{2:0#;0#} min, {3:0#;0#} sec",
-                days, hours, timeLeft.Minutes, timeLeft.Seconds, timePrefix);
+            LaunchTimerText = $"{timePrefix}{days}{hours}{timeLeft.Minutes:0#;0#} min, {timeLeft.Seconds:0#;0#} sec";
 
             // Remove a second
-            _endDate.AddSeconds(-10);
+            if (_endDate != DateTime.MinValue)
+            {
+                _endDate.AddSeconds(-10);
+            }
 
             return true;
         }

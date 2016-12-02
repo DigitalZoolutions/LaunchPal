@@ -28,7 +28,7 @@ namespace LaunchPal.Model
                     Device.OnPlatform("", "OverviewBlack.png", "Assets/Menu/OverviewBlack.png")
                     ),
                 Name = "Overview",
-                TargetType = typeof(Overview)
+                TargetType = typeof(OverviewPage)
             });
 
             this.Add(new MenuItem
@@ -39,7 +39,29 @@ namespace LaunchPal.Model
                     Device.OnPlatform("", "LaunchBlack.png", "Assets/Menu/LaunchBlack.png")
                     ),
                 Name = "Launch",
-                TargetType = typeof(Launch)
+                TargetType = typeof(LaunchPage)
+            });
+
+            this.Add(new MenuItem
+            {
+                IconSource = ImageSource.FromFile(
+                    Theme.UseLightIcons ?
+                    Device.OnPlatform("", "SpaceNews.png", "Assets/Menu/SpaceNews.png") :
+                    Device.OnPlatform("", "SpaceNewsBlack.png", "Assets/Menu/SpaceNewsBlack.png")
+                    ),
+                Name = "Space News",
+                TargetType = typeof(NewsPage)
+            });
+
+            this.Add(new MenuItem
+            {
+                IconSource = ImageSource.FromFile(
+                    Theme.UseLightIcons ?
+                    Device.OnPlatform("", "PeopleInSpace.png", "Assets/Menu/PeopleInSpace.png") :
+                    Device.OnPlatform("", "PeopleInSpaceBlack.png", "Assets/Menu/PeopleInSpaceBlack.png")
+                    ),
+                Name = "Astronauts",
+                TargetType = typeof(AstronautsPage)
             });
 
             this.Add(new MenuItem
@@ -50,7 +72,7 @@ namespace LaunchPal.Model
                     Device.OnPlatform("", "SearchBlack.png", "Assets/Menu/SearchBlack.png")
                     ),
                 Name = "Search",
-                TargetType = typeof(Search)
+                TargetType = typeof(SearchPage)
             });
 
             this.Add(new MenuItem
@@ -61,7 +83,7 @@ namespace LaunchPal.Model
                     Device.OnPlatform("", "SupportBlack.png", "Assets/Menu/SupportBlack.png")
                     ),
                 Name = "Feedback",
-                TargetType = typeof(Feedback)
+                TargetType = typeof(FeedbackPage)
             });
 
             this.Add(new MenuItem
@@ -72,7 +94,7 @@ namespace LaunchPal.Model
                     Device.OnPlatform("", "SettingsBlack.png", "Assets/Menu/SettingsBlack.png")
                     ),
                 Name = "Settings",
-                TargetType = typeof(View.Settings)
+                TargetType = typeof(View.SettingsPage)
             });
         }
     }

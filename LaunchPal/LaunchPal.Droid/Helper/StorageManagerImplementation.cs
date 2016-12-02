@@ -74,16 +74,11 @@ namespace LaunchPal.Droid.Helper
             }
         }
 
-        public Task ClearCache()
+        public Task ClearAllCache()
         {
             var fileName = FileNameFromCacheType(CacheType.LaunchData);
             var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
             var filePath = Path.Combine(documentsPath, fileName);
-            File.WriteAllText(filePath, "");
-
-            fileName = FileNameFromCacheType(CacheType.WeatherData);
-            documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-            filePath = Path.Combine(documentsPath, fileName);
             File.WriteAllText(filePath, "");
 
             fileName = FileNameFromCacheType(CacheType.SettingsData);
@@ -94,16 +89,55 @@ namespace LaunchPal.Droid.Helper
             return Task.CompletedTask;
         }
 
+        public Task ClearCache(CacheType type)
+        {
+            string fileName;
+            string documentsPath;
+            string filePath;
+
+            switch (type)
+            {
+                case CacheType.LaunchData:
+                    fileName = FileNameFromCacheType(CacheType.LaunchData);
+                    documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+                    filePath = Path.Combine(documentsPath, fileName);
+                    File.WriteAllText(filePath, "");
+                    return Task.CompletedTask;
+                case CacheType.SettingsData:
+                    fileName = FileNameFromCacheType(CacheType.SettingsData);
+                    documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+                    filePath = Path.Combine(documentsPath, fileName);
+                    File.WriteAllText(filePath, "");
+                    return Task.CompletedTask;
+                case CacheType.NewsData:
+                    fileName = FileNameFromCacheType(CacheType.NewsData);
+                    documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+                    filePath = Path.Combine(documentsPath, fileName);
+                    File.WriteAllText(filePath, "");
+                    return Task.CompletedTask;
+                case CacheType.TrackingData:
+                    fileName = FileNameFromCacheType(CacheType.TrackingData);
+                    documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+                    filePath = Path.Combine(documentsPath, fileName);
+                    File.WriteAllText(filePath, "");
+                    return Task.CompletedTask;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
+
         private static string FileNameFromCacheType(CacheType type)
         {
             switch (type)
             {
                 case CacheType.LaunchData:
-                    return "LaunchData.json";
-                case CacheType.WeatherData:
-                    return "WeatherData.Json";
+                    return "CacheData.json";
                 case CacheType.SettingsData:
                     return "SettingsData.json";
+                case CacheType.NewsData:
+                    return "NewsData.json";
+                case CacheType.TrackingData:
+                    return "TrackingData.json";
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }

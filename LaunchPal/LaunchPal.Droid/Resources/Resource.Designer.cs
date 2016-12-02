@@ -2467,8 +2467,8 @@ namespace LaunchPal.Droid
 			// aapt resource value: 0x7f0200cd
 			public const int mr_ic_play_light = 2130837709;
 			
-			// aapt resource value: 0x7f0200db
-			public const int notification_template_icon_bg = 2130837723;
+			// aapt resource value: 0x7f0200df
+			public const int notification_template_icon_bg = 2130837727;
 			
 			// aapt resource value: 0x7f0200ce
 			public const int Overview = 2130837710;
@@ -2477,37 +2477,49 @@ namespace LaunchPal.Droid
 			public const int OverviewBlack = 2130837711;
 			
 			// aapt resource value: 0x7f0200d0
-			public const int Search = 2130837712;
+			public const int PeopleInSpace = 2130837712;
 			
 			// aapt resource value: 0x7f0200d1
-			public const int SearchBlack = 2130837713;
+			public const int PeopleInSpaceBlack = 2130837713;
 			
 			// aapt resource value: 0x7f0200d2
-			public const int Settings = 2130837714;
+			public const int Search = 2130837714;
 			
 			// aapt resource value: 0x7f0200d3
-			public const int SettingsBlack = 2130837715;
+			public const int SearchBlack = 2130837715;
 			
 			// aapt resource value: 0x7f0200d4
-			public const int star_logo = 2130837716;
+			public const int Settings = 2130837716;
 			
 			// aapt resource value: 0x7f0200d5
-			public const int Support = 2130837717;
+			public const int SettingsBlack = 2130837717;
 			
 			// aapt resource value: 0x7f0200d6
-			public const int SupportBlack = 2130837718;
+			public const int SpaceNews = 2130837718;
 			
 			// aapt resource value: 0x7f0200d7
-			public const int widget_bg = 2130837719;
+			public const int SpaceNewsBlack = 2130837719;
 			
 			// aapt resource value: 0x7f0200d8
-			public const int widget_bg_normal = 2130837720;
+			public const int star_logo = 2130837720;
 			
 			// aapt resource value: 0x7f0200d9
-			public const int widget_bg_pressed = 2130837721;
+			public const int Support = 2130837721;
 			
 			// aapt resource value: 0x7f0200da
-			public const int widget_bg_selected = 2130837722;
+			public const int SupportBlack = 2130837722;
+			
+			// aapt resource value: 0x7f0200db
+			public const int widget_bg = 2130837723;
+			
+			// aapt resource value: 0x7f0200dc
+			public const int widget_bg_normal = 2130837724;
+			
+			// aapt resource value: 0x7f0200dd
+			public const int widget_bg_pressed = 2130837725;
+			
+			// aapt resource value: 0x7f0200de
+			public const int widget_bg_selected = 2130837726;
 			
 			static Drawable()
 			{

@@ -160,13 +160,13 @@ namespace LaunchPal.ExternalApi.LaunchLibrary.JsonObject
         public object Hashtag { get; set; }
 
         [JsonProperty("location")]
-        public LaunchLocation Location { get; set; }
+        public Location Location { get; set; }
 
         [JsonProperty("rocket")]
-        public LaunchRocket Rocket { get; set; }
+        public Rocket Rocket { get; set; }
 
         [JsonProperty("missions")]
-        public LaunchMission[] Missions { get; set; }
+        public Mission[] Missions { get; set; }
     }
 
     public class LaunchList : LaunchLibraryBase
@@ -182,156 +182,6 @@ namespace LaunchPal.ExternalApi.LaunchLibrary.JsonObject
 
             [JsonProperty("count")]
             public int Count { get; set; }
-    }
-
-    public class PadAgency : LaunchLibraryBase
-    {
-
-        [JsonProperty("id")]
-        public int Id { get; set; }
-
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("abbrev")]
-        public string Abbrev { get; set; }
-
-        [JsonProperty("countryCode")]
-        public string CountryCode { get; set; }
-
-        [JsonProperty("type")]
-        public int Type { get; set; }
-
-        [JsonProperty("infoURL")]
-        public string InfoURL { get; set; }
-
-        [JsonProperty("wikiURL")]
-        public string WikiURL { get; set; }
-
-        [JsonProperty("infoURLs")]
-        public object[] InfoURLs { get; set; }
-    }
-
-    public class LaunchPad : LaunchLibraryBase
-    {
-
-        [JsonProperty("id")]
-        public int Id { get; set; }
-
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("infoURL")]
-        public string InfoURL { get; set; }
-
-        [JsonProperty("wikiURL")]
-        public string WikiURL { get; set; }
-
-        [JsonProperty("mapURL")]
-        public string MapURL { get; set; }
-
-        [JsonProperty("latitude")]
-        public string Latitude { get; set; }
-
-        [JsonProperty("longitude")]
-        public string Longitude { get; set; }
-
-        [JsonProperty("agencies")]
-        public PadAgency[] Agencies { get; set; }
-    }
-
-    public class LaunchLocation
-    {
-
-        [JsonProperty("pads")]
-        public Pad[] Pads { get; set; }
-
-        [JsonProperty("id")]
-        public int Id { get; set; }
-
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("infoURL")]
-        public string InfoURL { get; set; }
-
-        [JsonProperty("wikiURL")]
-        public string WikiURL { get; set; }
-
-        [JsonProperty("countryCode")]
-        public string CountryCode { get; set; }
-    }
-
-    public class RocketAgency
-    {
-
-        [JsonProperty("id")]
-        public int Id { get; set; }
-
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("abbrev")]
-        public string Abbrev { get; set; }
-
-        [JsonProperty("countryCode")]
-        public string CountryCode { get; set; }
-
-        [JsonProperty("type")]
-        public int Type { get; set; }
-
-        [JsonProperty("infoURL")]
-        public string InfoURL { get; set; }
-
-        [JsonProperty("wikiURL")]
-        public string WikiURL { get; set; }
-
-        [JsonProperty("infoURLs")]
-        public object[] InfoURLs { get; set; }
-    }
-
-    public class LaunchRocket
-    {
-
-        [JsonProperty("id")]
-        public int Id { get; set; }
-
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("configuration")]
-        public string Configuration { get; set; }
-
-        [JsonProperty("familyname")]
-        public string Familyname { get; set; }
-
-        [JsonProperty("agencies")]
-        public RocketAgency[] Agencies { get; set; }
-
-        [JsonProperty("imageSizes")]
-        public int[] ImageSizes { get; set; }
-
-        [JsonProperty("imageURL")]
-        public string ImageURL { get; set; }
-    }
-
-    public class LaunchMission
-    {
-
-        [JsonProperty("id")]
-        public int Id { get; set; }
-
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("description")]
-        public string Description { get; set; }
-
-        [JsonProperty("type")]
-        public int Type { get; set; }
-
-        [JsonProperty("typeName")]
-        public string TypeName { get; set; }
     }
 
 }

@@ -19,6 +19,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Microsoft.QueryStringDotNET;
 
 namespace LaunchPal.UWP
 {
@@ -95,6 +96,66 @@ namespace LaunchPal.UWP
                 // parameter
                 rootFrame.Navigate(typeof(MainPage), e.Arguments);
             }
+            // Ensure the current window is active
+            Window.Current.Activate();
+        }
+
+        protected override void OnActivated(IActivatedEventArgs args)
+        {
+            base.OnActivated(args);
+
+            // Get the root frame
+            Frame rootFrame = Window.Current.Content as Frame;
+
+            if (rootFrame == null)
+            {
+                // Create a Frame to act as the navigation context and navigate to the first page
+                rootFrame = new Frame();
+
+                rootFrame.NavigationFailed += OnNavigationFailed;
+
+                Xamarin.Forms.Forms.Init(args);
+                Xamarin.FormsMaps.Init("NbOGZGgTBV0t87CtxyDh~J6ZX_x5EHjNi3UcQFeJkwA~AiUat14TdfzbD0guovERlUvjP4QHb5tKh1WygTBs_98qUKR1yeQzMR19PJZgb5_A");
+
+                if (args.PreviousExecutionState == ApplicationExecutionState.Terminated)
+                {
+                    //TODO: Load state from previously suspended application
+                }
+
+                // Place the frame in the current Window
+                Window.Current.Content = rootFrame;
+            }
+
+            // Handle toast activation
+            if (args is ToastNotificationActivatedEventArgs)
+            {
+                var toastActivationArgs = args as ToastNotificationActivatedEventArgs;
+
+                // Parse the query string
+                QueryString queryArgs = QueryString.Parse(toastActivationArgs.Argument);
+
+                // See what action is being requested 
+                switch (queryArgs["action"])
+                {
+                    // Open the image
+                    case "viewLaunch":
+
+                        // The URL retrieved from the toast args
+                        var launchId = queryArgs["LaunchId"];
+
+                        rootFrame.Content = new MainPage(launchId);
+                        break;
+                }
+
+                // If we're loading the app for the first time, place the main page on
+                // the back stack so that user can go back after they've been
+                // navigated to the specific page
+                if (rootFrame.BackStack.Count == 0)
+                    rootFrame.BackStack.Add(new PageStackEntry(typeof(MainPage), null, null));
+            }
+
+            // TODO: Handle other types of activation
+
             // Ensure the current window is active
             Window.Current.Activate();
         }

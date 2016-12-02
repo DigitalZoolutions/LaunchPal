@@ -9,11 +9,11 @@ using Xamarin.Forms;
 
 namespace LaunchPal.View
 {
-    class Navigation : ContentPage
+    class NavigationPage : ContentPage
     {
         public ListView Menu { get; set; } = new MenuListTemplate();
 
-        public Navigation()
+        public NavigationPage()
         {
             this.Title = "Menu";
             this.BackgroundColor = Theme.NavBackgroundColor;

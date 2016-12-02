@@ -11,30 +11,25 @@ using Xamarin.Forms;
 
 namespace LaunchPal.View
 {
-    class Search : ContentPage
+    class SearchPage : ContentPage
     {
         public SearchViewModel Context { get; set; }
 
-        public Search()
+        public SearchPage()
         {
             Title = "Search";
             Context = new SearchViewModel();
-            SetTheme();
+            BackgroundColor = Theme.BackgroundColor;
             Content = GenerateView();
         }
 
-        public Search(List<LaunchData> launchList)
+        public SearchPage(List<LaunchData> launchList)
         {
             Title = "Search";
             Context = new SearchViewModel(launchList);
             Context.SearchResult.ItemTapped += SearchResult_ItemTapped;
-            SetTheme();
-            Content = GenerateView();
-        }
-
-        private void SetTheme()
-        {
             BackgroundColor = Theme.BackgroundColor;
+            Content = GenerateView();
         }
 
         private Xamarin.Forms.View GenerateView()
@@ -141,7 +136,7 @@ namespace LaunchPal.View
 
             var mainPage = this.Parent.Parent as MainPage;
 
-            mainPage?.NavigateTo(new Launch(int.Parse(launchId)));
+            mainPage?.NavigateTo(new LaunchPage(int.Parse(launchId)));
         }
     }
 }

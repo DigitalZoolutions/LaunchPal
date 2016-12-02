@@ -1,4 +1,7 @@
-﻿using Xamarin.Forms;
+﻿using System;
+using System.Threading.Tasks;
+using LaunchPal.Helper;
+using Xamarin.Forms;
 
 namespace LaunchPal.View.HelperPages
 {
@@ -92,10 +95,6 @@ namespace LaunchPal.View.HelperPages
 
         public new Xamarin.Forms.View Content
         {
-            get
-            {
-                return WaitingPageContent.Content;
-            }
             set
             {
                 WaitingPageContent.Content = value;
@@ -107,9 +106,9 @@ namespace LaunchPal.View.HelperPages
         private ContentView WaitingPageContent;
         private Grid ContentLayout;
         private Frame FrameLayout;
-        private Color ShadedBackgroundColor = Color.Black.MultiplyAlpha(0.5);
+        private Color ShadedBackgroundColor = Theme.FrameColor.MultiplyAlpha(0.2);
         private Color TransparentBackgroundColor = Color.Transparent;
-        private Color WhiteBackgroundColor = Color.FromRgba(255, 255, 255, 1.0);    // Background color of White, Opaque is required for Android
+        private Color DefaultBackgroundColor = Theme.BackgroundColor;
 
         public WaitingPage()
         {
@@ -140,8 +139,8 @@ namespace LaunchPal.View.HelperPages
             {
                 Indicator = new ActivityIndicator
                 {
-                    Color = Color.Black,
-                    Scale = 2,
+                    Color = Theme.TextColor,
+                    Scale = 1.5,
                     IsEnabled = true,
                     VerticalOptions = LayoutOptions.CenterAndExpand,
                     HorizontalOptions = LayoutOptions.Center,
@@ -163,7 +162,7 @@ namespace LaunchPal.View.HelperPages
         {
             var loadingLabel = new Label
             {
-                TextColor = Color.Black,
+                TextColor = Theme.TextColor,
                 Text = LoadingMessage,
                 FontSize = Device.GetNamedSize(NamedSize.Small, typeof(Label))
             };
@@ -196,8 +195,8 @@ namespace LaunchPal.View.HelperPages
 
             FrameLayout = new Frame
             {
-                BackgroundColor = ShowLoadingFrame ? WhiteBackgroundColor : TransparentBackgroundColor,
-                OutlineColor = ShowLoadingFrame ? Color.Black : TransparentBackgroundColor,
+                BackgroundColor = ShowLoadingFrame ? DefaultBackgroundColor : TransparentBackgroundColor,
+                OutlineColor = ShowLoadingFrame ? Theme.FrameBorderColor : TransparentBackgroundColor,
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center,
                 IsVisible = IsWaiting,
@@ -235,5 +234,8 @@ namespace LaunchPal.View.HelperPages
 
             ContentLayout.BackgroundColor = TransparentBackgroundColor;
         }
+
+        
+
     }
 }

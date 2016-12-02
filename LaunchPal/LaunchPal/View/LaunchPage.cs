@@ -14,31 +14,30 @@ using Xamarin.Forms;
 
 namespace LaunchPal.View
 {
-    class Launch : ContentPage
+    public class LaunchPage : ContentPage
     {
         public LaunchViewModel Context { get; set; }
         private Grid _pageGrid;
 
-        public Launch()
+        public LaunchPage()
         {
-            Context = new LaunchViewModel();
-            CreatePage();
+            CreatePage(new LaunchViewModel());
         }
 
-        public Launch(int launchId)
+        public LaunchPage(int launchId)
         {
-            Context = new LaunchViewModel(launchId);
-            CreatePage();
+            CreatePage(new LaunchViewModel(launchId));
         }
 
-        private void CreatePage()
+        private void CreatePage(LaunchViewModel viewModel)
         {
-            if (Context.Error != null)
+            if (viewModel.Error != null)
             {
-                Content = Context.Error.GenerateErrorView(this);
+                Content = viewModel.Error.GenerateErrorView(this);
                 return;
             }
 
+            Context = viewModel;
             GenerateGrid();
             PopulateGrid();
         }
@@ -69,7 +68,6 @@ namespace LaunchPal.View
         {
             BindingContext = Context;
             Title = Context.Name;
-            BackgroundColor = Color.Transparent;
 
             PopulateLaunchTime();
             PopulateLaunchWindow();
@@ -86,13 +84,31 @@ namespace LaunchPal.View
             PopulateVideoLinks();
             PopulateTrackingButtons();
 
-            Content = new ScrollView
+            var relativeLayout = new RelativeLayout();
+
+            if (Context.RocketImage != null)
             {
-                Content = new MarginFrame(10, Theme.BackgroundColor)
+                relativeLayout.Children.Add(Context.RocketImage,
+                Constraint.Constant(0),
+                Constraint.Constant(0),
+                Constraint.RelativeToParent((parent) => { return parent.Width; }),
+                Constraint.RelativeToParent((parent) => { return parent.Height; }));
+            }
+
+            relativeLayout.Children.Add(new ScrollView
+            {
+                BackgroundColor = Color.Transparent,
+                Content = new MarginFrame(10, Color.Transparent)
                 {
                     Content = _pageGrid
                 }
-            };
+            },
+                Constraint.Constant(0),
+                Constraint.Constant(0),
+                Constraint.RelativeToParent((parent) => { return parent.Width; }),
+                Constraint.RelativeToParent((parent) => { return parent.Height; }));
+
+            Content = relativeLayout;
         }
 
         
@@ -101,7 +117,7 @@ namespace LaunchPal.View
         {
             var spacing = new BoxView
             {
-                BackgroundColor = Theme.BackgroundColor,
+                BackgroundColor = Color.Transparent,
                 HeightRequest = 10
             };
 
@@ -113,7 +129,7 @@ namespace LaunchPal.View
         {
             var launchTimeLabel = new Label
             {
-                Text = "Launch",
+                Text = "Launch Time",
                 HorizontalTextAlignment = TextAlignment.Start,
                 TextColor = Theme.TextColor,
                 FontSize = 20,
@@ -122,7 +138,7 @@ namespace LaunchPal.View
 
             var launchTime = new Label
             {
-                HorizontalTextAlignment = TextAlignment.End,
+                HorizontalTextAlignment = TextAlignment.Start,
                 TextColor = Theme.TextColor,
                 FontSize = 20,
                 FontAttributes = FontAttributes.None
@@ -131,17 +147,17 @@ namespace LaunchPal.View
             launchTime.SetBinding(Label.TextProperty, new Binding("LaunchTime"));
 
             _pageGrid.Children.Add(launchTimeLabel, 0, 0);
-            _pageGrid.Children.Add(launchTime, 2, 0);
+            _pageGrid.Children.Add(launchTime, 3, 0);
 
-            Grid.SetColumnSpan(launchTimeLabel, 2);
-            Grid.SetColumnSpan(launchTime, 4);
+            Grid.SetColumnSpan(launchTimeLabel, 3);
+            Grid.SetColumnSpan(launchTime, 3);
         }
 
         private void PopulateLaunchWindow()
         {
             var launchWindowLabel = new Label
             {
-                Text = "Window",
+                Text = "Launch Window",
                 HorizontalTextAlignment = TextAlignment.Start,
                 TextColor = Theme.TextColor,
                 FontSize = 20,
@@ -150,7 +166,7 @@ namespace LaunchPal.View
 
             var launchWindow = new Label
             {
-                HorizontalTextAlignment = TextAlignment.End,
+                HorizontalTextAlignment = TextAlignment.Start,
                 TextColor = Theme.TextColor,
                 FontSize = 20,
                 FontAttributes = FontAttributes.None
@@ -159,10 +175,10 @@ namespace LaunchPal.View
             launchWindow.SetBinding(Label.TextProperty, new Binding("LaunchWindow"));
 
             _pageGrid.Children.Add(launchWindowLabel, 0, 1);
-            _pageGrid.Children.Add(launchWindow, 2, 1);
+            _pageGrid.Children.Add(launchWindow, 3, 1);
 
-            Grid.SetColumnSpan(launchWindowLabel, 2);
-            Grid.SetColumnSpan(launchWindow, 4);
+            Grid.SetColumnSpan(launchWindowLabel, 3);
+            Grid.SetColumnSpan(launchWindow, 3);
         }
 
         private void PopulateLaunchAgency()
@@ -198,7 +214,7 @@ namespace LaunchPal.View
             var missionTypeLabel = new Label
             {
                 Text = "Mission Type",
-                HorizontalTextAlignment = TextAlignment.End,
+                HorizontalTextAlignment = TextAlignment.Start,
                 TextColor = Theme.TextColor,
                 FontSize = 20,
                 FontAttributes = FontAttributes.Bold
@@ -206,7 +222,7 @@ namespace LaunchPal.View
 
             var missionType = new Label
             {
-                HorizontalTextAlignment = TextAlignment.End,
+                HorizontalTextAlignment = TextAlignment.Start,
                 TextColor = Theme.TextColor,
                 FontSize = 18,
                 FontAttributes = FontAttributes.None
@@ -225,7 +241,7 @@ namespace LaunchPal.View
         {
             var rocketTypeLabel = new Label
             {
-                Text = "Rocket type",
+                Text = "Rocket configuration",
                 HorizontalTextAlignment = TextAlignment.Start,
                 TextColor = Theme.TextColor,
                 FontSize = 20,
@@ -239,10 +255,9 @@ namespace LaunchPal.View
                 rocketType = new Label
                 {
                     HorizontalTextAlignment = TextAlignment.Start,
-                    TextColor = Theme.LinkColor,
+                    TextColor = Theme.TextColor,
                     FontSize = 18,
                     FontAttributes = FontAttributes.None,
-                    GestureRecognizers = { NavigateToMapWhenTaped(Context.LaunchPad) }
                 };
             }
             else
@@ -270,7 +285,7 @@ namespace LaunchPal.View
             var launchSiteLabel = new Label
             {
                 Text = "Launch Site",
-                HorizontalTextAlignment = TextAlignment.End,
+                HorizontalTextAlignment = TextAlignment.Start,
                 TextColor = Theme.TextColor,
                 FontSize = 20,
                 FontAttributes = FontAttributes.Bold
@@ -282,7 +297,7 @@ namespace LaunchPal.View
             {
                 launchSite = new Label
                 {
-                    HorizontalTextAlignment = TextAlignment.End,
+                    HorizontalTextAlignment = TextAlignment.Start,
                     TextColor = Theme.LinkColor,
                     FontSize = 18,
                     FontAttributes = FontAttributes.None,
@@ -293,7 +308,7 @@ namespace LaunchPal.View
             {
                 launchSite = new Label
                 {
-                    HorizontalTextAlignment = TextAlignment.End,
+                    HorizontalTextAlignment = TextAlignment.Start,
                     TextColor = Theme.TextColor,
                     FontSize = 18,
                     FontAttributes = FontAttributes.None
@@ -374,7 +389,7 @@ namespace LaunchPal.View
 
             var clouds = new Label
             {
-                HorizontalTextAlignment = TextAlignment.End,
+                HorizontalTextAlignment = TextAlignment.Start,
                 TextColor = Theme.TextColor,
                 FontSize = 18,
                 FontAttributes = FontAttributes.None
@@ -390,7 +405,7 @@ namespace LaunchPal.View
 
             var wind = new Label
             {
-                HorizontalTextAlignment = TextAlignment.End,
+                HorizontalTextAlignment = TextAlignment.Start,
                 TextColor = Theme.TextColor,
                 FontSize = 18,
                 FontAttributes = FontAttributes.None
@@ -496,17 +511,18 @@ namespace LaunchPal.View
 
         private void PopulateTrackingButtons()
         {
-            bool beingTracked = TrackingManager.IsLaunchBeingTracked(Context.Id);
-
+            // Create/Remove notification for launch
             var notify = new Button
             {
-                Text = beingTracked ? "Remove Tracking" : "Track Launch",
                 BackgroundColor = Theme.ButtonBackgroundColor,
                 BorderColor = Theme.FrameBorderColor,
                 TextColor = Theme.ButtonTextColor
             };
+            notify.SetBinding(Button.TextProperty, "TrackingButtonText");
             notify.Clicked += async (sender, args) =>
             {
+                bool beingTracked = TrackingManager.IsLaunchBeingTracked(Context.Id);
+
                 var response = beingTracked ? 
                 await DisplayAlert("Please confirm", "Do you want to remove the notification and stop tracking this launch?", "Yes", "No") :
                 await DisplayAlert("Please confirm", $"Do you want to be notified {App.Settings.NotifyBeforeLaunch} minutes before this launch?", "Yes", "No");
@@ -516,14 +532,17 @@ namespace LaunchPal.View
 
                 if (beingTracked)
                 {
+                    notify.Text = "Track Launch";
                     TrackingManager.RemoveTrackedLaunch(Context.Id);
                 }
                 else
                 {
+                    notify.Text = "Remove Tracking";
                     TrackingManager.AddTrackedLaunch(Context.Id);
                 }
             };
 
+            // Set data for tile/Widget
             var setTile = new Button
             {
                 Text = "Follow Launch",
@@ -534,7 +553,8 @@ namespace LaunchPal.View
             setTile.Clicked += async (sender, args) =>
             {
                 await DisplayAlert("Launch followed", "You are now following this launch on your homescreen", "Confirm");
-                App.Settings.SimpleLaunchDataData = new SimpleLaunchData(CacheManager.TryGetLaunchById(Context.Id).Result);
+                var trackedLaunch = new SimpleLaunchData(CacheManager.TryGetLaunchById(Context.Id).Result);
+                App.Settings.SimpleLaunchDataData = trackedLaunch;
                 DependencyService.Get<ICreateTile>().SetLaunch();
             };
 
@@ -545,7 +565,23 @@ namespace LaunchPal.View
             Grid.SetColumnSpan(setTile, 3);
         }
 
-        private TapGestureRecognizer NavigateToMapWhenTaped(Pad launchSite)
+        private IGestureRecognizer NavigateToPageWhenTaped(int rocketId)
+        {
+            var tapGestureRecognizer = new TapGestureRecognizer();
+            tapGestureRecognizer.Tapped += (s, e) => {
+
+                var mainPage = this.Parent.Parent as MainPage;
+
+                if (mainPage?.GetType() != typeof(MainPage))
+                    return;
+
+                mainPage.NavigateTo(new RocketPage(rocketId));
+            };
+
+            return tapGestureRecognizer;
+        }
+
+        private IGestureRecognizer NavigateToMapWhenTaped(Pad launchSite)
         {
             var tapGestureRecognizer = new TapGestureRecognizer();
             tapGestureRecognizer.Tapped += (s, e) => {
@@ -561,7 +597,7 @@ namespace LaunchPal.View
             return tapGestureRecognizer;
         }
 
-        private TapGestureRecognizer NavigateToWebWhenTaped(string url)
+        private IGestureRecognizer NavigateToWebWhenTaped(string url)
         {
             var tapGestureRecognizer = new TapGestureRecognizer();
             tapGestureRecognizer.Tapped += (s, e) => {
@@ -573,7 +609,7 @@ namespace LaunchPal.View
                     if (mainPage?.GetType() != typeof(MainPage))
                         return;
 
-                    mainPage.NavigateTo(new Web(url, Context));
+                    mainPage.NavigateTo(new WebPage(url, Context));
                 }
                 else
                 {

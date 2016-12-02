@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="48046Threezool.LaunchPal" Publisher="CN=9D303B81-1815-49A7-8132-B7BC184851CE" Version="4.0.1.0" />
+  <Identity Name="48046Threezool.LaunchPal" Publisher="CN=9D303B81-1815-49A7-8132-B7BC184851CE" Version="4.0.2.0" />
   <mp:PhoneIdentity PhoneProductId="9ee54cbd-2516-4f0d-a725-8f6f02ff4920" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>LaunchPal</DisplayName>
