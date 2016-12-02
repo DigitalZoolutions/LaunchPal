@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using LaunchPal.Helper;
+﻿using LaunchPal.Helper;
 using Xamarin.Forms;
 
 namespace LaunchPal.View.HelperPages

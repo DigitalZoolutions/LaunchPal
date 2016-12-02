@@ -7,7 +7,6 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LaunchPal.ExternalApi.SpaceNews.JsonObject;
-using LaunchPal.ExternalApi.SpaceNews.XmlObject;
 using Newtonsoft.Json;
 
 namespace LaunchPal.ExternalApi.SpaceNews.Request

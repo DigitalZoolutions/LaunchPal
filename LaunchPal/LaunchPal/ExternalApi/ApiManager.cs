@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using LaunchPal.ExternalApi.LaunchLibrary.JsonObject;
 using LaunchPal.ExternalApi.LaunchLibrary.Request;
-using LaunchPal.ExternalApi.LaunchPal.JsonObject;
-using LaunchPal.ExternalApi.LaunchPal.Request;
 using LaunchPal.ExternalApi.OpenWeatherMap.JsonObject;
 using LaunchPal.ExternalApi.OpenWeatherMap.Request;
 using LaunchPal.ExternalApi.PeopleInSpace.Request;
-using LaunchPal.ExternalApi.SpaceNews.JsonObject;
 using LaunchPal.ExternalApi.SpaceNews.Request;
-using LaunchPal.ExternalApi.SpaceNews.XmlObject;
 using LaunchPal.Model;
 
 namespace LaunchPal.ExternalApi

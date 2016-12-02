@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using LaunchPal.Helper;
+﻿using LaunchPal.Helper;
 using LaunchPal.Interface;
 using LaunchPal.View;
 using Xamarin.Forms;
-using System.Threading;
-using System.Threading.Tasks;
-using LaunchPal.ExternalApi;
 using LaunchPal.Manager;
 
 namespace LaunchPal

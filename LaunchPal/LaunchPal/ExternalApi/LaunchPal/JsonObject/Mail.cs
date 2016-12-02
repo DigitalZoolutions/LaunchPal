@@ -1,5 +1,4 @@
-﻿using LaunchPal.ExternalApi.LaunchLibrary.JsonObject;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace LaunchPal.ExternalApi.LaunchPal.JsonObject
 {

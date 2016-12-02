@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using LaunchPal.Extension;
 using LaunchPal.ExternalApi;
-using LaunchPal.ExternalApi.LaunchLibrary;
 using LaunchPal.ExternalApi.LaunchLibrary.JsonObject;
 using LaunchPal.ExternalApi.PeopleInSpace.JsonObject;
 using LaunchPal.Helper;

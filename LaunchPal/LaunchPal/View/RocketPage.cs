@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LaunchPal.CustomElement;
 using LaunchPal.Helper;
 using LaunchPal.View.HelperPages;
 using LaunchPal.ViewModel;

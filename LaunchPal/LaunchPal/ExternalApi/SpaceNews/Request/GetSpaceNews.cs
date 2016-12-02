@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LaunchPal.ExternalApi.SpaceNews.JsonObject;
+﻿using System.Threading.Tasks;
 using LaunchPal.ExternalApi.SpaceNews.XmlObject;
 
 namespace LaunchPal.ExternalApi.SpaceNews.Request
