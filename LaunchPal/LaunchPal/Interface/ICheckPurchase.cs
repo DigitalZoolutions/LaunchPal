@@ -6,7 +6,7 @@ namespace LaunchPal.Interface
     {
         bool HasPurchasedPlus();
 
-        Task<bool> PurchasePlus();
+        bool PurchasePlus();
 
         bool CanPurchasePlus();
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using LaunchPal.Enums;
 using LaunchPal.Interface;
 using LaunchPal.Model;
 using LaunchPal.Model.CacheModel;
@@ -58,11 +59,9 @@ namespace LaunchPal.Manager
             DependencyService.Get<INotify>().DeleteNotification(launchToRemove.Launch.Id, NotificationType.TrackedLaunch);
         }
 
-        public static async void ClearAllTrackedLaunches()
+        public static void ClearAllTrackedLaunches()
         {
             _trackedLaunches = new CacheTracking { TrackingList = new List<LaunchData>() };
-            DependencyService.Get<INotify>().ClearNotifications(NotificationType.TrackedLaunch);
-            await DependencyService.Get<IStoreCache>().ClearCache(CacheType.TrackingData);
         }
 
         public static void GenerateNotificationsForAllTrackedLaunches()
@@ -73,6 +72,21 @@ namespace LaunchPal.Manager
             }
         }
 
+        /// <summary>
+        /// Refresh all notifications based on current tracked launches
+        /// </summary>
+        public static void UpdateTrackedLaunches()
+        {
+            foreach (var trackedLaunch in _trackedLaunches.TrackingList)
+            {
+                DependencyService.Get<INotify>().UpdateNotification(trackedLaunch, NotificationType.TrackedLaunch);
+            }
+        }
+
+        /// <summary>
+        /// Update any existing notification if a launch is tracked based on a list of launches provided
+        /// </summary>
+        /// <param name="launches">A list of LaunchData</param>
         public static void UpdateTrackedLaunches(List<LaunchData> launches)
         {
             foreach (var launch in launches)
@@ -88,6 +102,10 @@ namespace LaunchPal.Manager
             }
         }
 
+        /// <summary>
+        /// Update any existing notification if the launch provided is tracked
+        /// </summary>
+        /// <param name="launch">A LaunchData object</param>
         public static void UpdateTrackedLaunches(LaunchData launch)
         {
             var trackedLaunch = _trackedLaunches.TrackingList.FirstOrDefault(x => x.Launch.Id == launch?.Launch?.Id);

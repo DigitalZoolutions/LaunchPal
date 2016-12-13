@@ -1,4 +1,5 @@
-﻿using LaunchPal.Model;
+﻿using LaunchPal.Enums;
+using LaunchPal.Model;
 
 namespace LaunchPal.Interface
 {
@@ -11,11 +12,5 @@ namespace LaunchPal.Interface
         void DeleteNotification(int index, NotificationType type);
 
         void ClearNotifications(NotificationType type);
-    }
-
-    public enum NotificationType
-    {
-        NextLaunch,
-        TrackedLaunch
     }
 }

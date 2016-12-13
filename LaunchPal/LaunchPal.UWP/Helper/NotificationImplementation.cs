@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Notifications;
+using LaunchPal.Enums;
 using LaunchPal.ExternalApi.LaunchLibrary.JsonObject;
+using LaunchPal.Helper;
 using LaunchPal.Interface;
 using LaunchPal.Model;
 using LaunchPal.UWP.Helper;
@@ -18,6 +20,17 @@ namespace LaunchPal.UWP.Helper
     {
         public void AddNotification(LaunchData launch, NotificationType type)
         {
+            if (launch?.Launch == null)
+                return;
+
+            var deliverytime = TimeConverter.DetermineTimeSettings(launch.Launch.Net, LaunchPal.App.Settings.UseLocalTime)
+                .AddMinutes(-LaunchPal.App.Settings.NotifyBeforeLaunch.ToIntValue());
+
+            if (deliverytime < DateTime.Now)
+            {
+                return;
+            }
+
             switch (type)
             {
                 case NotificationType.NextLaunch:
@@ -48,7 +61,12 @@ namespace LaunchPal.UWP.Helper
                         new AdaptiveText()
                         {
                             Text = $"{launch?.Launch?.Name} is about to launch."
-                        }
+                        },
+
+                        new AdaptiveText()
+                        {
+                            Text = $"Time: {TimeConverter.SetStringTimeFormat(launch.Launch.Net, LaunchPal.App.Settings.UseLocalTime).Replace(" Local", "")}"
+                        }
                     },
  
                     AppLogoOverride = new ToastGenericAppLogo()
@@ -71,22 +89,44 @@ namespace LaunchPal.UWP.Helper
                     { "action", "viewLaunch" },
                     { "LaunchId", launch?.Launch?.Id.ToString() }
  
-                }.ToString()
+                }.ToString(),
+
+                Actions = new ToastActionsCustom()
+                {
+                    Inputs =
+                    {
+                        new ToastSelectionBox("snoozeTime")
+                        {
+                            DefaultSelectionBoxItemId = "15",
+                            Items =
+                            {
+                                new ToastSelectionBoxItem("5", "5 minutes"),
+                                new ToastSelectionBoxItem("15", "15 minutes"),
+                                new ToastSelectionBoxItem("30", "30 minutes"),
+                                new ToastSelectionBoxItem("45", "45 minutes"),
+                                new ToastSelectionBoxItem("60", "1 hour")
+                            }
+                        }
+                    },
+                    Buttons =
+                    {
+                        new ToastButtonSnooze()
+                        {
+                            SelectionBoxId = "snoozeTime"
+                        },
+                        new ToastButtonDismiss()
+                    }
+                }
             };
 
             // And create the toast notification
-            var toast = new ToastNotification(toastContent.GetXml())
-            {
-                ExpirationTime = DateTime.Now.AddHours(2)
-            };
-
-            var scheduleToast = new ScheduledToastNotification(toast.Content, launch.Launch.Net.AddMinutes(-LaunchPal.App.Settings.NotifyBeforeLaunch))
+            var scheduleToast = new ScheduledToastNotification(toastContent.GetXml(), deliverytime)
             {
                 Id = launch?.Launch?.Id.ToString() ?? "0",
                 Tag = launch?.Launch?.Id.ToString() ?? "0",
                 Group = groupName,
+                NotificationMirroring = NotificationMirroring.Allowed,
             };
-
             ToastNotificationManager.CreateToastNotifier().AddToSchedule(scheduleToast);
         }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Net.Http;
 using System.Runtime.CompilerServices;
 using LaunchPal.ExternalApi;
 using LaunchPal.ExternalApi.LaunchLibrary.JsonObject;
@@ -65,38 +66,48 @@ namespace LaunchPal.ViewModel
 
         public LaunchViewModel()
         {
+            LaunchData launchData = new LaunchData();
+
             try
             {
-                var launchData = CacheManager.TryGetNextLaunch().Result;
+                launchData = CacheManager.TryGetNextLaunch().Result;
                 if (launchData.Forecast == null && App.Settings.SuccessfullIap)
                 {
                     launchData.Forecast = ApiManager.GetForecastByCoordinates(launchData.Launch.Location.Pads[0].Latitude, launchData.Launch.Location.Pads[0].Longitude).GetAwaiter().GetResult();
                     CacheManager.TryStoreUpdatedLaunchData(launchData);
                 }
-                PrepareViewModelData(launchData);
             }
             catch (Exception ex)
             {
                 SetError(ex);
-            } 
+            }
+
+            PrepareViewModelData(launchData);
         }
 
         public LaunchViewModel(int launchId)
         {
+            LaunchData launchData = new LaunchData();
+
             try
             {
-                var launchData = CacheManager.TryGetLaunchById(launchId).Result;
+                launchData = CacheManager.TryGetLaunchById(launchId).Result;
                 if (launchData.Forecast == null && (launchData.Launch.Net - DateTime.Now).TotalDays < 5 && App.Settings.SuccessfullIap)
                 {
                     launchData.Forecast = ApiManager.GetForecastByCoordinates(launchData.Launch.Location.Pads[0].Latitude, launchData.Launch.Location.Pads[0].Longitude).GetAwaiter().GetResult();
                     CacheManager.TryStoreUpdatedLaunchData(launchData);
                 }
-                PrepareViewModelData(launchData);
+                if (launchData?.Launch == null)
+                {
+                    throw new HttpRequestException();
+                }
             }
             catch (Exception ex)
             {
                 SetError(ex);
             }
+
+            PrepareViewModelData(launchData);
         }
 
         private void PrepareViewModelData(LaunchData launchData)

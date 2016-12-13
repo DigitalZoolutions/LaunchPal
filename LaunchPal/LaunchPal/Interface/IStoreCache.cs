@@ -1,14 +1,8 @@
 ﻿using System.Threading.Tasks;
+using LaunchPal.Enums;
 
 namespace LaunchPal.Interface
 {
-    public enum CacheType
-    {
-        LaunchData,
-        SettingsData,
-        NewsData,
-        TrackingData
-    }
     public interface IStoreCache
     {
         Task<bool> SaveCache(string objectToStore, CacheType type);

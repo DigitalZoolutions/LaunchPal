@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Graphics.Display;
+using LaunchPal.Enums;
 using LaunchPal.Interface;
 using LaunchPal.Windows.Helper;
 using Xamarin.Forms;

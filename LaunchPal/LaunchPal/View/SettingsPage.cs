@@ -1,4 +1,8 @@
-﻿using LaunchPal.CustomElement;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using LaunchPal.CustomElement;
+using LaunchPal.Enums;
 using LaunchPal.Helper;
 using LaunchPal.Interface;
 using LaunchPal.Manager;
@@ -35,7 +39,7 @@ namespace LaunchPal.View
             grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Auto) });
 
             grid.Children.Add(GenerateThemePicker(), 0, 0);
-            grid.Children.Add(new Label { Text = "Select the theme for the app", TextColor = Theme.TextColor, VerticalTextAlignment = TextAlignment.Center }, 1, 0);
+            grid.Children.Add(new Label { Text = $"Select the theme for the app{Environment.NewLine}Note - A restart is required for the change to take affect", TextColor = Theme.TextColor, VerticalTextAlignment = TextAlignment.Center }, 1, 0);
             grid.Children.Add(GenerateLocalTimeToggle(), 0, 1);
             grid.Children.Add(new Label { Text = "Switch between using the device time or UTC", TextColor = Theme.TextColor, VerticalTextAlignment = TextAlignment.Center }, 1, 1);
             grid.Children.Add(GenerateNextLaunchNotificationToggle(), 0, 2);
@@ -139,57 +143,33 @@ namespace LaunchPal.View
 
         private Picker GenerateNotifyBeforeLaunchTimePicker()
         {
-            var themePicker = new Picker
+            var timePicker = new Picker
             {
-                Items =
-                {
-                    "15 min",
-                    "30 min",
-                    "45 min",
-                    "60 min",
-                    "1h 15min",
-                    "1h 30min"
-                },
-                SelectedIndex = Theme.GetCurrentThemeIntValue(),
                 Title = "Remind me for tracked launches",
                 TextColor = Theme.LinkColor,
                 BackgroundColor = Theme.FrameColor
             };
 
-            themePicker.SelectedIndexChanged += (sender, args) =>
+            foreach (var notifyTime in (NotifyTime[])Enum.GetValues(typeof(NotifyTime)))
+            {
+                timePicker.Items.Add(notifyTime.ToFriendlyString());
+            }
+
+            timePicker.SelectedIndex = (int)App.Settings.NotifyBeforeLaunch;
+
+            timePicker.SelectedIndexChanged += (sender, args) =>
             {
                 if (sender.GetType() != typeof(Picker))
                     return;
 
                 var selectedIndex = (sender as Picker)?.SelectedIndex ?? 0;
 
-                switch (selectedIndex)
-                {
-                    case 0:
-                        App.Settings.NotifyBeforeLaunch = 15;
-                        break;
-                    case 1:
-                        App.Settings.NotifyBeforeLaunch = 30;
-                        break;
-                    case 2:
-                        App.Settings.NotifyBeforeLaunch = 45;
-                        break;
-                    case 3:
-                        App.Settings.NotifyBeforeLaunch = 60;
-                        break;
-                    case 4:
-                        App.Settings.NotifyBeforeLaunch = 75;
-                        break;
-                    case 5:
-                        App.Settings.NotifyBeforeLaunch = 90;
-                        break;
-                    default:
-                        App.Settings.NotifyBeforeLaunch = 15;
-                        break;
-                }
+                App.Settings.NotifyBeforeLaunch = (NotifyTime) selectedIndex;
+
+                TrackingManager.UpdateTrackedLaunches();
             };
 
-            return themePicker;
+            return timePicker;
         }
 
         private static StackLayout GenerateLocalTimeToggle()
@@ -233,7 +213,7 @@ namespace LaunchPal.View
 
             button.Clicked += (sender, args) =>
             {
-                CacheManager.ClearCache();
+                StorageManager.ClearCache();
             };
 
             return button;
@@ -250,8 +230,10 @@ namespace LaunchPal.View
 
             button.Clicked += (sender, args) =>
             {
-                TrackingManager.ClearAllTrackedLaunches();
+                StorageManager.ClearTracking();
+                App.Settings.TrackedLaunchOnHomescreen = null;
                 DependencyService.Get<INotify>().ClearNotifications(NotificationType.TrackedLaunch);
+                DependencyService.Get<ICreateTile>().SetLaunch();
             };
 
             return button;
@@ -274,41 +256,55 @@ namespace LaunchPal.View
                 BackgroundColor = Theme.FrameColor
             };
 
-            themePicker.SelectedIndexChanged += (sender, args) =>
+            themePicker.SelectedIndexChanged += async (sender, args) =>
             {
                 if (sender.GetType() != typeof(Picker))
                     return;
 
                 var selectedIndex = (sender as Picker)?.SelectedIndex ?? 0;
 
-                switch ((Theme.AppTheme)selectedIndex)
+                if (selectedIndex == (int)App.Settings.AppTheme)
+                    return;
+
+                var agreeToCloseApp = await DisplayAlert("Do you want to restart?", "To the change to take affect the app needs to be restarted, Do you want to close the app now?", "Continue", "Cancel");
+
+                if (!agreeToCloseApp)
                 {
-                    case Theme.AppTheme.Light:
-                        Theme.SetTheme(Theme.AppTheme.Light);
-                        App.Settings.AppTheme = Theme.AppTheme.Light;
+                    themePicker.SelectedIndex = (int)App.Settings.AppTheme;
+                    return;
+                }
+
+                switch ((AppTheme)selectedIndex)
+                {
+                    case AppTheme.Light:
+                        Theme.SetTheme(AppTheme.Light);
+                        App.Settings.AppTheme = AppTheme.Light;
                         NotifyRestartApp();
                         break;
-                    case Theme.AppTheme.Dark:
-                        Theme.SetTheme(Theme.AppTheme.Dark);
-                        App.Settings.AppTheme = Theme.AppTheme.Dark;
+                    case AppTheme.Dark:
+                        Theme.SetTheme(AppTheme.Dark);
+                        App.Settings.AppTheme = AppTheme.Dark;
                         NotifyRestartApp();
                         break;
-                    case Theme.AppTheme.Night:
-                        Theme.SetTheme(Theme.AppTheme.Night);
-                        App.Settings.AppTheme = Theme.AppTheme.Night;
+                    case AppTheme.Night:
+                        Theme.SetTheme(AppTheme.Night);
+                        App.Settings.AppTheme = AppTheme.Night;
                         NotifyRestartApp();
                         break;
-                    case Theme.AppTheme.Contrast:
-                        Theme.SetTheme(Theme.AppTheme.Contrast);
-                        App.Settings.AppTheme = Theme.AppTheme.Contrast;
+                    case AppTheme.Contrast:
+                        Theme.SetTheme(AppTheme.Contrast);
+                        App.Settings.AppTheme = AppTheme.Contrast;
                         NotifyRestartApp();
                         break;
                     default:
-                        Theme.SetTheme(Theme.AppTheme.Light);
-                        App.Settings.AppTheme = Theme.AppTheme.Light;
+                        Theme.SetTheme(AppTheme.Light);
+                        App.Settings.AppTheme = AppTheme.Light;
                         NotifyRestartApp();
                         break;
                 }
+
+                StorageManager.SaveAllData();
+                DependencyService.Get<IControlAppFunction>().ExitApp();
             };
 
             return themePicker;

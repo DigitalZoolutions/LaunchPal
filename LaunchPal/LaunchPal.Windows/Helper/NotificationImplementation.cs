@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LaunchPal.Enums;
 using LaunchPal.ExternalApi.LaunchLibrary.JsonObject;
 using LaunchPal.Interface;
 using LaunchPal.Model;
@@ -13,22 +14,22 @@ namespace LaunchPal.Windows.Helper
 {
     class NotificationImplementation : INotify
     {
-        public void AddNotification(LaunchData launch)
+        public void AddNotification(LaunchData launch, NotificationType type)
         {
             throw new NotImplementedException();
         }
 
-        public void UpdateNotification(LaunchData launch)
+        public void UpdateNotification(LaunchData launch, NotificationType type)
         {
             throw new NotImplementedException();
         }
 
-        public void DeleteNotification(int index)
+        public void DeleteNotification(int index, NotificationType type)
         {
             throw new NotImplementedException();
         }
 
-        public void ClearNotifications()
+        public void ClearNotifications(NotificationType type)
         {
             throw new NotImplementedException();
         }

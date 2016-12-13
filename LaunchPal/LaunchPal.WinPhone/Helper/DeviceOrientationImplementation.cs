@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Graphics.Display;
+using LaunchPal.Enums;
 using LaunchPal.Interface;
 using LaunchPal.WinPhone.Helper;
 using Xamarin.Forms;
@@ -13,8 +14,6 @@ namespace LaunchPal.WinPhone.Helper
 {
     class DeviceOrientationImplementation
     {
-        public DeviceOrientationImplementation() { }
-
         public DeviceOrientations GetOrientation()
         {
             var orientation = DisplayInformation.GetForCurrentView().CurrentOrientation;

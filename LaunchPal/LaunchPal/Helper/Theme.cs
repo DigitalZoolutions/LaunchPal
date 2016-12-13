@@ -1,4 +1,5 @@
-﻿using Xamarin.Forms;
+﻿using LaunchPal.Enums;
+using Xamarin.Forms;
 
 namespace LaunchPal.Helper
 {
@@ -16,25 +17,16 @@ namespace LaunchPal.Helper
         private static Color _buttonBackgroundColor;
         private static Color _buttonTextColor;
 
-        public enum AppTheme
-        {
-            Light,
-            Dark,
-            Night,
-            Contrast
-        }
-
-        internal static bool UseLightIcons => _useLightIcons;
-        internal static Color BackgroundColor => _backgroundColor;
-        internal static Color NavBackgroundColor => _navBackgroundColor;
-        internal static Color TextColor => _textColor;
-        internal static Color HeaderColor => _headerColor;
-        internal static Color LinkColor => _linkColor;
-        internal static Color FrameColor => _frameColor;
-        internal static Color FrameBorderColor => _frameBorderColor;
-        internal static Color ButtonBackgroundColor => _buttonBackgroundColor;
-        internal static Color ButtonTextColor => _buttonTextColor;
-
+        public static bool UseLightIcons => _useLightIcons;
+        public static Color BackgroundColor => _backgroundColor;
+        public static Color NavBackgroundColor => _navBackgroundColor;
+        public static Color TextColor => _textColor;
+        public static Color HeaderColor => _headerColor;
+        public static Color LinkColor => _linkColor;
+        public static Color FrameColor => _frameColor;
+        public static Color FrameBorderColor => _frameBorderColor;
+        public static Color ButtonBackgroundColor => _buttonBackgroundColor;
+        public static Color ButtonTextColor => _buttonTextColor;
 
         internal static void SetTheme(AppTheme theme)
         {

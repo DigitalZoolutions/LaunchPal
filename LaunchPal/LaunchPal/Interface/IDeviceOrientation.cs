@@ -1,12 +1,7 @@
-﻿namespace LaunchPal.Interface
-{
-    public enum DeviceOrientations
-    {
-        Undefined,
-        Landscape,
-        Portrait
-    }
+﻿using LaunchPal.Enums;
 
+namespace LaunchPal.Interface
+{
     public interface IDeviceOrientation
     {
         DeviceOrientations GetOrientation();

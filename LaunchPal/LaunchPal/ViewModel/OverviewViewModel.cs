@@ -59,8 +59,9 @@ namespace LaunchPal.ViewModel
             List<LaunchData> upcomingLaunches = new List<LaunchData>();
             try
             {
-                nextLaunch = CacheManager.TryGetNextLaunch().Result.Launch;
-                upcomingLaunches = CacheManager.TryGetUpcomingLaunches().Result;
+                nextLaunch = CacheManager.TryGetNextLaunch().GetAwaiter().GetResult().Launch;
+                upcomingLaunches = CacheManager.TryGetUpcomingLaunches().GetAwaiter().GetResult();
+                AstronautsInSpace = CacheManager.TryGetAstronautsInSpace().GetAwaiter().GetResult().Count;
             }
             catch (Exception ex)
             {
@@ -80,13 +81,17 @@ namespace LaunchPal.ViewModel
             LaunchId = nextLaunch?.Id ?? 0;
             _endDate = TimeConverter.DetermineTimeSettings(nextLaunch?.Net ?? DateTime.MinValue, App.Settings.UseLocalTime);
             CurrentMonth = "Launches in " + DateTime.Now.NameOfMonth();
-            LaunchesThisWeek = upcomingLaunches.FindAll(x => x.Launch.Net > DateTime.Now.MondayOfWeek() && x.Launch.Net < DateTime.Now.MondayOfWeek().AddDays(6) && x.Launch.Status != 2);
-            LaunchesThisMonth = upcomingLaunches.FindAll(x => x.Launch.Net > DateTime.Now.FirstDayOfMonth() && x.Launch.Net < DateTime.Now.LastDayOfMonth());
+            LaunchesThisWeek = upcomingLaunches.FindAll(x => x.Launch.Net > DateTime.Today.MondayOfWeek() && x.Launch.Net < DateTime.Today.MondayOfWeek().AddDays(6) && x.Launch.Status != 2);
+            LaunchesThisMonth = upcomingLaunches.FindAll(x => x.Launch.Net > DateTime.Today.FirstDayOfMonth() && x.Launch.Net < DateTime.Today.LastDayOfMonth());
             LaunchesThisWeekLabel = LaunchesThisWeek.Where(x => x.Launch.Status != 2).ToList().Count.ToString();
             LaunchesThisMonthLabel = LaunchesThisMonth.Where(x => x.Launch.Status != 2).ToList().Count.ToString();
             AstronoutsInSpaceLabel = "Astronauts in space: ";
-            AstronautsInSpace = CacheManager.TryGetAstronautsInSpace().GetAwaiter().GetResult().Count;
             TrackedLaunches = new SearchListTemplate(TrackingManager.TryGetTrackedLaunches().TrackingList);
+        }
+
+        public OverviewViewModel(Exception ex)
+        {
+            SetError(ex);
         }
 
         private bool OnTimerTick()

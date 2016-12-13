@@ -9,6 +9,7 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using LaunchPal.Droid.Helper;
+using LaunchPal.Enums;
 using LaunchPal.Interface;
 using Xamarin.Forms;
 

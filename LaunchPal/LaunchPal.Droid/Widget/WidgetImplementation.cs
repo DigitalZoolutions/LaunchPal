@@ -24,7 +24,8 @@ namespace LaunchPal.Droid.Widget
 
         public void SetLaunch()
         {
-            _launchSimpleLaunchDataData = App.Settings.SimpleLaunchDataData;
+            _launchSimpleLaunchDataData = App.Settings.TrackedLaunchOnHomescreen;
+            return;
         }
 
         public SimpleLaunchData GetLaunch()

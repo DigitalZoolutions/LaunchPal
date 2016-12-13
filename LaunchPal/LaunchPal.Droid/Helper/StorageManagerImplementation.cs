@@ -11,6 +11,7 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using LaunchPal.Droid.Helper;
+using LaunchPal.Enums;
 using LaunchPal.Interface;
 using Xamarin.Forms;
 using Environment = System.Environment;
@@ -56,7 +57,7 @@ namespace LaunchPal.Droid.Helper
             }
         }
 
-        public Task<string> LoadCache(CacheType type)
+        public string LoadCache(CacheType type)
         {
             var fileName = FileNameFromCacheType(type);
             
@@ -65,12 +66,12 @@ namespace LaunchPal.Droid.Helper
                 var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
                 var filePath = Path.Combine(documentsPath, fileName);
                 return File.Exists(filePath) ?
-                    Task.FromResult(File.ReadAllText(filePath)) :
-                    Task.FromResult("");
+                    Task.FromResult(File.ReadAllText(filePath)).GetAwaiter().GetResult() :
+                    Task.FromResult("").GetAwaiter().GetResult();
             }
             catch (Exception)
             {
-                return Task.FromResult("");
+                return Task.FromResult("").GetAwaiter().GetResult();
             }
         }
 

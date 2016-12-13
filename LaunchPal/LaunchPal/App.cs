@@ -1,4 +1,6 @@
-﻿using LaunchPal.Helper;
+﻿using System;
+using System.Threading.Tasks;
+using LaunchPal.Helper;
 using LaunchPal.Interface;
 using LaunchPal.View;
 using Xamarin.Forms;
@@ -12,17 +14,31 @@ namespace LaunchPal
 
         public App()
         {
-            // Load Settings
-            LoadAppSettingsAndCache();
+            Exception exception = null;
 
-            // Set startup theme
-            Theme.SetTheme(Settings.AppTheme);
+            try
+            {
+                // Load Settings
+                LoadAppSettingsAndCache();
 
-            // Set LiveTile
-            DependencyService.Get<ICreateTile>().SetLaunch();
+                // Set startup theme
+                Theme.SetTheme(Settings.AppTheme);
+
+                // Set LiveTile
+                if (Device.Idiom == TargetIdiom.Desktop || Device.Idiom == TargetIdiom.Phone)
+                {
+                    DependencyService.Get<ICreateTile>().SetLaunch();
+                }
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+            }
 
             // The root page of your application
-            MainPage = new MainPage();
+            MainPage = string.IsNullOrEmpty(exception?.Message) ? new MainPage() : new MainPage(exception);
+
+            
         }
 
         public App(int id)
@@ -34,7 +50,10 @@ namespace LaunchPal
             Theme.SetTheme(Settings.AppTheme);
 
             // Set LiveTile
-            DependencyService.Get<ICreateTile>().SetLaunch();
+            if (Device.Idiom == TargetIdiom.Desktop || Device.Idiom == TargetIdiom.Phone)
+            {
+                DependencyService.Get<ICreateTile>().SetLaunch();
+            }
 
             // Start the app on the Launch Page
             var mainPage = new MainPage();
@@ -46,7 +65,7 @@ namespace LaunchPal
 
         private static void LoadAppSettingsAndCache()
         {
-            CacheManager.LoadCache();
+            StorageManager.LoadAllData();
         }
 
         protected override void OnStart()
@@ -57,13 +76,12 @@ namespace LaunchPal
         protected override void OnSleep()
         {
             // Handle when your app sleeps
-            CacheManager.SaveCache();
+            StorageManager.SaveAllData();
         }
 
         protected override void OnResume()
         {
             // Handle when your app resumes
         }
-
     }
 }

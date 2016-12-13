@@ -19,7 +19,7 @@ namespace LaunchPal.View
 
             this.Appearing += async (sender, args) =>
             {
-                await WaitAndExecute(1000, () =>
+                await WaitAndExecute(100, () =>
                 {
                     Context = new NewsViewModel();
                     Content = GenerateView();

@@ -15,8 +15,8 @@
 
     // Get the latest launch from launchlibrary
     var getLaunch = function () {
-        return $http.get('http://localhost:57334/api/LaunchLibrary/')
-        //return $http.get('http://launchpal.digitalzoolutions.com/api/LaunchLibrary/')
+        //return $http.get('http://localhost:57334/api/LaunchLibrary/')
+        return $http.get('http://launchpal.digitalzoolutions.com/api/LaunchLibrary/')
             .then(
             function (payload) {
                 return payload.data;

@@ -24,14 +24,14 @@ namespace LaunchPal.UWP.Helper
             return iap1 || iap2;
         }
 
-        public async Task<bool> PurchasePlus()
+        public bool PurchasePlus()
         {
             if (HasPurchasedPlus())
                 return true;
 
             try
             {
-                var result = await CurrentApp.RequestProductPurchaseAsync("LaunchPal Plus");
+                var result = CurrentApp.RequestProductPurchaseAsync("LaunchPal Plus").GetAwaiter().GetResult();
 
                 switch (result.Status)
                 {

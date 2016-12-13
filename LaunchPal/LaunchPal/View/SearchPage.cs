@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using LaunchPal.Helper;
+using LaunchPal.Interface;
 using LaunchPal.Model;
 using LaunchPal.ViewModel;
 using Xamarin.Forms;
 
 namespace LaunchPal.View
 {
-    class SearchPage : ContentPage
+    internal class SearchPage : ContentPage
     {
         public SearchViewModel Context { get; set; }
 
@@ -22,7 +23,7 @@ namespace LaunchPal.View
 
         public SearchPage(List<LaunchData> launchList)
         {
-            Title = "Search";
+            Title = "Launch list";
             Context = new SearchViewModel(launchList);
             Context.SearchResult.ItemTapped += SearchResult_ItemTapped;
             BackgroundColor = Theme.BackgroundColor;
@@ -35,18 +36,9 @@ namespace LaunchPal.View
             {
                 RowDefinitions = new RowDefinitionCollection
                 {
-                    new RowDefinition()
-                    {
-                        Height = new GridLength(1, GridUnitType.Auto),
-                    },
-                    new RowDefinition
-                    {
-                        Height = new GridLength(2, GridUnitType.Absolute)
-                    },
-                    new RowDefinition
-                    {
-                        Height = new GridLength(1, GridUnitType.Auto)
-                    }
+                    new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) },
+                    new RowDefinition { Height = new GridLength(2, GridUnitType.Absolute) },
+                    new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) }
                 }
             };
 
@@ -55,23 +47,39 @@ namespace LaunchPal.View
                 Margin = new Thickness(10),
                 VerticalOptions = LayoutOptions.Start,
                 HorizontalOptions = LayoutOptions.FillAndExpand,
+                TextColor = Theme.TextColor,
                 Placeholder = "Search for launch",
+                PlaceholderColor = Theme.HeaderColor
             };
 
-            var searchButton = new Button
+            search.Completed += async (sender, args) =>
             {
-                Margin = new Thickness(10),
-                VerticalOptions = LayoutOptions.Start,
-                HorizontalOptions = LayoutOptions.End,
-                Text = "Search",
-                BackgroundColor = Theme.ButtonBackgroundColor,
-                BorderColor = Theme.FrameBorderColor,
-                TextColor = Theme.ButtonTextColor
+                if (!App.Settings.SuccessfullIap && DependencyService.Get<ICheckPurchase>().CanPurchasePlus())
+                {
+                    var purchaseNow = await DisplayAlert("LaunchPal Plus Needed",
+                        $"To be able to do a free search you need LaunchPal Plus.{Environment.NewLine}" +
+                        $"{Environment.NewLine}" +
+                        $"Do you want to purchase it now?",
+                        "Purchase", "Not now");
 
-            };
+                    if (!purchaseNow)
+                        return;
 
-            searchButton.Clicked += async (sender, args) =>
-            {
+                    var mainPage = this.Parent.Parent as MainPage;
+
+                    mainPage?.NavigateTo(new LaunchPalPlusPage());
+                    return;
+                }
+                else if (!App.Settings.SuccessfullIap && !DependencyService.Get<ICheckPurchase>().CanPurchasePlus())
+                {
+                    await DisplayAlert("LaunchPal Plus Needed",
+                                $"To be able to do a free search you need LaunchPal Plus.{Environment.NewLine}" +
+                                $"{Environment.NewLine}" +
+                                $"This is not currently supported on your device",
+                                "Continue");
+                    return;
+                }
+
                 try
                 {
                     this.Context.SearchForLaucnhes(search.Text);
@@ -96,8 +104,7 @@ namespace LaunchPal.View
                 Orientation = StackOrientation.Horizontal,
                 Children =
                 {
-                    search,
-                    searchButton
+                    search
                 }
             };
 
@@ -119,7 +126,17 @@ namespace LaunchPal.View
                 {
                     HorizontalTextAlignment = TextAlignment.Center,
                     VerticalTextAlignment = TextAlignment.Center,
-                    Text = "Search by typing in the name of the launch",
+                    Text = $"Search by typing in the name of the rocket or payload{Environment.NewLine}" +
+                           $"{Environment.NewLine}" +
+                           $"Examples when searching for rockets:{Environment.NewLine}" +
+                           $"Falcon 9{Environment.NewLine}" +
+                           $"Delta IV Heavy{Environment.NewLine}" +
+                           $"Long March 5{Environment.NewLine}" +
+                           $"{Environment.NewLine}" +
+                           $"Examples when searching for payloads:{Environment.NewLine}" +
+                           $"Iridium{Environment.NewLine}" +
+                           $"NRO{Environment.NewLine}" +
+                           $"Tiangong{Environment.NewLine}",
                     TextColor = Theme.TextColor
                 }, 0, 2);
             }

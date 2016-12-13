@@ -253,6 +253,7 @@
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="AppInstalationFiles\LaunchPal.Droid-Signed.apk" />
     <Content Include="AppInstalationFiles\LaunchPal_4.3.6.0_x86_x64_arm.appxbundle" />
+    <None Include="Properties\PublishProfiles\FTP.pubxml" />
     <None Include="Properties\PublishProfiles\Local server.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />

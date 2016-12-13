@@ -11,26 +11,30 @@ namespace LaunchPal.ViewModel
 {
     public class ErrorViewModel
     {
+        public bool HasError { get; set; }
         public Type ExceptionType { get; set; }
         public string ExceptionTitle { get; set; }
         public string ExceptionMessage { get; set; }
         public string ExceptionOriginalMessage { get; set; }
         public string StackTrace { get; set; }
 
-        private List<string> StackTraceList = new List<string>();
+        private readonly List<string> _stackTraceList;
 
         public ErrorViewModel()
         {
+            HasError = false;
             ExceptionType = null;
             ExceptionTitle = "";
             ExceptionMessage = "";
             ExceptionOriginalMessage = "";
             StackTrace = "";
-            StackTraceList = new List<string>();
+            _stackTraceList = new List<string>();
         }
 
         public void SetError(Exception exception)
         {
+            HasError = true;
+
             ExceptionType = exception.GetType();
 
             if (ExceptionType == typeof(AggregateException))
@@ -39,7 +43,7 @@ namespace LaunchPal.ViewModel
                 ExceptionType = exception.GetType();
             }
 
-            foreach (var stackTrace in StackTraceList.AsEnumerable().Reverse())
+            foreach (var stackTrace in _stackTraceList.AsEnumerable().Reverse())
             {
                 StackTrace += stackTrace + "\n";
             }
@@ -106,7 +110,7 @@ namespace LaunchPal.ViewModel
         {
             while (true)
             {
-                StackTraceList.Add(ex.StackTrace);
+                _stackTraceList.Add(ex.StackTrace);
                 if (ex.InnerException == null || ex.InnerException.Message.Contains("The text associated with this error code could not be found."))
                     return ex;
 

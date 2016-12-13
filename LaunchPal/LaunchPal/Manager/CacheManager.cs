@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LaunchPal.Enums;
 using LaunchPal.Extension;
 using LaunchPal.ExternalApi;
 using LaunchPal.ExternalApi.LaunchLibrary.JsonObject;
@@ -17,37 +18,41 @@ namespace LaunchPal.Manager
 {
     public static class CacheManager
     {
-        #region Private fields
+        #region Properties
 
-        private static LaunchData _nextLaunch = new LaunchData();
+        public static LaunchData NextLaunch { get; private set; } = new LaunchData();
 
-        private static List<CacheRocket> _cachedRockets = new List<CacheRocket>();
+        public static List<CacheRocket> CachedRockets { get; private set; } = new List<CacheRocket>();
 
-        private static LaunchRangeList _cachedLaunches = new LaunchRangeList
+        public static LaunchRangeList CachedLaunches { get; private set; } = new LaunchRangeList
         {
             CacheTimeOut = DateTime.Now.AddDays(-1),
             LaunchPairs = new List<LaunchData>()
         };
 
-        private static CacheNews _cachedCacheNewsFeed = new CacheNews
+        public static CacheNews CachedCacheNewsFeed { get; private set; } = new CacheNews
         {
             NewsFeeds = new List<NewsFeed>(),
             CacheTimeOut = DateTime.Now
         };
 
-        private static CachePeople _cachePeople = new CachePeople {Astronouts = new List<Person>(), CacheTimeOut = DateTime.Now};
+        public static CachePeople People { get; private set; } = new CachePeople
+        {
+            Astronouts = new List<Person>(),
+            CacheTimeOut = DateTime.Now
+        };
 
         #endregion
 
         public static async Task<LaunchData> TryGetNextLaunch()
         {
-            if (DateTime.Now < _nextLaunch.CacheTimeOut)
-                return _nextLaunch;
+            if (DateTime.Now < NextLaunch?.CacheTimeOut)
+                return NextLaunch;
 
             var nextLaunch = await ApiManager.NextLaunch();
             var nextMission = await ApiManager.MissionByLaunchId(nextLaunch.Id);
 
-            _nextLaunch = new LaunchData
+            NextLaunch = new LaunchData
             {
                 Launch = nextLaunch,
                 Mission = nextMission,
@@ -55,19 +60,19 @@ namespace LaunchPal.Manager
                 CacheTimeOut = GetCacheTimeOutForLaunches(nextLaunch.Net)
             };
 
-            TrackingManager.UpdateTrackedLaunches(_nextLaunch);
+            TrackingManager.UpdateTrackedLaunches(NextLaunch);
 
-            DependencyService.Get<INotify>().UpdateNotification(_nextLaunch, NotificationType.NextLaunch);
+            DependencyService.Get<INotify>().UpdateNotification(NextLaunch, NotificationType.NextLaunch);
 
-            return _nextLaunch;
+            return NextLaunch;
         }
 
         public static async Task<LaunchData> TryGetLaunchById(int id)
         {
-            if (_nextLaunch.Launch.Id == id)
-                return _nextLaunch;
+            if (NextLaunch.Launch.Id == id)
+                return NextLaunch;
 
-            var selectedLaunch = _cachedLaunches.LaunchPairs.FirstOrDefault(x => x.Launch.Id == id);
+            var selectedLaunch = CachedLaunches.LaunchPairs.FirstOrDefault(x => x.Launch.Id == id);
 
             if (selectedLaunch != null)
             {
@@ -80,7 +85,7 @@ namespace LaunchPal.Manager
                     return selectedLaunch;
                 }
 
-                _cachedLaunches.LaunchPairs.Remove(selectedLaunch);
+                CachedLaunches.LaunchPairs.Remove(selectedLaunch);
             }
 
             var newLaunch = await ApiManager.NextLaunchById(id);
@@ -96,14 +101,14 @@ namespace LaunchPal.Manager
 
             TrackingManager.UpdateTrackedLaunches(newLaunchPair);
 
-            _cachedLaunches.LaunchPairs.Add(newLaunchPair);
+            CachedLaunches.LaunchPairs.Add(newLaunchPair);
             return newLaunchPair;
         }
 
         public static async Task<List<LaunchData>> TryGetUpcomingLaunches()
         {
-            if (DateTime.Now < _cachedLaunches.CacheTimeOut)
-                return _cachedLaunches.LaunchPairs.ToList();
+            if (DateTime.Now < CachedLaunches?.CacheTimeOut)
+                return CachedLaunches.LaunchPairs.ToList();
 
             var upcomingLaunches =
                 await ApiManager.LaunchesByDate(
@@ -121,7 +126,7 @@ namespace LaunchPal.Manager
 
             TrackingManager.UpdateTrackedLaunches(launchPairs);
 
-            _cachedLaunches = new LaunchRangeList
+            CachedLaunches = new LaunchRangeList
             {
                 LaunchPairs = launchPairs,
                 CacheTimeOut = DateTime.Now.AddDays(7)
@@ -132,7 +137,7 @@ namespace LaunchPal.Manager
 
         public static async Task<List<LaunchData>> TryGetLaunchesBySearchString(string searchString)
         {
-            var searchResult = await ApiManager.SearchLaunches(searchString, 20);
+            var searchResult = await ApiManager.SearchLaunches(searchString, 50);
 
             var launchPairs = searchResult.Select(upcomingLaunch => new LaunchData
             {
@@ -144,7 +149,7 @@ namespace LaunchPal.Manager
 
             foreach (var launchPair in launchPairs)
             {
-                _cachedLaunches.LaunchPairs.Add(launchPair);
+                CachedLaunches.LaunchPairs.Add(launchPair);
             }
 
             return launchPairs;
@@ -152,15 +157,15 @@ namespace LaunchPal.Manager
 
         public static void TryStoreUpdatedLaunchData(LaunchData launchdata)
         {
-            if (_nextLaunch.Launch.Id == launchdata.Launch.Id)
+            if (NextLaunch.Launch.Id == launchdata.Launch.Id)
             {
-                _nextLaunch.Launch = launchdata.Launch;
-                _nextLaunch.Mission = launchdata.Mission;
-                _nextLaunch.Forecast = launchdata.Forecast;
-                TrackingManager.UpdateTrackedLaunches(_nextLaunch);
+                NextLaunch.Launch = launchdata.Launch;
+                NextLaunch.Mission = launchdata.Mission;
+                NextLaunch.Forecast = launchdata.Forecast;
+                TrackingManager.UpdateTrackedLaunches(NextLaunch);
             }
 
-            foreach (var cachedLaunch in _cachedLaunches.LaunchPairs)
+            foreach (var cachedLaunch in CachedLaunches.LaunchPairs)
             {
                 if (cachedLaunch.Launch.Id != launchdata.Launch.Id)
                     continue;
@@ -173,51 +178,51 @@ namespace LaunchPal.Manager
 
         public static async Task<List<Person>> TryGetAstronautsInSpace()
         {
-            if (_cachePeople.CacheTimeOut > DateTime.Now)
-                return _cachePeople.Astronouts;
+            if (People?.CacheTimeOut > DateTime.Now)
+                return People.Astronouts;
 
             var result = await ApiManager.GetNumberOfPeopleInSpace();
 
-            _cachePeople = new CachePeople {CacheTimeOut = DateTime.Now.AddDays(1), Astronouts = result.People};
+            People = new CachePeople {CacheTimeOut = DateTime.Now.AddDays(1), Astronouts = result.People};
 
-            return _cachePeople.Astronouts;
+            return People.Astronouts;
         }
 
         public static async Task<List<NewsFeed>> TryGetNewsFeed()
         {
-            if (_cachedCacheNewsFeed?.NewsFeeds?.Count != 0 && _cachedCacheNewsFeed?.CacheTimeOut > DateTime.Now)
-                return _cachedCacheNewsFeed.NewsFeeds;
+            if (CachedCacheNewsFeed?.NewsFeeds?.Count != 0 && CachedCacheNewsFeed?.CacheTimeOut > DateTime.Now)
+                return CachedCacheNewsFeed.NewsFeeds;
 
             var spaceNews = await ApiManager.GetNewsFromSpaceNews();
             var spaceFlightNow = await ApiManager.GetNewsFromSpaceFlightNow();
 
-            if (_cachedCacheNewsFeed?.NewsFeeds == null)
-                _cachedCacheNewsFeed = new CacheNews {NewsFeeds = new List<NewsFeed>(), CacheTimeOut = DateTime.Now};
+            if (CachedCacheNewsFeed?.NewsFeeds == null)
+                CachedCacheNewsFeed = new CacheNews {NewsFeeds = new List<NewsFeed>(), CacheTimeOut = DateTime.Now};
 
-            _cachedCacheNewsFeed.NewsFeeds = new List<NewsFeed>().Concat(spaceNews.DistinctBy(x => x.Title).ToList()).Concat(spaceFlightNow.Distinct().DistinctBy(x => x.Title).ToList()).OrderByDescending(x => x.Published).Take(20).ToList();
-            _cachedCacheNewsFeed.CacheTimeOut = DateTime.Now.AddHours(4);
+            CachedCacheNewsFeed.NewsFeeds = new List<NewsFeed>().Concat(spaceNews.DistinctBy(x => x.Title).ToList()).Concat(spaceFlightNow.Distinct().DistinctBy(x => x.Title).ToList()).OrderByDescending(x => x.Published).Take(20).ToList();
+            CachedCacheNewsFeed.CacheTimeOut = DateTime.Now.AddHours(4);
 
-            return _cachedCacheNewsFeed.NewsFeeds;
+            return CachedCacheNewsFeed.NewsFeeds;
         }
 
         public static async Task<Rocket> TryGetRocketByRocketId(int rocketId)
         {
-            var cachedRocket = _cachedRockets.FirstOrDefault(x => x.Rocket.Id == rocketId);
+            var cachedRocket = CachedRockets.FirstOrDefault(x => x.Rocket.Id == rocketId);
 
             if (cachedRocket?.CacheTimeOut < DateTime.Now)
                 return cachedRocket.Rocket;
 
-            var cachedLaunch = _cachedLaunches.LaunchPairs.FirstOrDefault(x => x.Launch.Rocket.Id == rocketId);
+            var cachedLaunch = CachedLaunches.LaunchPairs.FirstOrDefault(x => x.Launch.Rocket.Id == rocketId);
 
             if (cachedLaunch?.CacheTimeOut < DateTime.Now)
             {
-                _cachedRockets.Add(new CacheRocket {CacheTimeOut = DateTime.Now.AddDays(30), Rocket = cachedLaunch.Launch.Rocket});
+                CachedRockets.Add(new CacheRocket {CacheTimeOut = DateTime.Now.AddDays(30), Rocket = cachedLaunch.Launch.Rocket});
                 return cachedLaunch.Launch.Rocket;
             }
 
             var newRocket = await ApiManager.GetRocketById(rocketId);
 
-            _cachedRockets.Add(new CacheRocket {CacheTimeOut = DateTime.Now.AddDays(30), Rocket = newRocket});
+            CachedRockets.Add(new CacheRocket {CacheTimeOut = DateTime.Now.AddDays(30), Rocket = newRocket});
             return newRocket;
         }
 
@@ -243,84 +248,30 @@ namespace LaunchPal.Manager
 
         #region Cache Handling
 
-        public static void LoadCache()
+        public static void UpdateCache(CacheData cacheData, CacheNews newsData)
         {
-            try
-            {
-                var launchDataString = DependencyService.Get<IStoreCache>().LoadCache(CacheType.LaunchData);
-                var cacheData = launchDataString.ConvertToObject<CacheData>();
-                _nextLaunch = cacheData?.NextLaunch ?? new LaunchData();
-                _cachedRockets = cacheData?.CacheRockets ?? new List<CacheRocket>();
-                _cachedLaunches = cacheData?.LaunchRangeList ?? new LaunchRangeList { LaunchPairs = new List<LaunchData>() };
-                _cachePeople = cacheData?.PeopleInSpace ?? new CachePeople() { Astronouts = new List<Person>(), CacheTimeOut = DateTime.Now };
-
-                var newsDataString = DependencyService.Get<IStoreCache>().LoadCache(CacheType.NewsData);
-                var newsData = newsDataString.ConvertToObject<CacheNews>();
-                _cachedCacheNewsFeed = newsData;
-
-                var trackingDataString = DependencyService.Get<IStoreCache>().LoadCache(CacheType.TrackingData);
-                var trackingData = trackingDataString.ConvertToObject<CacheTracking>();
-                TrackingManager.TrySetTrackedLaunches(trackingData ?? new CacheTracking { TrackingList = new List<LaunchData>() });
-
-                var settingsDataString = DependencyService.Get<IStoreCache>().LoadSettings(CacheType.SettingsData);
-                var settingsData = settingsDataString.ConvertToObject<Settings>();
-                App.Settings = settingsData ?? new Settings();
-
-                TrackingManager.UpdateTrackedLaunches(_nextLaunch);
-                TrackingManager.UpdateTrackedLaunches(_cachedLaunches.LaunchPairs);
-            }
-            catch (Exception)
-            {
-                _nextLaunch = new LaunchData { CacheTimeOut = DateTime.Now };
-                _cachedRockets = new List<CacheRocket>();
-                _cachedLaunches = new LaunchRangeList { CacheTimeOut = DateTime.Now, LaunchPairs = new List<LaunchData>() };
-                _cachedCacheNewsFeed = new CacheNews { NewsFeeds = new List<NewsFeed>(), CacheTimeOut = DateTime.Now };
-                _cachePeople = new CachePeople() { Astronouts = new List<Person>(), CacheTimeOut = DateTime.Now };
-                TrackingManager.TrySetTrackedLaunches(new CacheTracking { TrackingList = new List<LaunchData>() });
-                App.Settings = new Settings();
-            }
+            NextLaunch = cacheData?.NextLaunch;
+            CachedRockets = cacheData?.CacheRockets;
+            CachedLaunches = cacheData?.LaunchRangeList;
+            People = cacheData?.PeopleInSpace;
+            CachedCacheNewsFeed = newsData;            
         }
 
-        public static void SaveCache()
+        public static void ClearCache()
         {
-            var launchData = new CacheData
-            {
-                NextLaunch = _nextLaunch,
-                CacheRockets = _cachedRockets,
-                LaunchRangeList = _cachedLaunches,
-                PeopleInSpace = _cachePeople
-            };
-
-            var newsDataString = _cachedCacheNewsFeed.ConvertToJsonString();
-            var trackingDataString = TrackingManager.TryGetTrackedLaunches().ConvertToJsonString();
-            var launchDataString = launchData.ConvertToJsonString();
-            var settingsDataString = App.Settings.ConvertToJsonString();
-
-#pragma warning disable 4014
-            Task.Run(() => DependencyService.Get<IStoreCache>().SaveCache(settingsDataString, CacheType.SettingsData));
-            Task.Run(() => DependencyService.Get<IStoreCache>().SaveCache(trackingDataString, CacheType.TrackingData));
-            Task.Run(() => DependencyService.Get<IStoreCache>().SaveCache(launchDataString, CacheType.LaunchData));
-            Task.Run(() => DependencyService.Get<IStoreCache>().SaveCache(newsDataString, CacheType.NewsData));
-#pragma warning restore 4014
-
-        }
-
-        public static async void ClearCache()
-        {
-            _nextLaunch = new LaunchData();
-            _cachedRockets = new List<CacheRocket>();
-            _cachedLaunches = new LaunchRangeList
+            NextLaunch = new LaunchData();
+            CachedRockets = new List<CacheRocket>();
+            CachedLaunches = new LaunchRangeList
             {
                 CacheTimeOut = DateTime.Now.AddDays(-1),
                 LaunchPairs = new List<LaunchData>()
 
             };
-            _cachedCacheNewsFeed = new CacheNews
+            CachedCacheNewsFeed = new CacheNews
             {
                 NewsFeeds = new List<NewsFeed>(),
                 CacheTimeOut = DateTime.Now
             };
-            await DependencyService.Get<IStoreCache>().ClearAllCache();
         }
 
         #endregion
@@ -329,19 +280,19 @@ namespace LaunchPal.Manager
 
         private static DateTime GetCacheTimeOutForLaunches(DateTime net)
         {
-            if ((net - DateTime.Now).TotalDays > 0.25)
+            if ((net - DateTime.Now).TotalDays < 0.25)
             {
                 return DateTime.Now.AddHours(1);
             }
-            else if ((net - DateTime.Now).TotalDays > 1)
+            else if ((net - DateTime.Now).TotalDays < 1)
             {
                 return DateTime.Now.AddHours(3);
             }
-            else if ((net - DateTime.Now).TotalDays > 2)
+            else if ((net - DateTime.Now).TotalDays < 2)
             {
                 return DateTime.Now.AddHours(12);
             }
-            else if ((net - DateTime.Now).TotalDays > 4)
+            else if ((net - DateTime.Now).TotalDays < 4)
             {
                 return DateTime.Now.AddDays(1);
             }

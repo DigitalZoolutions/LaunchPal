@@ -1,4 +1,5 @@
 ﻿using System;
+using LaunchPal.Enums;
 using LaunchPal.Helper;
 using LaunchPal.Interface;
 using LaunchPal.Manager;
@@ -10,40 +11,41 @@ namespace LaunchPal
 {
     public class Settings : CacheBase
     {
-        private SimpleLaunchData _simpleLaunchDataData;
-        public Theme.AppTheme AppTheme { get; set; } = Theme.AppTheme.Light;
+        private SimpleLaunchData _trackedLaunchOnHomescreen;
+        public AppTheme AppTheme { get; set; } = AppTheme.Light;
         public bool UseLocalTime { get; set; } = true;
-        public bool SuccessfullIap => DependencyService.Get<ICheckPurchase>().HasPurchasedPlus();
-        public bool UseNextLaunchOnTile => _simpleLaunchDataData == null || _simpleLaunchDataData.Net < DateTime.Now;
+        public bool SuccessfullIap => DependencyService.Get<ICheckPurchase>().HasPurchasedPlus();     //Live
+        //public bool SuccessfullIap => false;                                                        //Testing
+        public bool UseNextLaunchOnTile => _trackedLaunchOnHomescreen == null || _trackedLaunchOnHomescreen.Net < DateTime.Now;
         public bool NextLaunchNotifications { get; set; } = true;
-        public int NotifyBeforeLaunch { get; set; } = 15;
+        public NotifyTime NotifyBeforeLaunch { get; set; } = NotifyTime.Notify15;
         public bool TrackedLaunchNotifications { get; set; } = true;
 
-        public SimpleLaunchData SimpleLaunchDataData
+        public SimpleLaunchData TrackedLaunchOnHomescreen
         {
             get
             {
-                if (!UseNextLaunchOnTile)
-                    return _simpleLaunchDataData;
+                if (!UseNextLaunchOnTile && _trackedLaunchOnHomescreen != null)
+                    return _trackedLaunchOnHomescreen;
 
                 try
                 {
-                    _simpleLaunchDataData = new SimpleLaunchData(CacheManager.TryGetNextLaunch().GetAwaiter().GetResult());
+                    _trackedLaunchOnHomescreen = new SimpleLaunchData(CacheManager.TryGetNextLaunch().GetAwaiter().GetResult());
                 }
                 catch (Exception)
                 {
-                    _simpleLaunchDataData = new SimpleLaunchData
+                    _trackedLaunchOnHomescreen = new SimpleLaunchData
                     {
                         LaunchId = 0,
                         Name = "Could not load launch",
-                        Message = "The requested launch could not be loaded, please check connection and try again.",
+                        Description = "The requested launch could not be loaded, please check connection and try again.",
                         Net = DateTime.Now
                     };
                 }
 
-                return _simpleLaunchDataData;
+                return _trackedLaunchOnHomescreen;
             }
-            set { _simpleLaunchDataData = value; }
+            set { _trackedLaunchOnHomescreen = value; }
         }
     }
 }

@@ -1,1 +1,1 @@
-C:\Users\Threezool\documents\visual studio 2015\Projects\LaunchPal\LaunchPal\LaunchPal.UWP\AppPackages\LaunchPal.UWP_4.0.2.0\LaunchPal.UWP_4.0.2.0_x86_x64_arm.appxbundle
+C:\Users\Threezool\Documents\Visual Studio 2015\Projects\LaunchPal\LaunchPal\LaunchPal.UWP\AppPackages\LaunchPal.UWP_5.0.12.0\LaunchPal.UWP_5.0.12.0_x86_x64_arm.appxbundle

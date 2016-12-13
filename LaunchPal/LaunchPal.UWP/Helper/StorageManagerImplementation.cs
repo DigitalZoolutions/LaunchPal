@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
+using LaunchPal.Enums;
 using LaunchPal.ExternalApi;
 using LaunchPal.UWP.Helper;
 using Xamarin.Forms;
@@ -23,7 +24,7 @@ namespace LaunchPal.UWP.Helper
 
         public async Task<bool> SaveCache(string stringToStore, CacheType type)
         {
-            var fileName = GetFileNameFromCacheType(type);
+            var fileName = type.GetFileNameFromCacheType();
 
             try
             {
@@ -53,7 +54,7 @@ namespace LaunchPal.UWP.Helper
 
         public string LoadSettings(CacheType type)
         {
-            var fileName = GetFileNameFromCacheType(type);
+            var fileName = type.GetFileNameFromCacheType();
 
             try
             {
@@ -72,7 +73,7 @@ namespace LaunchPal.UWP.Helper
 
         public string LoadCache(CacheType type)
         {
-            var fileName = GetFileNameFromCacheType(type);
+            var fileName = type.GetFileNameFromCacheType();
 
             try
             {
@@ -94,22 +95,22 @@ namespace LaunchPal.UWP.Helper
             try
             {
                 // Clear Settings data
-                var fileName = GetFileNameFromCacheType(CacheType.SettingsData);
+                var fileName = CacheType.SettingsData.GetFileNameFromCacheType();
                 var fileToClear = await LocalRoamingFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
                 await FileIO.WriteTextAsync(fileToClear, "");
 
                 // Clear Launch data
-                fileName = GetFileNameFromCacheType(CacheType.LaunchData);
+                fileName = CacheType.LaunchData.GetFileNameFromCacheType();
                 fileToClear = await LocalCacheFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
                 await FileIO.WriteTextAsync(fileToClear, "");
 
                 // Clear News data
-                fileName = GetFileNameFromCacheType(CacheType.NewsData);
+                fileName = CacheType.NewsData.GetFileNameFromCacheType();
                 fileToClear = await LocalRoamingFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
                 await FileIO.WriteTextAsync(fileToClear, "");
 
                 // Clear Tracking data
-                fileName = GetFileNameFromCacheType(CacheType.TrackingData);
+                fileName = CacheType.TrackingData.GetFileNameFromCacheType();
                 fileToClear = await LocalRoamingFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
                 await FileIO.WriteTextAsync(fileToClear, "");
             }
@@ -129,45 +130,28 @@ namespace LaunchPal.UWP.Helper
             {
                 case CacheType.LaunchData:
                     // Clear Launch data
-                    fileName = GetFileNameFromCacheType(CacheType.LaunchData);
+                    fileName = CacheType.LaunchData.GetFileNameFromCacheType();
                     fileToClear = await LocalCacheFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
                     await FileIO.WriteTextAsync(fileToClear, "");
                     break;
                 case CacheType.SettingsData:
                     // Clear Settings data
-                    fileName = GetFileNameFromCacheType(CacheType.SettingsData);
+                    fileName = CacheType.SettingsData.GetFileNameFromCacheType();
                     fileToClear = await LocalRoamingFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
                     await FileIO.WriteTextAsync(fileToClear, "");
                     break;
                 case CacheType.NewsData:
                     // Clear News data
-                    fileName = GetFileNameFromCacheType(CacheType.NewsData);
+                    fileName = CacheType.NewsData.GetFileNameFromCacheType();
                     fileToClear = await LocalRoamingFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
                     await FileIO.WriteTextAsync(fileToClear, "");
                     break;
                 case CacheType.TrackingData:
                     // Clear Tracking data
-                    fileName = GetFileNameFromCacheType(CacheType.TrackingData);
+                    fileName = CacheType.TrackingData.GetFileNameFromCacheType();
                     fileToClear = await LocalRoamingFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
                     await FileIO.WriteTextAsync(fileToClear, "");
                     break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
-            }
-        }
-
-        private static string GetFileNameFromCacheType(CacheType type)
-        {
-            switch (type)
-            {
-                case CacheType.LaunchData:
-                    return "LaunchData.json";
-                case CacheType.SettingsData:
-                    return "SettingsData.json";
-                case CacheType.NewsData:
-                    return "NewsData.json";
-                case CacheType.TrackingData:
-                    return "TrackingData.json";
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }

@@ -11,9 +11,13 @@ using Android.Widget;
 using Android.Support.V4.App;
 using TaskStackBuilder = Android.Support.V4.App.TaskStackBuilder;
 using LaunchPal.Droid.Helper;
+using LaunchPal.Enums;
+using LaunchPal.Helper;
 using LaunchPal.Interface;
 using LaunchPal.Model;
 using LaunchPal.View;
+using Xamarin.Forms;
+using Environment = System.Environment;
 using Notification = Android.App.Notification;
 
 [assembly: Xamarin.Forms.Dependency(typeof(NotificationImplementation))]
@@ -21,57 +25,72 @@ namespace LaunchPal.Droid.Helper
 {
     internal class NotificationImplementation : INotify
     {
-        internal static Context Context;
+        internal static AlarmManager AlarmManager;
+        internal static Dictionary<int, PendingIntent> PendingIntent;
 
+        public NotificationImplementation()
+        {
+            AlarmManager = (AlarmManager)Forms.Context.GetSystemService(Context.AlarmService);
+            PendingIntent = new Dictionary<int, PendingIntent>();
+        }
 
         public void AddNotification(LaunchData launch, NotificationType type)
         {
-            // Set up an intent so that tapping the notifications returns to this app:
-            Intent intent = new Intent(Context, typeof(NotificationActivity));
+            Intent alarmIntent = new Intent(Forms.Context, typeof(AlarmReceiver));
+            alarmIntent.PutExtra("id", launch.Launch.Id.ToString());
+            alarmIntent.PutExtra("title", "Launch Alert!");
+            alarmIntent.PutExtra("message", $"{launch?.Launch?.Name} is about to launch.{Environment.NewLine}" +
+                                          $"Time: {TimeConverter.SetStringTimeFormat(launch.Launch.Net, LaunchPal.App.Settings.UseLocalTime).Replace(" Local", "")}");
 
-            // Create a PendingIntent; we're only using one PendingIntent (ID = 0):
-            const int pendingIntentId = 0;
-            PendingIntent pendingIntent =
-                PendingIntent.GetActivity(Context, pendingIntentId, intent, PendingIntentFlags.OneShot);
+            PendingIntent pendingIntent = Android.App.PendingIntent.GetBroadcast(Forms.Context, launch.Launch.Id, alarmIntent, PendingIntentFlags.UpdateCurrent);
 
+            PendingIntent.Add(launch.Launch.Id, pendingIntent);
 
-            // Instantiate the builder and set notification elements:
-            Notification.Builder builder = new Notification.Builder(Context)
-                .SetContentIntent(pendingIntent)
-                .SetContentTitle("Launch Alert!")
-                .SetContentText($"{launch.Launch.Name} is about to launch.")
-                .SetDefaults(NotificationDefaults.Sound | NotificationDefaults.Vibrate)
-                .SetSmallIcon(Resource.Drawable.icon);
+            //TODO: For demo set after 5 seconds.
+            AlarmManager.Set(AlarmType.ElapsedRealtime, SetTriggerTime(TimeConverter.DetermineTimeSettings(launch.Launch.Net, App.Settings.UseLocalTime)), pendingIntent);
+        }
 
-            // Build the notification:
-            Notification notification = builder.Build();
+        private long SetTriggerTime(DateTime net)
+        {
+            if (net < DateTime.Now)
+                return SystemClock.ElapsedRealtime();
 
-
-
-            // Store notification
-
-
-            // Get the notification manager:
-            NotificationManager notificationManager = Context.GetSystemService(Context.NotificationService) as NotificationManager;
-
-            // Publish the notification:
-            int notificationId = launch.Launch.Id;
-            notificationManager?.Notify(notificationId, notification);
+            return SystemClock.ElapsedRealtime() + (long)(net.AddMinutes(-App.Settings.NotifyBeforeLaunch.ToIntValue()) - DateTime.Now).TotalMilliseconds;
         }
 
         public void UpdateNotification(LaunchData launch, NotificationType type)
         {
-            
+            DeleteNotification(launch.Launch.Id, type);
+
+            AddNotification(launch, type);
         }
 
         public void DeleteNotification(int index, NotificationType type)
         {
-            throw new NotImplementedException();
+            PendingIntent pendingIntent;
+            var result = PendingIntent.TryGetValue(index, out pendingIntent);
+            if (result)
+            {
+                AlarmManager.Cancel(pendingIntent);
+                PendingIntent.Remove(index);
+            }
         }
 
         public void ClearNotifications(NotificationType type)
         {
-            throw new NotImplementedException();
+            List<int> objectsToRemove = new List<int>();
+            foreach (var pendingIntent in PendingIntent)
+            {
+                AlarmManager.Cancel(pendingIntent.Value);
+                objectsToRemove.Add(pendingIntent.Key);
+            }
+
+            foreach (var id in objectsToRemove)
+            {
+                PendingIntent.Remove(id);
+            }
         }
+
+        
     }
 }

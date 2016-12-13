@@ -1,10 +1,12 @@
 ﻿using System.Globalization;
 using Windows.Data.Xml.Dom;
 using Windows.UI.Notifications;
+using LaunchPal.Helper;
 using LaunchPal.Interface;
 using LaunchPal.Model;
 using LaunchPal.UWP.Helper;
 using LaunchPal.Manager;
+using Microsoft.Toolkit.Uwp.Notifications;
 
 [assembly: Xamarin.Forms.Dependency(typeof(LiveTileImplementation))]
 namespace LaunchPal.UWP.Helper
@@ -13,39 +15,131 @@ namespace LaunchPal.UWP.Helper
     {
         public void SetLaunch()
         {
-            var tileNotification = CreateLiveTile(LaunchPal.App.Settings.SimpleLaunchDataData);
+            var tileNotification = CreateLiveTile(LaunchPal.App.Settings.TrackedLaunchOnHomescreen);
             TileUpdateManager.CreateTileUpdaterForApplication().Update(tileNotification);
         }
 
-        private TileNotification CreateLiveTile(SimpleLaunchData simpleLaunchDataInformation)
+        private TileNotification CreateLiveTile(SimpleLaunchData launchData)
         {
-            var tileXml = TileUpdateManager.GetTemplateContent(TileTemplateType.TileSquare150x150PeekImageAndText01);
+            TileContent content = new TileContent()
+            {
+                Visual = new TileVisual()
+                {
+                    TileMedium = new TileBinding
+                    {
+                        Branding = TileBranding.None,
+                        Content = new TileBindingContentAdaptive
+                        {
+                            PeekImage = new TilePeekImage()
+                            {
+                                Source = "Assets/Square150x150Logo.scale-200.png"
+                            },
+                            Children =
+                            {
+                                new AdaptiveText()
+                                {
+                                    Text = "Next Launch:",
+                                    HintWrap = true,
+                                    HintStyle = AdaptiveTextStyle.Caption
+                                },
+                                new AdaptiveText(),
+                                new AdaptiveText()
+                                {
+                                    Text = launchData.LaunchNet,
+                                    HintWrap = true,
+                                    HintStyle = AdaptiveTextStyle.Caption
+                                }
+                            }
+                        }
+                    },
 
-            var tileTextAttributes = tileXml.GetElementsByTagName("text");
-            tileTextAttributes[0].InnerText = simpleLaunchDataInformation.Name;
-            tileTextAttributes[1].InnerText = simpleLaunchDataInformation.Message ?? "No mission description";
-            tileTextAttributes[2].InnerText = $"{simpleLaunchDataInformation.Net.Day}-{simpleLaunchDataInformation.Net.Month}-{simpleLaunchDataInformation.Net.Year} {simpleLaunchDataInformation.Net.Hour}:{simpleLaunchDataInformation.Net.Minute}";
+                    TileWide = new TileBinding()
+                    {
+                        Branding = TileBranding.NameAndLogo,
+                        DisplayName = "LaunchPal",
+                        Content = new TileBindingContentAdaptive()
+                        {
+                            Children =
+                            {
+                                new AdaptiveText()
+                                {
+                                    Text = launchData.Name,
+                                    HintWrap = false,
+                                    HintStyle = AdaptiveTextStyle.Body
+                                },
 
+                                new AdaptiveText()
+                                {
+                                    Text = launchData.LaunchNet,
+                                    HintWrap = false,
+                                    HintStyle = AdaptiveTextStyle.CaptionSubtle
+                                },
 
-            var tileImageAttributes = tileXml.GetElementsByTagName("image");
-            ((XmlElement)tileImageAttributes[0]).SetAttribute("src", "ms-appx:///assets/Square150x150Logo.scale-200.png");
-            ((XmlElement)tileImageAttributes[0]).SetAttribute("alt", "red graphic");
+                                new AdaptiveText()
+                                {
+                                    Text = "Status: " + launchData.Status,
+                                    HintWrap = false,
+                                    HintStyle = AdaptiveTextStyle.Body
+                                },                                
+                            }
+                        }
+                    },
 
-            var wideTileXml = TileUpdateManager.GetTemplateContent(TileTemplateType.TileWide310x150PeekImage02);
+                    TileLarge = new TileBinding
+                    {
+                        Branding = TileBranding.NameAndLogo,
+                        DisplayName = "LaunchPal",
+                        Content = new TileBindingContentAdaptive()
+                        {
+                            Children =
+                            {
+                                new AdaptiveText()
+                                {
+                                    Text = launchData.Name,
+                                    HintWrap = false,
+                                    HintStyle = AdaptiveTextStyle.Body
+                                },
 
-            var wideTileTextAttributes = wideTileXml.GetElementsByTagName("text");
-            wideTileTextAttributes[0].AppendChild(wideTileXml.CreateTextNode(simpleLaunchDataInformation.Name));
-            wideTileTextAttributes[1].AppendChild(wideTileXml.CreateTextNode(simpleLaunchDataInformation.Message ?? "No mission description"));
-            wideTileTextAttributes[2].AppendChild(wideTileXml.CreateTextNode(simpleLaunchDataInformation.Net.ToString(CultureInfo.CurrentCulture)));
+                                new AdaptiveText()
+                                {
+                                    Text = launchData.LaunchNet,
+                                    HintWrap = false,
+                                    HintStyle = AdaptiveTextStyle.CaptionSubtle
+                                },
 
-            var wideTileImageAttributes = wideTileXml.GetElementsByTagName("image");
-            ((XmlElement)wideTileImageAttributes[0]).SetAttribute("src", "ms-appx:///assets/Wide310x150Logo.scale-200.png");
-            ((XmlElement)wideTileImageAttributes[0]).SetAttribute("alt", "red graphic");
+                                new AdaptiveText()
+                                {
+                                    Text = "Status - " + launchData.Status,
+                                    HintWrap = false,
+                                    HintStyle = AdaptiveTextStyle.Body
+                                },
 
-            var node = tileXml.ImportNode(wideTileXml.GetElementsByTagName("binding").Item(0), true);
-            tileXml.GetElementsByTagName("visual")?.Item(0)?.AppendChild(node);
+                                new AdaptiveText(),
 
-            return new TileNotification(tileXml) { ExpirationTime = simpleLaunchDataInformation.Net };
+                                new AdaptiveText
+                                {
+                                    Text = "Mission Description",
+                                    HintWrap = false,
+                                    HintStyle = AdaptiveTextStyle.Body
+                                },
+
+                                new AdaptiveText()
+                                {
+                                    Text = launchData.Description,
+                                    HintWrap = true,
+                                    HintStyle = AdaptiveTextStyle.Caption
+                                },
+                            }
+                        }
+                    }
+
+                }
+            };
+
+            return new TileNotification(content.GetXml())
+            {
+                ExpirationTime = launchData.Net.AddMinutes(30)
+            };
         }
     }
 }

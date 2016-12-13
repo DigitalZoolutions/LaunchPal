@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using LaunchPal.Helper;
+using LaunchPal.Interface;
 using LaunchPal.View;
 using Xamarin.Forms;
 
@@ -60,6 +61,20 @@ namespace LaunchPal.Model
                 Name = "Astronauts",
                 TargetType = typeof(AstronautsPage)
             });
+
+            if (!App.Settings.SuccessfullIap && DependencyService.Get<ICheckPurchase>().CanPurchasePlus())
+            {
+                this.Add(new MenuItem
+                {
+                    IconSource = ImageSource.FromFile(
+                    Theme.UseLightIcons ?
+                    Device.OnPlatform("", "Plus.png", "Assets/Menu/Plus.png") :
+                    Device.OnPlatform("", "PlusBlack.png", "Assets/Menu/PlusBlack.png")
+                    ),
+                    Name = "LaunchPal Plus",
+                    TargetType = typeof(LaunchPalPlusPage)
+                });
+            }
 
             this.Add(new MenuItem
             {

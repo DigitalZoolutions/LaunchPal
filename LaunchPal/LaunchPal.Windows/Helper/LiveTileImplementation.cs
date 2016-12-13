@@ -19,7 +19,7 @@ namespace LaunchPal.Windows.Helper
     {
         public void SetLaunch()
         {
-            var tileNotification = CreateLiveTile(LaunchPal.App.Settings.SimpleLaunchDataData);
+            var tileNotification = CreateLiveTile(LaunchPal.App.Settings.TrackedLaunchOnHomescreen);
             TileUpdateManager.CreateTileUpdaterForApplication().Update(tileNotification);
         }
 
@@ -29,7 +29,7 @@ namespace LaunchPal.Windows.Helper
 
             var tileTextAttributes = tileXml.GetElementsByTagName("text");
             tileTextAttributes[0].InnerText = simpleLaunchDataInformation.Name;
-            tileTextAttributes[1].InnerText = simpleLaunchDataInformation.Message ?? "No mission description";
+            tileTextAttributes[1].InnerText = simpleLaunchDataInformation.Description ?? "No mission description";
             tileTextAttributes[2].InnerText = $"{simpleLaunchDataInformation.Net.Day}-{simpleLaunchDataInformation.Net.Month}-{simpleLaunchDataInformation.Net.Year} {simpleLaunchDataInformation.Net.Hour}:{simpleLaunchDataInformation.Net.Minute}";
 
 
@@ -41,7 +41,7 @@ namespace LaunchPal.Windows.Helper
 
             var wideTileTextAttributes = wideTileXml.GetElementsByTagName("text");
             wideTileTextAttributes[0].AppendChild(wideTileXml.CreateTextNode(simpleLaunchDataInformation.Name));
-            wideTileTextAttributes[1].AppendChild(wideTileXml.CreateTextNode(simpleLaunchDataInformation.Message ?? "No mission description"));
+            wideTileTextAttributes[1].AppendChild(wideTileXml.CreateTextNode(simpleLaunchDataInformation.Description ?? "No mission description"));
             wideTileTextAttributes[2].AppendChild(wideTileXml.CreateTextNode(simpleLaunchDataInformation.Net.ToString(CultureInfo.CurrentCulture)));
 
             var wideTileImageAttributes = wideTileXml.GetElementsByTagName("image");

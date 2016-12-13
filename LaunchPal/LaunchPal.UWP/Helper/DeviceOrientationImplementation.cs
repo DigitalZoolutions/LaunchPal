@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LaunchPal.Enums;
 using LaunchPal.Interface;
 using LaunchPal.UWP.Helper;
 using Xamarin.Forms;

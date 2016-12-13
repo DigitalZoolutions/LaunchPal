@@ -37,6 +37,13 @@
   <ItemGroup>
     <Compile Include="App.cs" />
     <Compile Include="CustomElement\MarginFrame.cs" />
+    <Compile Include="Enums\AgencyEnum.cs" />
+    <Compile Include="Enums\CacheEnum.cs" />
+    <Compile Include="Enums\LaunchStatusEnum.cs" />
+    <Compile Include="Enums\NotificationEnum.cs" />
+    <Compile Include="Enums\NotifyTimeEnum.cs" />
+    <Compile Include="Enums\OrientationEnum.cs" />
+    <Compile Include="Enums\ThemeEnum.cs" />
     <Compile Include="Extension\DateExtension.cs" />
     <Compile Include="Extension\ListExtension.cs" />
     <Compile Include="ExternalApi\ApiManager.cs" />
@@ -57,11 +64,13 @@
     <Compile Include="ExternalApi\SpaceNews\XmlObject\SpaceNewsComRss.cs" />
     <Compile Include="ExternalApi\SpaceNews\Request\GetSpaceNews.cs" />
     <Compile Include="ExternalApi\SpaceNews\Request\HttpCaller.cs" />
+    <Compile Include="Helper\ClickEvents.cs" />
     <Compile Include="Helper\JsonConverterExtension.cs" />
     <Compile Include="Helper\MailSender.cs" />
     <Compile Include="Helper\Theme.cs" />
     <Compile Include="Helper\TimeConverter.cs" />
     <Compile Include="Interface\ICheckPurchase.cs" />
+    <Compile Include="Interface\IControlAppFunction.cs" />
     <Compile Include="Interface\ICreateTile.cs" />
     <Compile Include="Interface\ISendMail.cs" />
     <Compile Include="Interface\IStoreCache.cs" />
@@ -80,6 +89,7 @@
     <Compile Include="ExternalApi\LaunchLibrary\Request\GetMission.cs" />
     <Compile Include="ExternalApi\LaunchLibrary\Request\HttpCaller.cs" />
     <Compile Include="Manager\CacheManager.cs" />
+    <Compile Include="Manager\StorageManager.cs" />
     <Compile Include="Manager\TrackingManager.cs" />
     <Compile Include="Model\CacheModel\CacheBase.cs" />
     <Compile Include="Model\CacheModel\CacheData.cs" />
@@ -108,6 +118,7 @@
     <Compile Include="ExternalApi\OpenWeatherMap\Request\HttpCaller.cs" />
     <Compile Include="Model\SimpleLaunchData.cs" />
     <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="Properties\Annotations3.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Template\AstronoutListTemplate.cs" />
@@ -122,10 +133,11 @@
     <Compile Include="ViewModel\AstronautsViewModel.cs" />
     <Compile Include="ViewModel\RocketViewModel.cs" />
     <Compile Include="ViewModel\SearchViewModel.cs" />
+    <Compile Include="ViewModel\WebViewModel.cs" />
     <Compile Include="View\FeedbackPage.cs" />
     <Compile Include="View\HelperPages\LoadingPage.cs" />
     <Compile Include="View\LaunchPage.cs" />
-    <Compile Include="View\LaunchPalPlus.cs" />
+    <Compile Include="View\LaunchPalPlusPage.cs" />
     <Compile Include="View\MainPage.cs" />
     <Compile Include="View\MapPage.cs" />
     <Compile Include="View\NavigationPage.cs" />
@@ -142,6 +154,9 @@
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\portable-net45+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="System.EnterpriseServices">
+      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\System.EnterpriseServices.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Http">
       <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\WindowsPhoneApp\v8.1\System.Net.Http.dll</HintPath>
