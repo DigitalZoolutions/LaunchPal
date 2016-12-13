@@ -193,8 +193,17 @@ namespace LaunchPal.View
                 pageGrid.Children.Add(noVideoLinks, 0, 6, 23, 24);
             }
             pageGrid.Children.Add(spacing, 0, 6, 24, 25);
-            pageGrid.Children.Add(trackLaunchButton, 0, 3, 25, 26);
-            pageGrid.Children.Add(tileTrackLaunchButton, 3, 6, 25, 26);
+
+            if (Device.OS == TargetPlatform.Android)
+            {
+                pageGrid.Children.Add(trackLaunchButton, 0, 6, 25, 26);
+                //TODO Implement Widget on Android for tracking
+            }
+            else
+            {
+                pageGrid.Children.Add(trackLaunchButton, 0, 3, 25, 26);
+                pageGrid.Children.Add(tileTrackLaunchButton, 3, 6, 25, 26);
+            }
 
             var relativeLayout = new RelativeLayout();
 
