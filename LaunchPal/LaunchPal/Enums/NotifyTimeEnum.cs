@@ -34,7 +34,8 @@ namespace LaunchPal.Enums
                 case NotifyTime.Notify90:
                     return "1 hour 30 minutes";
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(me), me, null);
+                    App.Settings.NotifyBeforeLaunch = NotifyTime.Notify15;
+                    return "15 minutes";
             }
         }
 
@@ -57,7 +58,7 @@ namespace LaunchPal.Enums
                 case NotifyTime.Notify90:
                     return 90;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(me), me, null);
+                    return 15;
             }
         }
     }
