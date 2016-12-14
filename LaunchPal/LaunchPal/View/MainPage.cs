@@ -11,31 +11,49 @@ namespace LaunchPal.View
         public MainPage()
         {
             BackgroundColor = Theme.BackgroundColor;
-            var navPage = new NavigationPage();
-            navPage.Menu.ItemTapped += (sender, arg) => NavigateTo((arg.Item as MenuItem)?.TargetType);
-            Xamarin.Forms.NavigationPage.SetHasNavigationBar(this, false);
-            Master = navPage;
-            Detail = new Xamarin.Forms.NavigationPage(new OverviewPage());
+            var menuPage = new MenuPage();
+            menuPage.Menu.ItemTapped += (sender, arg) => NavigateTo((arg.Item as MenuItem)?.TargetType);
+            NavigationPage.SetHasNavigationBar(this, false);
+            Master = menuPage;
+            var navigationPage = new NavigationPage(new OverviewPage())
+            {
+                BarBackgroundColor = Theme.FrameColor,
+                BarTextColor = Theme.HeaderColor
+            };
+            Detail = navigationPage;
+            this.MasterBehavior = MasterBehavior.Popover;
         }
 
         public MainPage(Exception ex)
         {
             BackgroundColor = Theme.BackgroundColor;
-            var navPage = new NavigationPage();
-            navPage.Menu.ItemTapped += (sender, arg) => NavigateTo((arg.Item as MenuItem)?.TargetType);
-            Xamarin.Forms.NavigationPage.SetHasNavigationBar(this, false);
-            Master = navPage;
-            Detail = new Xamarin.Forms.NavigationPage(new OverviewPage(ex));
+            var menuPage = new MenuPage();
+            menuPage.Menu.ItemTapped += (sender, arg) => NavigateTo((arg.Item as MenuItem)?.TargetType);
+            NavigationPage.SetHasNavigationBar(this, false);
+            Master = menuPage;
+            var navigationPage = new NavigationPage(new OverviewPage(ex))
+            {
+                BarBackgroundColor = Theme.FrameColor,
+                BarTextColor = Theme.HeaderColor
+            };
+            Detail = navigationPage;
+            this.MasterBehavior = MasterBehavior.Popover;
         }
 
         public MainPage(int launchId)
         {
             BackgroundColor = Theme.BackgroundColor;
-            var navPage = new NavigationPage();
-            navPage.Menu.ItemTapped += (sender, arg) => NavigateTo((arg.Item as MenuItem)?.TargetType);
-            Xamarin.Forms.NavigationPage.SetHasNavigationBar(this, false);
-            Master = navPage;
-            Detail = new Xamarin.Forms.NavigationPage(new LaunchPage(launchId));
+            var menuPage = new MenuPage();
+            menuPage.Menu.ItemTapped += (sender, arg) => NavigateTo((arg.Item as MenuItem)?.TargetType);
+            NavigationPage.SetHasNavigationBar(this, false);
+            Master = menuPage;
+            var navigationPage = new NavigationPage(new LaunchPage(launchId))
+            {
+                BarBackgroundColor = Theme.FrameColor,
+                BarTextColor = Theme.HeaderColor,
+            };
+            Detail = navigationPage;
+            this.MasterBehavior = MasterBehavior.Popover;
         }
 
         internal void NavigateTo(Type pageType)
@@ -59,19 +77,22 @@ namespace LaunchPal.View
 
         private void SetPage(Page page)
         {
-            Detail = new Xamarin.Forms.NavigationPage(page);
-
-            // ReSharper disable once SimplifyConditionalTernaryExpression
-            IsPresented = Device.Idiom == TargetIdiom.Phone ? false : true;
+            var navigationPage = new NavigationPage(page)
+            {
+                BarBackgroundColor = Theme.FrameColor,
+                BarTextColor = Theme.HeaderColor
+            };
+            Detail = navigationPage;
+            IsPresented = false;
         }
 
         public void ReloadAllPages()
         {
             BackgroundColor = Theme.BackgroundColor;
-            var navPage = new NavigationPage();
-            navPage.Menu.ItemTapped += (sender, arg) => NavigateTo((arg.Item as MenuItem)?.TargetType);
-            Master = navPage;
-            Detail = new Xamarin.Forms.NavigationPage(new OverviewPage())
+            var menuPage = new MenuPage();
+            menuPage.Menu.ItemTapped += (sender, arg) => NavigateTo((arg.Item as MenuItem)?.TargetType);
+            Master = menuPage;
+            Detail = new NavigationPage(new OverviewPage())
             {
                 BarBackgroundColor = Theme.NavBackgroundColor,
                 BarTextColor = Theme.HeaderColor,
@@ -82,15 +103,15 @@ namespace LaunchPal.View
 
         protected override bool OnBackButtonPressed()
         {
-            var result = this.Detail.GetType().ToString();
+            var result = Detail.GetType().ToString();
 
-            if (this.Detail.GetType().ToString() == "Klaim.HomePage")
+            if (Detail.GetType().ToString() == "Klaim.HomePage")
             {
 
             }
             
 
-            var root = this.Parent.Parent as MainPage;
+            var root = Parent.Parent as MainPage;
 
             if (root?.GetType() != typeof(MainPage))
                 return false;
