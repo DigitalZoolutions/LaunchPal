@@ -47,5 +47,9 @@ namespace LaunchPal
             }
             set { _trackedLaunchOnHomescreen = value; }
         }
+
+        public bool FollowSpaceNews { get; set; } = true;
+        public bool FollowSpaceFlightNow { get; set; } = true;
+        public bool FollowNasaSpaceFlight { get; set; } = true;
     }
 }

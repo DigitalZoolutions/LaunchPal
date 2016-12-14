@@ -193,14 +193,30 @@ namespace LaunchPal.Manager
             if (CachedCacheNewsFeed?.NewsFeeds?.Count != 0 && CachedCacheNewsFeed?.CacheTimeOut > DateTime.Now)
                 return CachedCacheNewsFeed.NewsFeeds;
 
-            var spaceNews = await ApiManager.GetNewsFromSpaceNews();
-            var spaceFlightNow = await ApiManager.GetNewsFromSpaceFlightNow();
+            var newsFeed = new List<NewsFeed>();
 
-            if (CachedCacheNewsFeed?.NewsFeeds == null)
-                CachedCacheNewsFeed = new CacheNews {NewsFeeds = new List<NewsFeed>(), CacheTimeOut = DateTime.Now};
+            if (App.Settings.FollowSpaceNews)
+            {
+                var spaceNews = await ApiManager.GetNewsFromSpaceNews();
+                newsFeed = newsFeed.Concat(spaceNews).Distinct().DistinctBy(x => x.Title).ToList();
+            }
+            if (App.Settings.FollowSpaceFlightNow)
+            {
+                var spaceFlightNow = await ApiManager.GetNewsFromSpaceFlightNow();
+                newsFeed = newsFeed.Concat(spaceFlightNow).DistinctBy(x => x.Title).ToList();
+            }
+            if (App.Settings.FollowNasaSpaceFlight)
+            {
+                var nasaSpaceFlight = await ApiManager.GetNewsFromNasaSpaceFlight();
+                newsFeed = newsFeed.Concat(nasaSpaceFlight).DistinctBy(x => x.Title).ToList();
+            }
 
-            CachedCacheNewsFeed.NewsFeeds = new List<NewsFeed>().Concat(spaceNews.DistinctBy(x => x.Title).ToList()).Concat(spaceFlightNow.Distinct().DistinctBy(x => x.Title).ToList()).OrderByDescending(x => x.Published).Take(20).ToList();
-            CachedCacheNewsFeed.CacheTimeOut = DateTime.Now.AddHours(4);
+            if (CachedCacheNewsFeed?.NewsFeeds == null || CachedCacheNewsFeed?.NewsFeeds.Count == 0)
+                CachedCacheNewsFeed = new CacheNews
+                {
+                    NewsFeeds = newsFeed.OrderByDescending(x => x.Published).Take(20).ToList(),
+                    CacheTimeOut = DateTime.Now.AddHours(4)
+                };
 
             return CachedCacheNewsFeed.NewsFeeds;
         }

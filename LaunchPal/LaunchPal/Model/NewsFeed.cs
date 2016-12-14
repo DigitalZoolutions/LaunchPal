@@ -55,6 +55,16 @@ namespace LaunchPal.Model
             this.Published = DateTime.Parse(item.PubDate);
         }
 
+        public NewsFeed(NasaSpaceFlightItem item)
+        {
+            this.Title = item.Title;
+            this.Lead = item.Description.Substring(0, item.Description.IndexOf("<div class", StringComparison.Ordinal));
+            this.Author = item.Creator;
+            this.Source = "NasaSpaceFlight";
+            this.Link = item.Link2;
+            this.Published = DateTime.Parse(item.PubDate);
+        }
+
         string ExtractString(string s, string tag)
         {
             // You should check for errors in real-world code, omitted for brevity

@@ -59,6 +59,7 @@
     <Compile Include="ExternalApi\PeopleInSpace\Request\GetPeopleInSpace.cs" />
     <Compile Include="ExternalApi\PeopleInSpace\Request\HttpCaller.cs" />
     <Compile Include="ExternalApi\SpaceNews\XmlObject\Error.cs" />
+    <Compile Include="ExternalApi\SpaceNews\XmlObject\NasaSpaceFlightComRss.cs" />
     <Compile Include="ExternalApi\SpaceNews\XmlObject\NewsBase.cs" />
     <Compile Include="ExternalApi\SpaceNews\XmlObject\SpaceFlightNowComRSS.cs" />
     <Compile Include="ExternalApi\SpaceNews\XmlObject\SpaceNewsComRss.cs" />

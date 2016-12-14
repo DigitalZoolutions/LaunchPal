@@ -140,6 +140,13 @@ namespace LaunchPal.ExternalApi
             return result.Channel.Item.Select(item => new NewsFeed(item)).ToList();
         }
 
+        public static async Task<List<NewsFeed>> GetNewsFromNasaSpaceFlight()
+        {
+            var result = await GetSpaceNews.FromNasaSpaceFlight();
+
+            return result.Channel.Item.Select(item => new NewsFeed(item)).ToList();
+        }
+
         public static async Task<PeopleInSpace.JsonObject.PeopleInSpace> GetNumberOfPeopleInSpace()
         {
             var result = await GetPeopleInSpace.GetAll();

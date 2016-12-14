@@ -20,5 +20,13 @@ namespace LaunchPal.ExternalApi.SpaceNews.Request
 
             return feed ?? new SpaceFlightNowRss();
         }
+
+        internal static async Task<NasaSpaceFlightRss> FromNasaSpaceFlight()
+        {
+            string apiUrl = $"https://www.nasaspaceflight.com/feed/";
+            var feed = await HttpCaller.GetSpaceNews<NasaSpaceFlightRss>(apiUrl);
+
+            return feed ?? new NasaSpaceFlightRss();
+        }
     }
 }
