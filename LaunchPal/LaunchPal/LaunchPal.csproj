@@ -141,7 +141,7 @@
     <Compile Include="View\LaunchPalPlusPage.cs" />
     <Compile Include="View\MainPage.cs" />
     <Compile Include="View\MapPage.cs" />
-    <Compile Include="View\NavigationPage.cs" />
+    <Compile Include="View\MenuPage.cs" />
     <Compile Include="View\NewsPage.cs" />
     <Compile Include="View\OverviewPage.cs" />
     <Compile Include="View\AstronautsPage.cs" />
