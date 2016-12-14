@@ -126,7 +126,7 @@ namespace LaunchPal.View
                 {
                     HorizontalTextAlignment = TextAlignment.Center,
                     VerticalTextAlignment = TextAlignment.Center,
-                    Text = $"Search by typing in the name of the rocket or payload{Environment.NewLine}" +
+                    Text = $"Search by typing the name of the rocket or payload{Environment.NewLine}" +
                            $"{Environment.NewLine}" +
                            $"Examples when searching for rockets:{Environment.NewLine}" +
                            $"Falcon 9{Environment.NewLine}" +
