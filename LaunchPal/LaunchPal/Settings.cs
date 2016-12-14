@@ -17,7 +17,7 @@ namespace LaunchPal
         public bool SuccessfullIap => DependencyService.Get<ICheckPurchase>().HasPurchasedPlus();     //Live
         //public bool SuccessfullIap => false;                                                        //Testing
         public bool UseNextLaunchOnTile => _trackedLaunchOnHomescreen == null || _trackedLaunchOnHomescreen.Net < DateTime.Now;
-        public bool NextLaunchNotifications { get; set; } = true;
+        public bool LaunchInProgressNotifications { get; set; } = true;
         public NotifyTime NotifyBeforeLaunch { get; set; } = NotifyTime.Notify15;
         public bool TrackedLaunchNotifications { get; set; } = true;
 

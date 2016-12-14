@@ -6,6 +6,7 @@ using LaunchPal.Enums;
 using LaunchPal.Helper;
 using LaunchPal.Interface;
 using LaunchPal.Manager;
+using LaunchPal.Model;
 using Xamarin.Forms;
 
 namespace LaunchPal.View
@@ -38,20 +39,31 @@ namespace LaunchPal.View
             grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Auto) });
             grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Auto) });
 
-            grid.Children.Add(GenerateThemePicker(), 0, 0);
-            grid.Children.Add(new Label { Text = $"Select the theme for the app{Environment.NewLine}Note - A restart is required for the change to take affect", TextColor = Theme.TextColor, VerticalTextAlignment = TextAlignment.Center }, 1, 0);
-            grid.Children.Add(GenerateLocalTimeToggle(), 0, 1);
-            grid.Children.Add(new Label { Text = "Switch between using the device time or UTC", TextColor = Theme.TextColor, VerticalTextAlignment = TextAlignment.Center }, 1, 1);
-            grid.Children.Add(GenerateNextLaunchNotificationToggle(), 0, 2);
-            grid.Children.Add(new Label { Text = "Notify me 5 minutes before a rocket is scheduled to launch", TextColor = Theme.TextColor, VerticalTextAlignment = TextAlignment.Center }, 1, 2);
-            grid.Children.Add(GenerateTrackLaunchNotificationToggle(), 0, 3);
-            grid.Children.Add(new Label { Text = "Extra notification for tracked launches", TextColor = Theme.TextColor, VerticalTextAlignment = TextAlignment.Center }, 1, 3);
-            grid.Children.Add(GenerateNotifyBeforeLaunchTimePicker(), 0, 4);
-            grid.Children.Add(new Label { Text = "Select when you want a extra reminder for a tracked launch", TextColor = Theme.TextColor, VerticalTextAlignment = TextAlignment.Center }, 1, 4);
-            grid.Children.Add(GenerateClearCacheButton(), 0, 5);
-            grid.Children.Add(new Label { Text = "Clear the app-cache", TextColor = Theme.TextColor, VerticalTextAlignment = TextAlignment.Center }, 1, 5);
-            grid.Children.Add(GenerateClearTrackingButton(), 0, 6);
-            grid.Children.Add(new Label { Text = "Clear all tracked launches and notifications", TextColor = Theme.TextColor, VerticalTextAlignment = TextAlignment.Center }, 1, 6);
+            grid.Children.Add(GenerateGeneralAppSettings(), 0, 0);
+            grid.Children.Add(new Label { Text = $"Choose what time a launch should display in the app, UTC or your local time. This does not effect other things like notifications.{Environment.NewLine}" +
+                                                 $"{Environment.NewLine}" +
+                                                 $"Select the theme you would like to use in the app, you will be prompted to restart the app if you choose to change the theme.",
+                TextColor = Theme.TextColor, VerticalTextAlignment = TextAlignment.Center }, 1, 0);
+
+            grid.Children.Add(NewsToFollowToggles(), 0, 1);
+            grid.Children.Add(new Label { Text = $"Select what news sources you would like to see when checking the news section.{Environment.NewLine}" +
+                                                 $"{Environment.NewLine}" +
+                                                 $"Note - Load time greatly affects the number of news sources selected.",
+                TextColor = Theme.TextColor, VerticalTextAlignment = TextAlignment.Center }, 1, 1);
+
+            grid.Children.Add(GenerateNotificationOptions(), 0, 3);
+            grid.Children.Add(new Label { Text = $"Select if you would like to recieve notifications 5 minutes before a upcoming launch.{Environment.NewLine}" +
+                                                 $"{Environment.NewLine}" +
+                                                 $"Select if you would like to recieve a additional notification before a launch that is tracked by you.{Environment.NewLine}" +
+                                                 $"{Environment.NewLine}" +
+                                                 $"Select the time before a launch a notification should appear for tracked launches.",
+                TextColor = Theme.TextColor, VerticalTextAlignment = TextAlignment.Center }, 1, 3);
+
+            grid.Children.Add(GenerateCacheHandlers(), 0, 4);
+            grid.Children.Add(new Label { Text = $"Clear the app cache like launches, news and so on.{Environment.NewLine}" +
+                                                 $"{Environment.NewLine}" +
+                                                 $"Clear tracked launches and all notifications for them.",
+                TextColor = Theme.TextColor, VerticalTextAlignment = TextAlignment.Center }, 1, 4);
 
             view.Content = new MarginFrame(10)
             {
@@ -61,134 +73,22 @@ namespace LaunchPal.View
             return view;
         }
 
-        private static StackLayout GenerateTrackLaunchNotificationToggle()
+        private StackLayout GenerateGeneralAppSettings()
         {
-            var toggleStack = new StackLayout();
+            var settingsStack = new StackLayout();
 
-            var label = new Label
-            {
-                Text = "Notify tracked launches",
-                TextColor = Theme.TextColor
-            };
+            var label = HeaderLabel("General App Settings");
 
-            var toggle = new Switch()
+            // Local time toggle
+            var localTimeLabel = SubtitleLabel("Use local device time");
+
+            var localTimeToggle = new Switch()
             {
                 IsToggled = App.Settings.UseLocalTime,
+
             };
 
-            toggle.Toggled += (sender, args) =>
-            {
-                if (sender.GetType() != typeof(Switch))
-                    return;
-
-                var isToggled = (sender as Switch)?.IsToggled ?? true;
-
-                if (isToggled)
-                {
-                    App.Settings.TrackedLaunchNotifications = true;
-                    TrackingManager.GenerateNotificationsForAllTrackedLaunches();
-                }
-                else
-                {
-                    App.Settings.TrackedLaunchNotifications = false;
-                    DependencyService.Get<INotify>().ClearNotifications(NotificationType.TrackedLaunch);
-                }
-            };
-
-            toggleStack.Children.Add(label);
-            toggleStack.Children.Add(toggle);
-
-            return toggleStack;
-        }
-
-        private static StackLayout GenerateNextLaunchNotificationToggle()
-        {
-            var toggleStack = new StackLayout();
-
-            var label = new Label
-            {
-                Text = "Notify launch in progress",
-                TextColor = Theme.TextColor
-            };
-
-            var toggle = new Switch()
-            {
-                IsToggled = App.Settings.UseLocalTime,
-            };
-
-            toggle.Toggled += async (sender, args) =>
-            {
-                if (sender.GetType() != typeof(Switch))
-                    return;
-
-                var isToggled = (sender as Switch)?.IsToggled ?? true;
-
-                if (isToggled)
-                {
-                    App.Settings.NextLaunchNotifications = true;
-                    DependencyService.Get<INotify>().AddNotification(await CacheManager.TryGetNextLaunch(), NotificationType.NextLaunch);
-                }
-                else
-                {
-                    App.Settings.NextLaunchNotifications = false;
-                    DependencyService.Get<INotify>().ClearNotifications(NotificationType.NextLaunch);
-                }
-            };
-
-            toggleStack.Children.Add(label);
-            toggleStack.Children.Add(toggle);
-
-            return toggleStack;
-        }
-
-        private Picker GenerateNotifyBeforeLaunchTimePicker()
-        {
-            var timePicker = new Picker
-            {
-                Title = "Remind me for tracked launches",
-                TextColor = Theme.LinkColor,
-                BackgroundColor = Theme.FrameColor
-            };
-
-            foreach (var notifyTime in (NotifyTime[])Enum.GetValues(typeof(NotifyTime)))
-            {
-                timePicker.Items.Add(notifyTime.ToFriendlyString());
-            }
-
-            timePicker.SelectedIndex = (int)App.Settings.NotifyBeforeLaunch;
-
-            timePicker.SelectedIndexChanged += (sender, args) =>
-            {
-                if (sender.GetType() != typeof(Picker))
-                    return;
-
-                var selectedIndex = (sender as Picker)?.SelectedIndex ?? 0;
-
-                App.Settings.NotifyBeforeLaunch = (NotifyTime) selectedIndex;
-
-                TrackingManager.UpdateTrackedLaunches();
-            };
-
-            return timePicker;
-        }
-
-        private static StackLayout GenerateLocalTimeToggle()
-        {
-            var toggleStack = new StackLayout();
-
-            var label = new Label
-            {
-                Text = "Use device time",
-                TextColor = Theme.TextColor
-            };
-
-            var toggle = new Switch()
-            {
-                IsToggled = App.Settings.UseLocalTime,
-                
-            };
-
-            toggle.Toggled += (sender, args) =>
+            localTimeToggle.Toggled += (sender, args) =>
             {
                 if (sender.GetType() != typeof(Switch))
                     return;
@@ -196,51 +96,9 @@ namespace LaunchPal.View
                 App.Settings.UseLocalTime = (sender as Switch)?.IsToggled ?? true;
             };
 
-            toggleStack.Children.Add(label);
-            toggleStack.Children.Add(toggle);
+            // Theme picker
+            var themePickerLabel = SubtitleLabel("Select theme for the app");
 
-            return toggleStack;
-        }
-
-        private Button GenerateClearCacheButton()
-        {
-            var button = new Button()
-            {
-                Text = "Clear Cache",
-                TextColor = Theme.ButtonTextColor,
-                BackgroundColor = Theme.ButtonBackgroundColor
-            };
-
-            button.Clicked += (sender, args) =>
-            {
-                StorageManager.ClearCache();
-            };
-
-            return button;
-        }
-
-        private Button GenerateClearTrackingButton()
-        {
-            var button = new Button()
-            {
-                Text = "Clear Trackings",
-                TextColor = Theme.ButtonTextColor,
-                BackgroundColor = Theme.ButtonBackgroundColor
-            };
-
-            button.Clicked += (sender, args) =>
-            {
-                StorageManager.ClearTracking();
-                App.Settings.TrackedLaunchOnHomescreen = null;
-                DependencyService.Get<INotify>().ClearNotifications(NotificationType.TrackedLaunch);
-                DependencyService.Get<ICreateTile>().SetLaunch();
-            };
-
-            return button;
-        }
-
-        private Picker GenerateThemePicker()
-        {
             var themePicker = new Picker
             {
                 Items =
@@ -251,7 +109,6 @@ namespace LaunchPal.View
                     "Contrast"
                 },
                 SelectedIndex = Theme.GetCurrentThemeIntValue(),
-                Title = "Select theme",
                 TextColor = Theme.LinkColor,
                 BackgroundColor = Theme.FrameColor
             };
@@ -307,7 +164,257 @@ namespace LaunchPal.View
                 DependencyService.Get<IControlAppFunction>().ExitApp();
             };
 
-            return themePicker;
+            settingsStack.Children.Add(label);
+            settingsStack.Children.Add(localTimeLabel);
+            settingsStack.Children.Add(localTimeToggle);
+            settingsStack.Children.Add(themePickerLabel);
+            settingsStack.Children.Add(themePicker);
+
+            return settingsStack;
+        }
+
+        private static StackLayout NewsToFollowToggles()
+        {
+            var toggleStack = new StackLayout();
+
+            var label = HeaderLabel("News Sources Settings");
+
+            // SpaceNews
+            var spaceNewsLabel = SubtitleLabel("SpaceNews");
+
+            var spaceNewsToggle = new Switch()
+            {
+                IsToggled = App.Settings.FollowSpaceNews,
+
+            };
+
+            spaceNewsToggle.Toggled += (sender, args) =>
+            {
+                if (sender.GetType() != typeof(Switch))
+                    return;
+
+                ClearNewsCache();
+                App.Settings.FollowSpaceNews = (sender as Switch)?.IsToggled ?? true;
+            };
+
+            // SpaceFlightNow
+            var spaceFlightNowLabel = SubtitleLabel("SpaceFlightNow");
+
+            var spaceFlightNowToggle = new Switch()
+            {
+                IsToggled = App.Settings.FollowSpaceFlightNow,
+
+            };
+
+            spaceFlightNowToggle.Toggled += (sender, args) =>
+            {
+                if (sender.GetType() != typeof(Switch))
+                    return;
+
+                ClearNewsCache();
+                App.Settings.FollowSpaceFlightNow = (sender as Switch)?.IsToggled ?? true;
+            };
+
+            // NasaSpaceFlight
+            var nasaSpaceFlightLabel = SubtitleLabel("NasaSpaceFlight");
+
+            var nasaSpaceFlightToggle = new Switch()
+            {
+                IsToggled = App.Settings.FollowNasaSpaceFlight,
+
+            };
+
+            nasaSpaceFlightToggle.Toggled += (sender, args) =>
+            {
+                if (sender.GetType() != typeof(Switch))
+                    return;
+
+                ClearNewsCache();
+                App.Settings.FollowNasaSpaceFlight = (sender as Switch)?.IsToggled ?? true;
+            };
+
+            toggleStack.Children.Add(label);
+            toggleStack.Children.Add(spaceNewsLabel);
+            toggleStack.Children.Add(spaceNewsToggle);
+            toggleStack.Children.Add(spaceFlightNowLabel);
+            toggleStack.Children.Add(spaceFlightNowToggle);
+            toggleStack.Children.Add(nasaSpaceFlightLabel);
+            toggleStack.Children.Add(nasaSpaceFlightToggle);
+
+            return toggleStack;
+        }
+
+        private static StackLayout GenerateNotificationOptions()
+        {
+            var toggleStack = new StackLayout();
+
+            var label = HeaderLabel("Notification Settings");
+
+            // Tracked Launch Toggle
+            var trackedLaunchLabel = SubtitleLabel("Notify for tracked launches");
+
+            var trackedLaunchToggle = new Switch()
+            {
+                IsToggled = App.Settings.TrackedLaunchNotifications,
+            };
+
+            trackedLaunchToggle.Toggled += (sender, args) =>
+            {
+                if (sender.GetType() != typeof(Switch))
+                    return;
+
+                var isToggled = (sender as Switch)?.IsToggled ?? true;
+
+                if (isToggled)
+                {
+                    App.Settings.TrackedLaunchNotifications = true;
+                    TrackingManager.GenerateNotificationsForAllTrackedLaunches();
+                }
+                else
+                {
+                    App.Settings.TrackedLaunchNotifications = false;
+                    DependencyService.Get<INotify>().ClearNotifications(NotificationType.TrackedLaunch);
+                }
+            };
+
+            // Launch in Progress Toggle
+            var launchInProgressLabel = SubtitleLabel("Notify Launch in Progress");
+
+            var launchInProgessToggle = new Switch()
+            {
+                IsToggled = App.Settings.LaunchInProgressNotifications,
+            };
+
+            launchInProgessToggle.Toggled += async (sender, args) =>
+            {
+                if (sender.GetType() != typeof(Switch))
+                    return;
+
+                var isToggled = (sender as Switch)?.IsToggled ?? true;
+
+                if (isToggled)
+                {
+                    App.Settings.LaunchInProgressNotifications = true;
+                    DependencyService.Get<INotify>().AddNotification(await CacheManager.TryGetNextLaunch(), NotificationType.NextLaunch);
+                }
+                else
+                {
+                    App.Settings.LaunchInProgressNotifications = false;
+                    DependencyService.Get<INotify>().ClearNotifications(NotificationType.NextLaunch);
+                }
+            };
+
+            // Tracked launch time picker
+            var timePickerLabel = SubtitleLabel("Remind me for tracked launches");
+
+            var timePicker = new Picker
+            {
+                TextColor = Theme.LinkColor,
+                BackgroundColor = Theme.FrameColor,
+            };
+
+            foreach (var notifyTime in (NotifyTime[])Enum.GetValues(typeof(NotifyTime)))
+            {
+                timePicker.Items.Add(notifyTime.ToFriendlyString());
+            }
+
+            timePicker.SelectedIndex = (int)App.Settings.NotifyBeforeLaunch;
+
+            timePicker.SelectedIndexChanged += (sender, args) =>
+            {
+                if (sender.GetType() != typeof(Picker))
+                    return;
+
+                var selectedIndex = (sender as Picker)?.SelectedIndex ?? 0;
+
+                App.Settings.NotifyBeforeLaunch = (NotifyTime)selectedIndex;
+
+                TrackingManager.UpdateTrackedLaunches();
+            };
+
+            toggleStack.Children.Add(label);
+            toggleStack.Children.Add(launchInProgressLabel);
+            toggleStack.Children.Add(launchInProgessToggle);
+            toggleStack.Children.Add(trackedLaunchLabel);
+            toggleStack.Children.Add(trackedLaunchToggle);
+            toggleStack.Children.Add(timePickerLabel);
+            toggleStack.Children.Add(timePicker);
+
+            return toggleStack;
+        }
+
+        private static StackLayout GenerateCacheHandlers()
+        {
+            var cacheStack = new StackLayout();
+
+            var label = HeaderLabel("Cache Management");
+
+            // Clear cache button
+            var clearCacheLabel = SubtitleLabel("Clear LaunchPal Cache");
+
+            var clearCacheButton = new Button()
+            {
+                Text = "Clear Cache",
+                TextColor = Theme.ButtonTextColor,
+                BackgroundColor = Theme.ButtonBackgroundColor
+            };
+
+            clearCacheButton.Clicked += (sender, args) =>
+            {
+                StorageManager.ClearCache();
+            };
+
+            // Clear cache button
+            var clearTrackingsLabel = SubtitleLabel("Clear Launch Trackings");
+
+            var ClearTrackingsButton = new Button()
+            {
+                Text = "Clear Trackings",
+                TextColor = Theme.ButtonTextColor,
+                BackgroundColor = Theme.ButtonBackgroundColor
+            };
+
+            ClearTrackingsButton.Clicked += (sender, args) =>
+            {
+                StorageManager.ClearTracking();
+                App.Settings.TrackedLaunchOnHomescreen = null;
+                DependencyService.Get<INotify>().ClearNotifications(NotificationType.TrackedLaunch);
+                DependencyService.Get<ICreateTile>().SetLaunch();
+            };
+
+            cacheStack.Children.Add(label);
+            cacheStack.Children.Add(clearCacheLabel);
+            cacheStack.Children.Add(clearCacheButton);
+            cacheStack.Children.Add(clearTrackingsLabel);
+            cacheStack.Children.Add(ClearTrackingsButton);
+
+            return cacheStack;
+        }
+
+        private static Label HeaderLabel(string text)
+        {
+            return new Label
+            {
+                Text = text,
+                TextColor = Theme.HeaderColor,
+                FontSize = 20,
+                FontAttributes = FontAttributes.Bold
+            };
+        }
+
+        private static Label SubtitleLabel(string text)
+        {
+            return new Label
+            {
+                Text = text,
+                TextColor = Theme.TextColor,
+                FontSize = 16
+            };
+        }
+
+        private static void ClearNewsCache()
+        {
+            CacheManager.CachedCacheNewsFeed.NewsFeeds = new List<NewsFeed>();
         }
 
         private void NotifyRestartApp()
