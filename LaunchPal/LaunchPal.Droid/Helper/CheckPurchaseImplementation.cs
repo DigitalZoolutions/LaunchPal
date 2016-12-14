@@ -62,7 +62,7 @@ namespace LaunchPal.Droid.Helper
 
         public bool CanPurchasePlus()
         {
-            return true;
+            return false;
         }
     }
 }
