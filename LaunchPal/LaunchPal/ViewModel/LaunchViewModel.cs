@@ -19,6 +19,8 @@ namespace LaunchPal.ViewModel
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public bool HasLaunched { get; set; }
+        public LaunchStatus LaunchStatus { get; set; }
         public string LaunchTime { get; set; }
         public string LaunchWindow { get; set; }
         public string Rocket { get; set; }
@@ -128,6 +130,8 @@ namespace LaunchPal.ViewModel
 
             this.Id = launchData.Launch.Id;
             this.Name = launchData.Launch.Name;
+            this.HasLaunched = TimeConverter.DetermineTimeSettings(launchData.Launch.Net, App.Settings.UseLocalTime).AddHours(2) < DateTime.Now;
+            this.LaunchStatus = LaunchStatusEnum.GetLaunchStatusById(launchData.Launch.Status);
             this.LaunchWindow = CalculateLaunchWindow(launchData.Launch.Windowstart, launchData.Launch.Windowend);
             this.Rocket = SetRocketType(launchData);
             this.RocketId = launchData.Launch.Rocket.Id;
