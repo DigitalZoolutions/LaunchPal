@@ -147,6 +147,12 @@ namespace LaunchPal.View
             var trackLaunchButton = LaunchPageControls.GenerateTrackingButton();
             var tileTrackLaunchButton = LaunchPageControls.GenerateTileTrackingButton();
 
+            if (Context.HasLaunched)
+            {
+                trackLaunchButton.IsEnabled = false;
+                tileTrackLaunchButton.IsEnabled = false;
+            }
+
             pageGrid.Children.Add(launchNameLabel, 0, 6, 0, 1);
             pageGrid.Children.Add(launchTimeLabel, 0, 3, 1, 2);
             pageGrid.Children.Add(launchTime, 3, 6, 1, 2);
