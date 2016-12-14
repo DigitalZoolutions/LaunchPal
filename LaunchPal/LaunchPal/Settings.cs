@@ -12,7 +12,7 @@ namespace LaunchPal
     public class Settings : CacheBase
     {
         private SimpleLaunchData _trackedLaunchOnHomescreen;
-        public AppTheme AppTheme { get; set; } = AppTheme.Light;
+        public AppTheme CurrentTheme { get; set; } = AppTheme.Light;
         public bool UseLocalTime { get; set; } = true;
         public bool SuccessfullIap => DependencyService.Get<ICheckPurchase>().HasPurchasedPlus();     //Live
         //public bool SuccessfullIap => false;                                                        //Testing

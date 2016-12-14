@@ -120,14 +120,14 @@ namespace LaunchPal.View
 
                 var selectedIndex = (sender as Picker)?.SelectedIndex ?? 0;
 
-                if (selectedIndex == (int)App.Settings.AppTheme)
+                if (selectedIndex == (int)App.Settings.CurrentTheme)
                     return;
 
                 var agreeToCloseApp = await DisplayAlert("Do you want to restart?", "To the change to take affect the app needs to be restarted, Do you want to close the app now?", "Continue", "Cancel");
 
                 if (!agreeToCloseApp)
                 {
-                    themePicker.SelectedIndex = (int)App.Settings.AppTheme;
+                    themePicker.SelectedIndex = (int)App.Settings.CurrentTheme;
                     return;
                 }
 
@@ -135,27 +135,27 @@ namespace LaunchPal.View
                 {
                     case AppTheme.Light:
                         Theme.SetTheme(AppTheme.Light);
-                        App.Settings.AppTheme = AppTheme.Light;
+                        App.Settings.CurrentTheme = AppTheme.Light;
                         NotifyRestartApp();
                         break;
                     case AppTheme.Dark:
                         Theme.SetTheme(AppTheme.Dark);
-                        App.Settings.AppTheme = AppTheme.Dark;
+                        App.Settings.CurrentTheme = AppTheme.Dark;
                         NotifyRestartApp();
                         break;
                     case AppTheme.Night:
                         Theme.SetTheme(AppTheme.Night);
-                        App.Settings.AppTheme = AppTheme.Night;
+                        App.Settings.CurrentTheme = AppTheme.Night;
                         NotifyRestartApp();
                         break;
                     case AppTheme.Contrast:
                         Theme.SetTheme(AppTheme.Contrast);
-                        App.Settings.AppTheme = AppTheme.Contrast;
+                        App.Settings.CurrentTheme = AppTheme.Contrast;
                         NotifyRestartApp();
                         break;
                     default:
                         Theme.SetTheme(AppTheme.Light);
-                        App.Settings.AppTheme = AppTheme.Light;
+                        App.Settings.CurrentTheme = AppTheme.Light;
                         NotifyRestartApp();
                         break;
                 }

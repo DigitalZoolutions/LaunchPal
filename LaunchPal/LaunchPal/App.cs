@@ -22,7 +22,7 @@ namespace LaunchPal
                 LoadAppSettingsAndCache();
 
                 // Set startup theme
-                Theme.SetTheme(Settings.AppTheme);
+                Theme.SetTheme(Settings.CurrentTheme);
 
                 // Set LiveTile
                 if (Device.Idiom == TargetIdiom.Desktop || Device.Idiom == TargetIdiom.Phone)
@@ -47,7 +47,7 @@ namespace LaunchPal
             LoadAppSettingsAndCache();
 
             // Set startup theme
-            Theme.SetTheme(Settings.AppTheme);
+            Theme.SetTheme(Settings.CurrentTheme);
 
             // Set LiveTile
             if (Device.Idiom == TargetIdiom.Desktop || Device.Idiom == TargetIdiom.Phone)
