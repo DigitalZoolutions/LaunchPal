@@ -34,7 +34,7 @@ namespace LaunchPal.UWP.Helper
             switch (type)
             {
                 case NotificationType.NextLaunch:
-                    if (!LaunchPal.App.Settings.NextLaunchNotifications)
+                    if (!LaunchPal.App.Settings.LaunchInProgressNotifications)
                         return;
                     break;
                 case NotificationType.TrackedLaunch:
