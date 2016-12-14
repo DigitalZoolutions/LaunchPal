@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
+using LaunchPal.Enums;
 using LaunchPal.ExternalApi;
 using LaunchPal.ExternalApi.LaunchLibrary.JsonObject;
 using LaunchPal.Helper;
@@ -130,7 +131,7 @@ namespace LaunchPal.ViewModel
             this.LaunchWindow = CalculateLaunchWindow(launchData.Launch.Windowstart, launchData.Launch.Windowend);
             this.Rocket = SetRocketType(launchData);
             this.RocketId = launchData.Launch.Rocket.Id;
-            if (!launchData.Launch.Rocket.ImageUrl.Contains("placeholder"))
+            if (!launchData.Launch.Rocket.ImageUrl.Contains("placeholder") && App.Settings.CurrentTheme != AppTheme.Contrast)
             {
                 this.RocketImage = SetRocketImage(launchData);
             }
