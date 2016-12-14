@@ -76,7 +76,8 @@ namespace LaunchPal.View
                     new RowDefinition {Height = new GridLength(1, GridUnitType.Auto)},
                     new RowDefinition {Height = new GridLength(1, GridUnitType.Auto)},
                     new RowDefinition {Height = new GridLength(1, GridUnitType.Auto)}
-                }
+                },
+                BackgroundColor = Theme.BackgroundColor
             };
 
             var mainTitle = new Label
