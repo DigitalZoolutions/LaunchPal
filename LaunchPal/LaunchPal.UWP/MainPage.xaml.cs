@@ -70,30 +70,8 @@ namespace LaunchPal.UWP
                 ApplicationViewTitleBar formattableTitleBar = ApplicationView.GetForCurrentView().TitleBar;
                 if (formattableTitleBar != null)
                 {
-                    Color uiColor;
-
-                    switch (LaunchPal.App.Settings.AppTheme)
-                    {
-                        case AppTheme.Light:
-                            uiColor = Color.FromArgb(104, 105, 99, 1);
-                            break;
-                        case AppTheme.Dark:
-                            uiColor = Color.FromArgb(158, 166, 181, 1);
-                            break;
-                        case AppTheme.Night:
-                            uiColor = Color.FromArgb(115, 0, 0, 1);
-                            break;
-                        case AppTheme.Contrast:
-                            uiColor = Color.FromArgb(255, 255, 0, 1);
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
-
-                    formattableTitleBar.ButtonForegroundColor = uiColor;
-                    formattableTitleBar.ButtonBackgroundColor = Colors.Transparent;
                     CoreApplicationViewTitleBar coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
-                    coreTitleBar.ExtendViewIntoTitleBar = true;
+                    coreTitleBar.ExtendViewIntoTitleBar = false;
                 }
 
             }
