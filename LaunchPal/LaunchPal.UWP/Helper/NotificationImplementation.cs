@@ -18,12 +18,12 @@ namespace LaunchPal.UWP.Helper
 {
     internal class NotificationImplementation : INotify
     {
-        public void AddNotification(LaunchData launch, NotificationType type)
+        public void AddNotification(LaunchData launchData, NotificationType type)
         {
-            if (launch?.Launch == null)
+            if (launchData?.Launch == null)
                 return;
 
-            var deliverytime = TimeConverter.DetermineTimeSettings(launch.Launch.Net, LaunchPal.App.Settings.UseLocalTime)
+            var deliverytime = TimeConverter.DetermineTimeSettings(launchData.Launch.Net, LaunchPal.App.Settings.UseLocalTime)
                 .AddMinutes(-LaunchPal.App.Settings.NotifyBeforeLaunch.ToIntValue());
 
             if (deliverytime < DateTime.Now)
@@ -60,12 +60,12 @@ namespace LaunchPal.UWP.Helper
  
                         new AdaptiveText()
                         {
-                            Text = $"{launch?.Launch?.Name} is about to launch."
+                            Text = $"{launchData?.Launch?.Name} is about to launch."
                         },
 
                         new AdaptiveText()
                         {
-                            Text = $"Time: {TimeConverter.SetStringTimeFormat(launch.Launch.Net, LaunchPal.App.Settings.UseLocalTime).Replace(" Local", "")}"
+                            Text = $"Time: {TimeConverter.SetStringTimeFormat(launchData.Launch.Net, LaunchPal.App.Settings.UseLocalTime).Replace(" Local", "")}"
                         }
                     },
  
@@ -87,7 +87,7 @@ namespace LaunchPal.UWP.Helper
                 Launch = new QueryString()
                 {
                     { "action", "viewLaunch" },
-                    { "LaunchId", launch?.Launch?.Id.ToString() }
+                    { "LaunchId", launchData?.Launch?.Id.ToString() }
  
                 }.ToString(),
 
@@ -122,17 +122,17 @@ namespace LaunchPal.UWP.Helper
             // And create the toast notification
             var scheduleToast = new ScheduledToastNotification(toastContent.GetXml(), deliverytime)
             {
-                Id = launch?.Launch?.Id.ToString() ?? "0",
-                Tag = launch?.Launch?.Id.ToString() ?? "0",
+                Id = launchData?.Launch?.Id.ToString() ?? "0",
+                Tag = launchData?.Launch?.Id.ToString() ?? "0",
                 Group = groupName,
                 NotificationMirroring = NotificationMirroring.Allowed,
             };
             ToastNotificationManager.CreateToastNotifier().AddToSchedule(scheduleToast);
         }
 
-        public void UpdateNotification(LaunchData launch, NotificationType type)
+        public void UpdateNotification(LaunchData launchData, NotificationType type)
         {
-            AddNotification(launch, type);
+            AddNotification(launchData, type);
         }
 
         public void DeleteNotification(int index, NotificationType type)

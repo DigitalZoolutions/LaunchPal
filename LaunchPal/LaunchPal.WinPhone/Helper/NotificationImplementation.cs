@@ -14,12 +14,12 @@ namespace LaunchPal.WinPhone.Helper
 {
     class NotificationImplementation : INotify
     {
-        public void AddNotification(LaunchData launch, NotificationType type)
+        public void AddNotification(LaunchData launchData, NotificationType type)
         {
             throw new NotImplementedException();
         }
 
-        public void UpdateNotification(LaunchData launch, NotificationType type)
+        public void UpdateNotification(LaunchData launchData, NotificationType type)
         {
             throw new NotImplementedException();
         }
