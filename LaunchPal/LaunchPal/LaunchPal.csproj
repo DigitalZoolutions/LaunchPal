@@ -42,6 +42,7 @@
     <Compile Include="Enums\LaunchStatusEnum.cs" />
     <Compile Include="Enums\NotificationEnum.cs" />
     <Compile Include="Enums\NotifyTimeEnum.cs" />
+    <Compile Include="Enums\OrderByEnum.cs" />
     <Compile Include="Enums\OrientationEnum.cs" />
     <Compile Include="Enums\ThemeEnum.cs" />
     <Compile Include="Extension\DateExtension.cs" />
@@ -118,6 +119,7 @@
     <Compile Include="ExternalApi\OpenWeatherMap\JsonObject\Wind.cs" />
     <Compile Include="ExternalApi\OpenWeatherMap\Request\HttpCaller.cs" />
     <Compile Include="Model\SimpleLaunchData.cs" />
+    <Compile Include="Model\TrackedAgency.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\Annotations3.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -149,6 +151,7 @@
     <Compile Include="View\SearchPage.cs" />
     <Compile Include="View\SettingsPage.cs" />
     <Compile Include="View\HelperPages\WaitingPage.cs" />
+    <Compile Include="View\TrackedAgenciesPage.cs" />
     <Compile Include="View\WebPage.cs" />
   </ItemGroup>
   <ItemGroup>
