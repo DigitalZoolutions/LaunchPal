@@ -20,7 +20,6 @@ namespace LaunchPal.View
             Icon = "";
             Title = "Overview";
             BackgroundColor = Theme.BackgroundColor;
-            Padding = 10;
 
             Content = GenerateWaitingMessage("Downloading data...");
 
@@ -78,29 +77,6 @@ namespace LaunchPal.View
 
         private void PopulatePage()
         {
-            Grid pageGrid = new Grid
-            {
-                ColumnDefinitions = new ColumnDefinitionCollection
-                {
-                    new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
-                    new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
-                    new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
-                    new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
-                    new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
-                    new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
-                },
-                RowDefinitions = new RowDefinitionCollection
-                {
-                    new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) },
-                    new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) },
-                    new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) },
-                    new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) },
-                    new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) },
-                    new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) },
-                    new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) }
-                }
-            };
-
             OverviewPageControls.OverviewPage = this;
 
             // Generating the page controls
@@ -113,35 +89,126 @@ namespace LaunchPal.View
             var launchPalPlusButton = OverviewPageControls.SetLaunchPalPlusButton();
             var trackingLabel = OverviewPageControls.GenerateTrackedLaunchLabel();
 
-            // Next launch labels
-            pageGrid.Children.Add(nextLaunchLink, 0, 6, 0, 1);
-            pageGrid.Children.Add(launchInLabel, 0, 6, 1, 2);
-            pageGrid.Children.Add(launchTimerLabel, 0, 6, 2, 3);
+            var relativeLayout = new RelativeLayout();
 
-            // IAP Button
+            relativeLayout.Children.Add(nextLaunchLink, 
+                Constraint.RelativeToParent(parent => parent.Width / 2 - nextLaunchLink.Width / 2));
+
+            relativeLayout.Children.Add(launchInLabel, 
+                Constraint.RelativeToParent(parent => parent.Width / 2 - launchInLabel.Width / 2), 
+                Constraint.RelativeToView(nextLaunchLink, (parent, sibling) => sibling.Y + sibling.Height + 10));
+
+            relativeLayout.Children.Add(launchTimerLabel,
+                Constraint.RelativeToParent(parent => parent.Width / 2 - launchTimerLabel.Width / 2),
+                Constraint.RelativeToView(launchInLabel, (parent, sibling) => sibling.Y + sibling.Height + 10));
+
             if (!App.Settings.SuccessfullIap && DependencyService.Get<ICheckPurchase>().CanPurchasePlus())
-                pageGrid.Children.Add(launchPalPlusButton, 1, 5, 3, 4);
+                relativeLayout.Children.Add(launchPalPlusButton,
+                Constraint.RelativeToParent(parent => parent.Width / 2 - launchPalPlusButton.Width / 2),
+                Constraint.RelativeToView(launchTimerLabel, (parent, sibling) => sibling.Y + sibling.Height + 10));
 
-            // Launches this week/month and astronaauts in space frames
-            pageGrid.Children.Add(launchesThisWeekFrame, 0, 3, 4, 5);
-            pageGrid.Children.Add(launchesThisMonthFrame, 3, 6, 4, 5);
-            pageGrid.Children.Add(astronautsFrame, 0, 6, 5, 6);
+            var previousView = !App.Settings.SuccessfullIap && DependencyService.Get<ICheckPurchase>().CanPurchasePlus()
+                ? (Xamarin.Forms.View) launchPalPlusButton
+                : (Xamarin.Forms.View) launchTimerLabel;
 
-            // Tracked launches
-            pageGrid.Children.Add(trackingLabel, 0, 6, 6, 7);
-            if (Context.TrackedLaunches.ItemsSource.Cast<object>().Any())
+            relativeLayout.Children.Add(launchesThisWeekFrame,
+                Constraint.RelativeToParent(parent => parent.Width > 640 ? parent.Width / 4 - launchesThisWeekFrame.Width / 2 : parent.Width / 2 - launchesThisWeekFrame.Width / 2),
+                Constraint.RelativeToView(previousView, (parent, sibling) => sibling.Y + sibling.Height + 10),
+                Constraint.RelativeToParent(parent =>
+                {
+                    if (parent.Width > 1100)
+                    {
+                        return parent.Width / 4;
+                    }
+                    else if(parent.Width > 640)
+                    {
+                        return parent.Width / 2;
+                    }
+                    else
+                    {
+                        return parent.Width;
+                    }
+                }));
+
+            relativeLayout.Children.Add(launchesThisMonthFrame,
+                Constraint.RelativeToParent(parent => parent.Width > 640 ? parent.Width / 4 * 3 - launchesThisMonthFrame.Width / 2 : parent.Width / 2 - launchesThisMonthFrame.Width / 2),
+                Constraint.RelativeToView(launchesThisWeekFrame, (parent, sibling) => parent.Width > 640 ? sibling.Y : sibling.Y + sibling.Height),
+                Constraint.RelativeToParent(parent =>
+                {
+                    if (parent.Width > 1100)
+                    {
+                        return parent.Width / 4;
+                    }
+                    else if (parent.Width > 640)
+                    {
+                        return parent.Width / 2;
+                    }
+                    else
+                    {
+                        return parent.Width;
+                    }
+                }));
+
+            relativeLayout.Children.Add(astronautsFrame,
+                Constraint.RelativeToParent(parent => parent.Width / 2 - astronautsFrame.Width / 2),
+                Constraint.RelativeToView(launchesThisMonthFrame, (parent, sibling) => sibling.Y + (parent.Width > 1100 ? 0 : launchesThisWeekFrame.Height)),
+                Constraint.RelativeToParent(parent =>
+                {
+                    if (parent.Width > 1100)
+                    {
+                        return parent.Width / 4;
+                    }
+                    else if (parent.Width > 640)
+                    {
+                        return parent.Width / 2;
+                    }
+                    else
+                    {
+                        return parent.Width;
+                    }
+                }));
+
+            relativeLayout.Children.Add(trackingLabel,
+                Constraint.RelativeToParent(parent => parent.Width / 2 - trackingLabel.Width / 2),
+                Constraint.RelativeToView(astronautsFrame, (parent, sibling) => sibling.Y + sibling.Height + 10));
+
+            if (Context.TrackedLaunches.Any())
             {
-                Context.TrackedLaunches.Margin = new Thickness(5, 0, 0, 0);
-                Context.TrackedLaunches.ItemTapped += TrackedLaunch_ItemTapped;
-                pageGrid.Children.Add(Context.TrackedLaunches, 0, 6, 7, 8);
+                var trackedLaunchList = OverviewPageControls.GenerateTrackingList();
+                relativeLayout.Children.Add(trackedLaunchList,
+                    Constraint.RelativeToParent(parent => parent.Width / 4 - trackedLaunchList.Width / 2),
+                    Constraint.RelativeToView(trackingLabel, (parent, sibling) => sibling.Y + sibling.Height + 10),
+                    Constraint.RelativeToParent(parent => parent.Width / 2));
             }
             else
             {
                 var noTrackedLaunchLabel = OverviewPageControls.GenerateNoTrackingLabel();
-                pageGrid.Children.Add(noTrackedLaunchLabel, 0, 6, 7, 8);
+                relativeLayout.Children.Add(noTrackedLaunchLabel,
+                    Constraint.RelativeToParent(parent => parent.Width / 4 - noTrackedLaunchLabel.Width / 2),
+                    Constraint.RelativeToView(trackingLabel, (parent, sibling) => sibling.Y + sibling.Height + 10));
             }
 
-            Content = pageGrid;
+            if (Context.TrackedLaunches.Any())
+            {
+                var trackedLaunchList = OverviewPageControls.GenerateTrackingList();
+                relativeLayout.Children.Add(trackedLaunchList,
+                    Constraint.RelativeToParent(parent => parent.Width / 4 * 3 - trackedLaunchList.Width / 2),
+                    Constraint.RelativeToView(trackingLabel, (parent, sibling) => sibling.Y + sibling.Height + 10),
+                    Constraint.RelativeToParent(parent => parent.Width / 2));
+            }
+            else
+            {
+                var noTrackedLaunchLabel = OverviewPageControls.GenerateNoTrackingLabel();
+                relativeLayout.Children.Add(noTrackedLaunchLabel,
+                    Constraint.RelativeToParent(parent => parent.Width / 4 * 3 - noTrackedLaunchLabel.Width / 2),
+                    Constraint.RelativeToView(trackingLabel, (parent, sibling) => sibling.Y + sibling.Height + 10));
+            }
+
+            Content = new ScrollView
+            {
+                Padding = 10,
+                Content = relativeLayout
+            };
         }
 
         #region Action Triggers
@@ -302,10 +369,10 @@ namespace LaunchPal.View
                         Content = new StackLayout
                         {
                             Children =
-                        {
-                            launchThisMonthLabel,
-                            launchesThisMonthLabel
-                        }
+                            {
+                                launchThisMonthLabel,
+                                launchesThisMonthLabel
+                            }
                         }
                     }
                 };
@@ -319,6 +386,7 @@ namespace LaunchPal.View
                 launchThisMonthLabel.SetBinding(Label.TextProperty, new Binding("CurrentMonth"));
                 var launchesThisMonthLabel = new Label { HorizontalTextAlignment = TextAlignment.Center, FontAttributes = FontAttributes.Bold, TextColor = Theme.LinkColor, FontSize = 18 };
                 launchesThisMonthLabel.SetBinding(Label.TextProperty, new Binding("LaunchesThisMonthLabel"));
+
                 var launchesThisMonthFrame = new MarginFrame(10, Theme.BackgroundColor)
                 {
                     Content = new Frame()
@@ -329,10 +397,10 @@ namespace LaunchPal.View
                         Content = new StackLayout
                         {
                             Children =
-                        {
-                            launchThisMonthLabel,
-                            launchesThisMonthLabel
-                        }
+                            {
+                                launchThisMonthLabel,
+                                launchesThisMonthLabel
+                            }
                         }
                     }
                 };
@@ -342,25 +410,12 @@ namespace LaunchPal.View
 
             internal static MarginFrame GenerateAstronautsInSpaceFrame()
             {
-                var astronautsLabel = new Label
-                {
-                    HorizontalTextAlignment = TextAlignment.Center,
-                    FontAttributes = FontAttributes.Bold,
-                    TextColor = Theme.TextColor,
-                    FontSize = 18
-                };
+                var astronautsCount = new Label { HorizontalTextAlignment = TextAlignment.Center, FontAttributes = FontAttributes.Bold, TextColor = Theme.LinkColor, FontSize = 18 };
+                astronautsCount.SetBinding(Label.TextProperty, new Binding("AstronautsInSpace"));
+                var astronautsLabel = new Label { HorizontalTextAlignment = TextAlignment.Center, TextColor = Theme.TextColor, FontSize = 18, FontAttributes = FontAttributes.Bold };
                 astronautsLabel.SetBinding(Label.TextProperty, new Binding("AstronoutsInSpaceLabel"));
 
-                var astronautsCount = new Label
-                {
-                    HorizontalTextAlignment = TextAlignment.Center,
-                    FontAttributes = FontAttributes.Bold,
-                    FontSize = 18,
-                    TextColor = Theme.LinkColor
-                };
-                astronautsCount.SetBinding(Label.TextProperty, new Binding("AstronautsInSpace"));
-
-                var astronautsInSpaceFrame = new MarginFrame(10, 0, 10, 10, Theme.BackgroundColor)
+                var astronautsInSpaceFrame = new MarginFrame(10, Theme.BackgroundColor)
                 {
                     Content = new Frame()
                     {
@@ -369,14 +424,11 @@ namespace LaunchPal.View
                         OutlineColor = Theme.FrameBorderColor,
                         Content = new StackLayout
                         {
-                            Orientation = StackOrientation.Horizontal,
-                            VerticalOptions = LayoutOptions.Center,
-                            HorizontalOptions = LayoutOptions.Center,
                             Children =
-                        {
-                            astronautsLabel,
-                            astronautsCount
-                        }
+                            {
+                                astronautsLabel,
+                                astronautsCount
+                            }
                         }
                     }
                 };
@@ -409,6 +461,58 @@ namespace LaunchPal.View
                     FontSize = 20
                 };
                 return noTrackedLaunchLabel;
+            }
+
+            public static Xamarin.Forms.View GenerateTrackingList()
+            {
+                var trackedLaunchList = new StackLayout
+                {
+                    Orientation = StackOrientation.Vertical,
+                    Margin = new Thickness(0, 0, 0, 30)
+                };
+
+                foreach (var trackedLaunch in OverviewPage.Context.TrackedLaunches)
+                {
+                    trackedLaunchList.Children.Add(new MarginFrame(10, Theme.BackgroundColor)
+                    {
+                        Content = new MarginFrame(5, Theme.BackgroundColor)
+                        {
+                            Content = new Frame
+                            {
+                                GestureRecognizers = { OverviewPage.NavigateToPageWhenTaped(typeof(LaunchPage), trackedLaunch.Launch.Id) },
+                                OutlineColor = Theme.FrameColor,
+                                BackgroundColor = Theme.BackgroundColor,
+                                VerticalOptions = LayoutOptions.Center,
+                                Padding = new Thickness(5),
+                                Content = new StackLayout
+                                {
+                                    Orientation = StackOrientation.Vertical,
+                                    VerticalOptions = LayoutOptions.Center,
+                                    Children =
+                                    {
+                                        new Label
+                                        {
+                                            Text = trackedLaunch.Launch.Name,
+                                            VerticalOptions = LayoutOptions.Center,
+                                            TextColor = Theme.TextColor,
+                                            FontSize = Device.OnPlatform(16, 20, 16),
+                                            FontAttributes = FontAttributes.Bold
+                                        },
+                                        new Label
+                                        {
+                                            Text = TimeConverter.SetStringTimeFormat(trackedLaunch.Launch.Net, App.Settings.UseLocalTime),
+                                            VerticalOptions = LayoutOptions.Center,
+                                            TextColor = Theme.TextColor,
+                                            FontSize = 14,
+                                        }
+                                    }
+                                },
+                            }
+                        }
+                    });
+                }
+
+                return trackedLaunchList;
             }
         }
     }

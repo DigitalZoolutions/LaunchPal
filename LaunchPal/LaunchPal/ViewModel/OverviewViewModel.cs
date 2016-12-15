@@ -37,7 +37,7 @@ namespace LaunchPal.ViewModel
         public List<LaunchData> LaunchesThisMonth { get; set; }
         public string CurrentMonth { get; set; }
 
-        public ListView TrackedLaunches
+        public List<LaunchData> TrackedLaunches
         {
             get { return _trackedLaunches; }
             set
@@ -51,7 +51,7 @@ namespace LaunchPal.ViewModel
         private string _launchTimerText;
         public string AstronoutsInSpaceLabel { get; set; }
         public int AstronautsInSpace { get; set; }
-        private ListView _trackedLaunches;
+        private List<LaunchData> _trackedLaunches;
 
         public OverviewViewModel()
         {
@@ -85,8 +85,8 @@ namespace LaunchPal.ViewModel
             LaunchesThisMonth = upcomingLaunches.FindAll(x => x.Launch.Net > DateTime.Today.FirstDayOfMonth() && x.Launch.Net < DateTime.Today.LastDayOfMonth());
             LaunchesThisWeekLabel = LaunchesThisWeek.Where(x => x.Launch.Status != 2).ToList().Count.ToString();
             LaunchesThisMonthLabel = LaunchesThisMonth.Where(x => x.Launch.Status != 2).ToList().Count.ToString();
-            AstronoutsInSpaceLabel = "Astronauts in space: ";
-            TrackedLaunches = new SearchListTemplate(TrackingManager.TryGetTrackedLaunches().TrackingList);
+            AstronoutsInSpaceLabel = "Astronauts in space";
+            TrackedLaunches = TrackingManager.TryGetTrackedLaunches().TrackingList;
         }
 
         public OverviewViewModel(Exception ex)
