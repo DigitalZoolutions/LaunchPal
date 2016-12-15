@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using LaunchPal.CustomElement;
+using LaunchPal.Enums;
 using LaunchPal.Helper;
 using LaunchPal.Interface;
 using LaunchPal.Model;
@@ -87,7 +88,12 @@ namespace LaunchPal.View
             var launchesThisMonthFrame = OverviewPageControls.SetLaunchesThisMonth();
             var astronautsFrame = OverviewPageControls.GenerateAstronautsInSpaceFrame();
             var launchPalPlusButton = OverviewPageControls.SetLaunchPalPlusButton();
-            var trackingLabel = OverviewPageControls.GenerateTrackedLaunchLabel();
+            var launchTrackingLabel = OverviewPageControls.GenerateTrackedLaunchLabel();
+            var agencyTrackingLabel = OverviewPageControls.GenerateTrackedAgenciesLabel();
+            var trackedAgenciesList = OverviewPageControls.GenerateAgencyTrackingList();
+            var noAgenciesTrackedLabel = OverviewPageControls.GenerateNoAgenciesTrackingLabel();
+            var trackedLaunchList = OverviewPageControls.GenerateLaunchTrackingList();
+            var noLaunchesTrackedLabel = OverviewPageControls.GenerateNoLaunchTrackingLabel();
 
             var relativeLayout = new RelativeLayout();
 
@@ -168,40 +174,93 @@ namespace LaunchPal.View
                     }
                 }));
 
-            relativeLayout.Children.Add(trackingLabel,
-                Constraint.RelativeToParent(parent => parent.Width / 2 - trackingLabel.Width / 2),
+            relativeLayout.Children.Add(agencyTrackingLabel,
+                Constraint.RelativeToParent(parent => parent.Width > 640 ? parent.Width / 4 - agencyTrackingLabel.Width / 2 : parent.Width / 2 - agencyTrackingLabel.Width / 2),
                 Constraint.RelativeToView(astronautsFrame, (parent, sibling) => sibling.Y + sibling.Height + 10));
 
-            if (Context.TrackedLaunches.Any())
+            if (Context.TrackedAgency.Any())
             {
-                var trackedLaunchList = OverviewPageControls.GenerateTrackingList();
-                relativeLayout.Children.Add(trackedLaunchList,
-                    Constraint.RelativeToParent(parent => parent.Width / 4 - trackedLaunchList.Width / 2),
-                    Constraint.RelativeToView(trackingLabel, (parent, sibling) => sibling.Y + sibling.Height + 10),
-                    Constraint.RelativeToParent(parent => parent.Width / 2));
+                relativeLayout.Children.Add(trackedAgenciesList,
+                    Constraint.RelativeToParent(parent => parent.Width > 640 ? parent.Width / 4 - trackedAgenciesList.Width / 2 : parent.Width / 2 - trackedAgenciesList.Width / 2),
+                    Constraint.RelativeToView(agencyTrackingLabel, (parent, sibling) => sibling.Y + sibling.Height + 10),
+                    Constraint.RelativeToParent(parent =>
+                    {
+                        if (parent.Width > 1100)
+                        {
+                            return parent.Width / 3;
+                        }
+                        else if (parent.Width > 640)
+                        {
+                            return parent.Width / 2;
+                        }
+                        else
+                        {
+                            return parent.Width;
+                        }
+                    }));
             }
             else
             {
-                var noTrackedLaunchLabel = OverviewPageControls.GenerateNoTrackingLabel();
-                relativeLayout.Children.Add(noTrackedLaunchLabel,
-                    Constraint.RelativeToParent(parent => parent.Width / 4 - noTrackedLaunchLabel.Width / 2),
-                    Constraint.RelativeToView(trackingLabel, (parent, sibling) => sibling.Y + sibling.Height + 10));
+                relativeLayout.Children.Add(noAgenciesTrackedLabel,
+                    Constraint.RelativeToParent(parent => parent.Width > 640 ? parent.Width / 4 - noAgenciesTrackedLabel.Width / 2 : parent.Width / 2 - noAgenciesTrackedLabel.Width / 2),
+                    Constraint.RelativeToView(agencyTrackingLabel, (parent, sibling) => sibling.Y + sibling.Height + 10));
             }
+
+            relativeLayout.Children.Add(launchTrackingLabel,
+                Constraint.RelativeToParent(parent => parent.Width > 640 ? parent.Width / 4 * 3 - launchTrackingLabel.Width / 2 : parent.Width / 2 - launchTrackingLabel.Width / 2),
+                Constraint.RelativeToView(agencyTrackingLabel, (parent, sibling) =>
+                {
+                    if (Context.TrackedLaunches.Any())
+                    {
+                        if (parent.Width > 640)
+                        {
+                            return sibling.Y;
+                        }
+                        else
+                        {
+                            return sibling.Y + sibling.Height + 10 + trackedAgenciesList.Height + 10;
+                        }
+                    }
+                    else
+                    {
+                        if (parent.Width > 640)
+                        {
+                            return sibling.Y;
+                        }
+                        else
+                        {
+                            return sibling.Y + sibling.Height + 10 + noAgenciesTrackedLabel.Height + 10;
+
+                        }
+                    }
+                }));
 
             if (Context.TrackedLaunches.Any())
             {
-                var trackedLaunchList = OverviewPageControls.GenerateTrackingList();
                 relativeLayout.Children.Add(trackedLaunchList,
-                    Constraint.RelativeToParent(parent => parent.Width / 4 * 3 - trackedLaunchList.Width / 2),
-                    Constraint.RelativeToView(trackingLabel, (parent, sibling) => sibling.Y + sibling.Height + 10),
-                    Constraint.RelativeToParent(parent => parent.Width / 2));
+                    Constraint.RelativeToParent(parent => parent.Width > 640 ? parent.Width / 4 * 3 - trackedLaunchList.Width / 2 : parent.Width / 2 - trackedLaunchList.Width / 2),
+                    Constraint.RelativeToView(launchTrackingLabel, (parent, sibling) => sibling.Y + sibling.Height + 10),
+                    Constraint.RelativeToParent(parent =>
+                    {
+                        if (parent.Width > 1100)
+                        {
+                            return parent.Width / 3;
+                        }
+                        else if (parent.Width > 640)
+                        {
+                            return parent.Width / 2;
+                        }
+                        else
+                        {
+                            return parent.Width;
+                        }
+                    }));
             }
             else
             {
-                var noTrackedLaunchLabel = OverviewPageControls.GenerateNoTrackingLabel();
-                relativeLayout.Children.Add(noTrackedLaunchLabel,
-                    Constraint.RelativeToParent(parent => parent.Width / 4 * 3 - noTrackedLaunchLabel.Width / 2),
-                    Constraint.RelativeToView(trackingLabel, (parent, sibling) => sibling.Y + sibling.Height + 10));
+                relativeLayout.Children.Add(noLaunchesTrackedLabel,
+                    Constraint.RelativeToParent(parent => parent.Width > 640 ? parent.Width / 4 * 3 - noLaunchesTrackedLabel.Width / 2 : parent.Width / 2 - noLaunchesTrackedLabel.Width / 2),
+                    Constraint.RelativeToView(launchTrackingLabel, (parent, sibling) => sibling.Y + sibling.Height + 10));
             }
 
             Content = new ScrollView
@@ -249,12 +308,12 @@ namespace LaunchPal.View
             return tapGestureRecognizer;
         }
 
-        private TapGestureRecognizer NavigateToPageWhenTaped(Type page, List<LaunchData> launches)
+        private TapGestureRecognizer NavigateToPageWhenTaped(Type page, List<LaunchData> launches, OrderBy order)
         {
             var tapGestureRecognizer = new TapGestureRecognizer();
             tapGestureRecognizer.Tapped += (s, e) => {
 
-                var displayPage = (Page)Activator.CreateInstance(page, launches);
+                var displayPage = (Page)Activator.CreateInstance(page, launches, order);
 
                 var root = this.Parent.Parent as MainPage;
 
@@ -265,15 +324,6 @@ namespace LaunchPal.View
             };
 
             return tapGestureRecognizer;
-        }
-
-        private void TrackedLaunch_ItemTapped(object sender, ItemTappedEventArgs e)
-        {
-            var launchId = (e.Item as SimpleLaunchData)?.LaunchId.ToString();
-
-            var mainPage = this.Parent.Parent as MainPage;
-
-            mainPage?.NavigateTo(new LaunchPage(int.Parse(launchId)));
         }
 
         #endregion
@@ -363,7 +413,7 @@ namespace LaunchPal.View
                 {
                     Content = new Frame()
                     {
-                        GestureRecognizers = { OverviewPage.NavigateToPageWhenTaped(typeof(SearchPage), OverviewPage.Context.LaunchesThisWeek) },
+                        GestureRecognizers = { OverviewPage.NavigateToPageWhenTaped(typeof(SearchPage), OverviewPage.Context.LaunchesThisWeek, OrderBy.Net) },
                         BackgroundColor = Theme.FrameColor,
                         OutlineColor = Theme.FrameBorderColor,
                         Content = new StackLayout
@@ -391,7 +441,7 @@ namespace LaunchPal.View
                 {
                     Content = new Frame()
                     {
-                        GestureRecognizers = { OverviewPage.NavigateToPageWhenTaped(typeof(SearchPage), OverviewPage.Context.LaunchesThisMonth) },
+                        GestureRecognizers = { OverviewPage.NavigateToPageWhenTaped(typeof(SearchPage), OverviewPage.Context.LaunchesThisMonth, OrderBy.Net) },
                         BackgroundColor = Theme.FrameColor,
                         OutlineColor = Theme.FrameBorderColor,
                         Content = new StackLayout
@@ -450,20 +500,112 @@ namespace LaunchPal.View
                 return trackingLabel;
             }
 
-            internal static Label GenerateNoTrackingLabel()
+            internal static Label GenerateTrackedAgenciesLabel()
+            {
+                var trackingLabel = new Label
+                {
+                    HorizontalTextAlignment = TextAlignment.Center,
+                    VerticalTextAlignment = TextAlignment.Start,
+                    Text = "Tracked Agencies",
+                    TextColor = Theme.HeaderColor,
+                    FontSize = 24
+                };
+
+                return trackingLabel;
+            }
+
+            internal static Label GenerateNoLaunchTrackingLabel()
             {
                 var noTrackedLaunchLabel = new Label
                 {
                     HorizontalTextAlignment = TextAlignment.Center,
                     VerticalTextAlignment = TextAlignment.Start,
-                    Text = "No launches tracked at this time.",
+                    Text = "No launches tracked",
                     TextColor = Theme.TextColor,
                     FontSize = 20
                 };
                 return noTrackedLaunchLabel;
             }
 
-            public static Xamarin.Forms.View GenerateTrackingList()
+            internal static Layout GenerateNoAgenciesTrackingLabel()
+            {
+                var trackedAgencyStack = new StackLayout();
+
+                var noTrackedLaunchLabel = new Label
+                {
+                    HorizontalTextAlignment = TextAlignment.Center,
+                    VerticalTextAlignment = TextAlignment.Start,
+                    Text = $"No agencies tracked,{Environment.NewLine}" +
+                           $"add them in Settings.",
+                    TextColor = Theme.TextColor,
+                    FontSize = 20
+                };
+
+                trackedAgencyStack.Children.Add(noTrackedLaunchLabel);
+
+                return trackedAgencyStack;
+            }
+
+            public static Xamarin.Forms.View GenerateAgencyTrackingList()
+            {
+                var trackedLaunchList = new StackLayout
+                {
+                    Orientation = StackOrientation.Vertical,
+                    Margin = new Thickness(0, 0, 0, 30)
+                };
+
+                foreach (var trackedAgency in OverviewPage.Context.TrackedAgency)
+                {
+                    trackedLaunchList.Children.Add(new MarginFrame(10, 0, 0, 0, Theme.BackgroundColor)
+                    {
+                        Content = new MarginFrame(5, Theme.BackgroundColor)
+                        {
+                            Content = new Frame
+                            {
+                                GestureRecognizers = { OverviewPage.NavigateToPageWhenTaped(typeof(SearchPage), trackedAgency.ScheduledLaunchData.Concat(trackedAgency.PlanedLaunchData).ToList(), OrderBy.Status )},
+                                OutlineColor = Theme.FrameColor,
+                                BackgroundColor = Theme.BackgroundColor,
+                                VerticalOptions = LayoutOptions.Center,
+                                Padding = new Thickness(10),
+                                Content = new StackLayout
+                                {
+                                    Orientation = StackOrientation.Vertical,
+                                    VerticalOptions = LayoutOptions.Center,
+                                    Children =
+                                    {
+                                        new Label
+                                        {
+                                            Text = trackedAgency.AgencyType.ToFriendlyString(),
+                                            VerticalOptions = LayoutOptions.Center,
+                                            TextColor = Theme.TextColor,
+                                            FontSize = Device.OnPlatform(16, 20, 16),
+                                            FontAttributes = FontAttributes.Bold
+                                        },
+                                        new Label
+                                        {
+                                            Text = $"Scheduled Launches: {trackedAgency.ScheduledLaunchData.Count}",
+                                            VerticalOptions = LayoutOptions.Center,
+                                            TextColor = Theme.TextColor,
+                                            FontSize = 14,
+                                        },
+                                        new Label
+                                        {
+                                            Text = $"Planed Launches: {trackedAgency.PlanedLaunchData.Count}",
+                                            VerticalOptions = LayoutOptions.Center,
+                                            TextColor = Theme.TextColor,
+                                            FontSize = 14,
+                                        }
+                                    }
+                                },
+                            }
+                        }
+                    });
+                }
+
+                return trackedLaunchList;
+            }
+
+            public static Xamarin.Forms.View GenerateLaunchTrackingList()
             {
                 var trackedLaunchList = new StackLayout
                 {
@@ -473,7 +615,7 @@ namespace LaunchPal.View
 
                 foreach (var trackedLaunch in OverviewPage.Context.TrackedLaunches)
                 {
-                    trackedLaunchList.Children.Add(new MarginFrame(10, Theme.BackgroundColor)
+                    trackedLaunchList.Children.Add(new MarginFrame(10, 0, 0, 0, Theme.BackgroundColor)
                     {
                         Content = new MarginFrame(5, Theme.BackgroundColor)
                         {
@@ -483,7 +625,7 @@ namespace LaunchPal.View
                                 OutlineColor = Theme.FrameColor,
                                 BackgroundColor = Theme.BackgroundColor,
                                 VerticalOptions = LayoutOptions.Center,
-                                Padding = new Thickness(5),
+                                Padding = new Thickness(10),
                                 Content = new StackLayout
                                 {
                                     Orientation = StackOrientation.Vertical,

@@ -19,7 +19,6 @@ namespace LaunchPal.ViewModel
         public event PropertyChangedEventHandler PropertyChanged;
 
         public int LaunchId { get; set; }
-
         public string LaunchTimerText
         {
             get { return _launchTimerText; }
@@ -29,14 +28,12 @@ namespace LaunchPal.ViewModel
                 OnPropertyChanged(nameof(LaunchTimerText));
             }
         }
-
         public string LaunchName { get; set; }
         public string LaunchesThisWeekLabel { get; set; }
         public List<LaunchData> LaunchesThisWeek { get; set; }
         public string LaunchesThisMonthLabel { get; set; }
         public List<LaunchData> LaunchesThisMonth { get; set; }
         public string CurrentMonth { get; set; }
-
         public List<LaunchData> TrackedLaunches
         {
             get { return _trackedLaunches; }
@@ -47,10 +44,12 @@ namespace LaunchPal.ViewModel
             }
         }
 
-        private DateTime _endDate;
-        private string _launchTimerText;
+        public List<TrackedAgency> TrackedAgency { get; set; }
         public string AstronoutsInSpaceLabel { get; set; }
         public int AstronautsInSpace { get; set; }
+
+        private DateTime _endDate;
+        private string _launchTimerText;
         private List<LaunchData> _trackedLaunches;
 
         public OverviewViewModel()
@@ -87,6 +86,7 @@ namespace LaunchPal.ViewModel
             LaunchesThisMonthLabel = LaunchesThisMonth.Where(x => x.Launch.Status != 2).ToList().Count.ToString();
             AstronoutsInSpaceLabel = "Astronauts in space";
             TrackedLaunches = TrackingManager.TryGetTrackedLaunches().TrackingList;
+            TrackedAgency = TrackingManager.TryGetAllTrackedAgencies();
         }
 
         public OverviewViewModel(Exception ex)
