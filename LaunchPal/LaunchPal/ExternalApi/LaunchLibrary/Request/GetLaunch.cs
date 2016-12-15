@@ -71,5 +71,17 @@ namespace LaunchPal.ExternalApi.LaunchLibrary.Request
 
             return launchList == null ? new List<Launch>() : launchList.Launches.ToList();
         }
+
+        public static async Task<List<Launch>> LaunchesByAgency(string abbreviation)
+        {
+            const string apiUrl = "launch";
+            string agencySearchString = $"?agency={abbreviation}";
+            const string limit = "&limit=200";
+            string date = "&startdate=" + DateTime.Now.AddDays(-3).Date.ToString("yyyy-MM-dd");
+
+            var launchList = await HttpCaller.CallLaunchLibraryApi<LaunchList>(apiUrl + agencySearchString + date + limit);
+
+            return launchList == null ? new List<Launch>() : launchList.Launches.ToList();
+        }
     }
 }

@@ -80,6 +80,11 @@ namespace LaunchPal.ExternalApi
             return await GetLaunch.LaunchesByDate(startDate, endDate);
         }
 
+        public static async Task<List<Launch>> TryGetLaunchesBasedOnAgency(string abbreviation)
+        {
+            return await GetLaunch.LaunchesByAgency(abbreviation);
+        }
+
         /// <summary>
         /// Returns a mission by its ID
         /// </summary>

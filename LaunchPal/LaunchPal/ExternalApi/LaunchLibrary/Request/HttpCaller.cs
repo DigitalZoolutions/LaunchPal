@@ -49,7 +49,14 @@ namespace LaunchPal.ExternalApi.LaunchLibrary.Request
 
                     if (error.Status == "error")
                     {
-                        throw new HttpRequestException(error.Msg);
+                        if (error.Msg == "None found")
+                        {
+                            return null;
+                        }
+                        else
+                        {
+                            throw new HttpRequestException(error.Msg);
+                        }
                     }
                     else
                     {
