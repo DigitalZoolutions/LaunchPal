@@ -79,7 +79,7 @@ namespace LaunchPal.ExternalApi.LaunchLibrary.Request
             const string limit = "&limit=200";
             string date = "&startdate=" + DateTime.Now.AddDays(-3).Date.ToString("yyyy-MM-dd");
 
-            var launchList = await HttpCaller.CallLaunchLibraryApi<LaunchList>(apiUrl + agencySearchString + date + limit);
+            var launchList = await HttpCaller.CallLaunchLibraryApi<LaunchList>(apiUrl + agencySearchString + date + limit + "&mode=verbose");
 
             return launchList == null ? new List<Launch>() : launchList.Launches.ToList();
         }
