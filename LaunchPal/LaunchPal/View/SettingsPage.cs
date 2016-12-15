@@ -164,11 +164,35 @@ namespace LaunchPal.View
                 DependencyService.Get<IControlAppFunction>().ExitApp();
             };
 
+            var trackAgencyLabel = SubtitleLabel("Select what agancies to track");
+
+            var trackAgencyButton = new Button
+            {
+                Text = "Manage Agancies",
+                BackgroundColor = Theme.ButtonBackgroundColor,
+                BorderColor = Theme.FrameBorderColor,
+                TextColor = Theme.ButtonTextColor,
+            };
+
+            trackAgencyButton.Clicked += (sender, args) =>
+            {
+
+                var mainPage = Parent.Parent as MainPage;
+
+                if (mainPage?.GetType() != typeof(MainPage))
+                    return;
+
+                mainPage.NavigateTo(new TrackedAgenciesPage());
+
+            };
+
             settingsStack.Children.Add(label);
             settingsStack.Children.Add(localTimeLabel);
             settingsStack.Children.Add(localTimeToggle);
             settingsStack.Children.Add(themePickerLabel);
             settingsStack.Children.Add(themePicker);
+            settingsStack.Children.Add(trackAgencyLabel);
+            settingsStack.Children.Add(trackAgencyButton);
 
             return settingsStack;
         }
