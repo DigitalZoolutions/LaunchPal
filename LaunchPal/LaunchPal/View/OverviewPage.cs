@@ -174,71 +174,15 @@ namespace LaunchPal.View
                     }
                 }));
 
-            relativeLayout.Children.Add(agencyTrackingLabel,
-                Constraint.RelativeToParent(parent => parent.Width > 640 ? parent.Width / 4 - agencyTrackingLabel.Width / 2 : parent.Width / 2 - agencyTrackingLabel.Width / 2),
-                Constraint.RelativeToView(astronautsFrame, (parent, sibling) => sibling.Y + sibling.Height + 10));
-
-            if (Context.TrackedAgency.Any())
-            {
-                relativeLayout.Children.Add(trackedAgenciesList,
-                    Constraint.RelativeToParent(parent => parent.Width > 640 ? parent.Width / 4 - trackedAgenciesList.Width / 2 : parent.Width / 2 - trackedAgenciesList.Width / 2),
-                    Constraint.RelativeToView(agencyTrackingLabel, (parent, sibling) => sibling.Y + sibling.Height + 10),
-                    Constraint.RelativeToParent(parent =>
-                    {
-                        if (parent.Width > 1100)
-                        {
-                            return parent.Width / 3;
-                        }
-                        else if (parent.Width > 640)
-                        {
-                            return parent.Width / 2;
-                        }
-                        else
-                        {
-                            return parent.Width;
-                        }
-                    }));
-            }
-            else
-            {
-                relativeLayout.Children.Add(noAgenciesTrackedLabel,
-                    Constraint.RelativeToParent(parent => parent.Width > 640 ? parent.Width / 4 - noAgenciesTrackedLabel.Width / 2 : parent.Width / 2 - noAgenciesTrackedLabel.Width / 2),
-                    Constraint.RelativeToView(agencyTrackingLabel, (parent, sibling) => sibling.Y + sibling.Height + 10));
-            }
-
+            // Tracking list for launches
             relativeLayout.Children.Add(launchTrackingLabel,
-                Constraint.RelativeToParent(parent => parent.Width > 640 ? parent.Width / 4 * 3 - launchTrackingLabel.Width / 2 : parent.Width / 2 - launchTrackingLabel.Width / 2),
-                Constraint.RelativeToView(agencyTrackingLabel, (parent, sibling) =>
-                {
-                    if (Context.TrackedLaunches.Any())
-                    {
-                        if (parent.Width > 640)
-                        {
-                            return sibling.Y;
-                        }
-                        else
-                        {
-                            return sibling.Y + sibling.Height + 10 + trackedAgenciesList.Height + 10;
-                        }
-                    }
-                    else
-                    {
-                        if (parent.Width > 640)
-                        {
-                            return sibling.Y;
-                        }
-                        else
-                        {
-                            return sibling.Y + sibling.Height + 10 + noAgenciesTrackedLabel.Height + 10;
-
-                        }
-                    }
-                }));
+                Constraint.RelativeToParent(parent => parent.Width > 640 ? parent.Width / 4 - launchTrackingLabel.Width / 2 : parent.Width / 2 - launchTrackingLabel.Width / 2),
+                Constraint.RelativeToView(astronautsFrame, (parent, sibling) => sibling.Y + sibling.Height + 10 ));
 
             if (Context.TrackedLaunches.Any())
             {
                 relativeLayout.Children.Add(trackedLaunchList,
-                    Constraint.RelativeToParent(parent => parent.Width > 640 ? parent.Width / 4 * 3 - trackedLaunchList.Width / 2 : parent.Width / 2 - trackedLaunchList.Width / 2),
+                    Constraint.RelativeToParent(parent => parent.Width > 640 ? parent.Width / 4 - trackedLaunchList.Width / 2 : parent.Width / 2 - trackedLaunchList.Width / 2),
                     Constraint.RelativeToView(launchTrackingLabel, (parent, sibling) => sibling.Y + sibling.Height + 10),
                     Constraint.RelativeToParent(parent =>
                     {
@@ -259,8 +203,56 @@ namespace LaunchPal.View
             else
             {
                 relativeLayout.Children.Add(noLaunchesTrackedLabel,
-                    Constraint.RelativeToParent(parent => parent.Width > 640 ? parent.Width / 4 * 3 - noLaunchesTrackedLabel.Width / 2 : parent.Width / 2 - noLaunchesTrackedLabel.Width / 2),
+                    Constraint.RelativeToParent(parent => parent.Width > 640 ? parent.Width / 4 - noLaunchesTrackedLabel.Width / 2 : parent.Width / 2 - noLaunchesTrackedLabel.Width / 2),
                     Constraint.RelativeToView(launchTrackingLabel, (parent, sibling) => sibling.Y + sibling.Height + 10));
+            }
+
+            previousView = Context.TrackedLaunches.Any()
+                ? (Xamarin.Forms.View)trackedLaunchList
+                : (Xamarin.Forms.View)noLaunchesTrackedLabel;
+
+            // Tracking list for agencies
+            relativeLayout.Children.Add(agencyTrackingLabel,
+                Constraint.RelativeToParent(parent => parent.Width > 640 ? parent.Width / 4 * 3 - agencyTrackingLabel.Width / 2 : parent.Width / 2 - agencyTrackingLabel.Width / 2),
+                Constraint.RelativeToView(previousView, (parent, sibling) => 
+                {
+
+                    if (parent.Width > 640)
+                    {
+                        return launchTrackingLabel.Y;
+                    }
+                    else
+                    {
+                        return sibling.Y + sibling.Height + 10;
+                    }
+                }));
+
+            if (Context.TrackedAgency.Any())
+            {
+                relativeLayout.Children.Add(trackedAgenciesList,
+                    Constraint.RelativeToParent(parent => parent.Width > 640 ? parent.Width / 4 * 3 - trackedAgenciesList.Width / 2 : parent.Width / 2 - trackedAgenciesList.Width / 2),
+                    Constraint.RelativeToView(agencyTrackingLabel, (parent, sibling) => sibling.Y + sibling.Height + 10),
+                    Constraint.RelativeToParent(parent =>
+                    {
+                        if (parent.Width > 1100)
+                        {
+                            return parent.Width / 3;
+                        }
+                        else if (parent.Width > 640)
+                        {
+                            return parent.Width / 2;
+                        }
+                        else
+                        {
+                            return parent.Width;
+                        }
+                    }));
+            }
+            else
+            {
+                relativeLayout.Children.Add(noAgenciesTrackedLabel,
+                    Constraint.RelativeToParent(parent => parent.Width > 640 ? parent.Width / 4 * 3 - noAgenciesTrackedLabel.Width / 2 : parent.Width / 2 - noAgenciesTrackedLabel.Width / 2),
+                    Constraint.RelativeToView(agencyTrackingLabel, (parent, sibling) => sibling.Y + sibling.Height + 10));
             }
 
             Content = new ScrollView
