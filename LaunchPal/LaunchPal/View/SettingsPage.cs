@@ -174,10 +174,33 @@ namespace LaunchPal.View
                 TextColor = Theme.ButtonTextColor,
             };
 
-            trackAgencyButton.Clicked += (sender, args) =>
+            trackAgencyButton.Clicked += async (sender, args) =>
             {
-
                 var mainPage = Parent.Parent as MainPage;
+
+                if (!App.Settings.SuccessfullIap && DependencyService.Get<ICheckPurchase>().CanPurchasePlus())
+                {
+                    var purchaseNow = await DisplayAlert("LaunchPal Plus Needed",
+                        $"To be able to select what agencies you want to follow you need LaunchPal Plus.{Environment.NewLine}" +
+                        $"{Environment.NewLine}" +
+                        $"Do you want to purchase it now?",
+                        "Purchase", "Not now");
+
+                    if (!purchaseNow)
+                        return;
+
+                    mainPage?.NavigateTo(new LaunchPalPlusPage());
+                    return;
+                }
+                else if (!App.Settings.SuccessfullIap && !DependencyService.Get<ICheckPurchase>().CanPurchasePlus())
+                {
+                    await DisplayAlert("LaunchPal Plus Needed",
+                                $"To be able to select what agencies you want to follow you need LaunchPal Plus.{Environment.NewLine}" +
+                                $"{Environment.NewLine}" +
+                                $"This is not currently supported on your device",
+                                "Continue");
+                    return;
+                }
 
                 if (mainPage?.GetType() != typeof(MainPage))
                     return;
