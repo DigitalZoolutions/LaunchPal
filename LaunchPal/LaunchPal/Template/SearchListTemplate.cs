@@ -82,6 +82,7 @@ namespace LaunchPal.Template
 
             ItemTemplate = menuDataTemplate;
             SelectedItem = launchList.Count != 0 ? launchList[0] : null;
+            Margin = new Thickness(0, 0, 0, 30);
         }
     }
 }
