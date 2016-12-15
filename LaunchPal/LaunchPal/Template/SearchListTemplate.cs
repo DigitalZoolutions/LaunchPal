@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using LaunchPal.CustomElement;
+using LaunchPal.Enums;
 using LaunchPal.Helper;
 using LaunchPal.Model;
 using Xamarin.Forms;
@@ -10,19 +11,57 @@ namespace LaunchPal.Template
 {
     class SearchListTemplate : ListView
     {
-        public SearchListTemplate(IReadOnlyList<LaunchData> launchList)
+        public SearchListTemplate(IReadOnlyList<LaunchData> launchList, OrderBy order)
         {
-            var simpleLaunchList = launchList.Select(launchPair => new SimpleLaunchData
+            IEnumerable<SimpleLaunchData> simpleLaunchList = null;
+
+            switch (order)
             {
-                LaunchId = launchPair.Launch.Id,
-                Name = launchPair.Launch.Name,
-                Net = launchPair.Launch.Status == 2 
-                    ? DateTime.Now.AddMonths(1).AddDays(-1) 
+                case OrderBy.Net:
+                    simpleLaunchList = launchList.Select(launchPair => new SimpleLaunchData
+                    {
+                        LaunchId = launchPair.Launch.Id,
+                        Name = launchPair.Launch.Name,
+                        Net = launchPair.Launch.Status == 2
+                    ? DateTime.Now.AddMonths(1).AddDays(-1)
                     : TimeConverter.DetermineTimeSettings(launchPair.Launch.Net, App.Settings.UseLocalTime),
-                LaunchNet = launchPair.Launch.Status == 2
-                ? "TBD"
-                : TimeConverter.SetStringTimeFormat(launchPair.Launch.Net, App.Settings.UseLocalTime)
-            }).OrderBy(x => x.Net).ToList();
+                        LaunchNet = launchPair.Launch.Status == 2 || launchPair.Launch.Status == 0 && launchPair.Launch.Net.TimeOfDay.Ticks == 0
+                        ? "TBD"
+                        : TimeConverter.SetStringTimeFormat(launchPair.Launch.Net, App.Settings.UseLocalTime)
+                    }).OrderBy(x => x.Net).ToList();
+
+                    break;
+                case OrderBy.Status:
+                    var statusGoList = launchList.Where(x => LaunchStatusEnum.GetLaunchStatusById(x.Launch.Status) == LaunchStatus.Go).Select(launchPair => new SimpleLaunchData
+                    {
+                        LaunchId = launchPair.Launch.Id,
+                        Name = launchPair.Launch.Name,
+                        Net = launchPair.Launch.Status == 2
+                    ? DateTime.Now.AddMonths(1).AddDays(-1)
+                    : TimeConverter.DetermineTimeSettings(launchPair.Launch.Net, App.Settings.UseLocalTime),
+                        LaunchNet = launchPair.Launch.Status == 2 || launchPair.Launch.Status == 0 && launchPair.Launch.Net.TimeOfDay.Ticks == 0
+                        ? "TBD"
+                        : TimeConverter.SetStringTimeFormat(launchPair.Launch.Net, App.Settings.UseLocalTime)
+                    }).OrderBy(x => x.Net).ToList();
+
+                    var statusHoldList = launchList.Where(x => LaunchStatusEnum.GetLaunchStatusById(x.Launch.Status) != LaunchStatus.Go).Select(launchPair => new SimpleLaunchData
+                    {
+                        LaunchId = launchPair.Launch.Id,
+                        Name = launchPair.Launch.Name,
+                        Net = launchPair.Launch.Status == 2
+                            ? DateTime.Now.AddMonths(1).AddDays(-1)
+                            : TimeConverter.DetermineTimeSettings(launchPair.Launch.Net, App.Settings.UseLocalTime),
+                        LaunchNet = launchPair.Launch.Status == 2 || launchPair.Launch.Status == 0 && launchPair.Launch.Net.TimeOfDay.Ticks == 0
+                        ? "TBD"
+                        : TimeConverter.SetStringTimeFormat(launchPair.Launch.Net, App.Settings.UseLocalTime)
+                    }).OrderBy(x => x.Net).ToList();
+
+                    simpleLaunchList = statusGoList.Concat(statusHoldList);
+
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(order), order, null);
+            }
 
             ItemsSource = simpleLaunchList;
             VerticalOptions = LayoutOptions.FillAndExpand;
