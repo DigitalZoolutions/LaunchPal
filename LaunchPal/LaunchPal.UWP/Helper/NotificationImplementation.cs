@@ -23,7 +23,7 @@ namespace LaunchPal.UWP.Helper
             if (launchData?.Launch == null)
                 return;
 
-            var deliverytime = TimeConverter.DetermineTimeSettings(launchData.Launch.Net, LaunchPal.App.Settings.UseLocalTime)
+            var deliverytime = TimeConverter.DetermineTimeSettings(launchData.Launch.Net, true)
                 .AddMinutes(-LaunchPal.App.Settings.NotifyBeforeLaunch.ToIntValue());
 
             if (deliverytime < DateTime.Now)
