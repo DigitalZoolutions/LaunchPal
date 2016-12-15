@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using LaunchPal.Enums;
 using LaunchPal.Interface;
 using LaunchPal.Model;
@@ -11,7 +12,11 @@ namespace LaunchPal.Manager
 {
     internal static class TrackingManager
     {
-        private static CacheTracking _trackedLaunches = new CacheTracking {TrackingList = new List<LaunchData>()};
+        private static CacheTracking _trackedLaunches = new CacheTracking
+        {
+            TrackingList = new List<LaunchData>(),
+            TrackedAgencies = new List<TrackedAgency>()
+        };
 
         public static CacheTracking TryGetTrackedLaunches()
         {
@@ -24,7 +29,11 @@ namespace LaunchPal.Manager
                 _trackedLaunches.TrackingList.Remove(launchToRemove);
             }
 
-            return _trackedLaunches?.TrackingList.Count > 0 ? _trackedLaunches : new CacheTracking { TrackingList = new List<LaunchData>() };
+            return _trackedLaunches?.TrackingList.Count > 0 || _trackedLaunches?.TrackedAgencies.Count > 0 ? _trackedLaunches : new CacheTracking
+            {
+                TrackingList = new List<LaunchData>(),
+                TrackedAgencies = new List<TrackedAgency>()
+            };
         }
 
         public static bool IsLaunchBeingTracked(int id)
@@ -48,6 +57,54 @@ namespace LaunchPal.Manager
             DependencyService.Get<INotify>().AddNotification(launchToTrack, NotificationType.TrackedLaunch);
         }
 
+        public static async void AddTrackedAgency(AgencyType agencyType)
+        {
+            var agency = _trackedLaunches.TrackedAgencies.FirstOrDefault(x => x.AgencyType == agencyType);
+
+            if (agency?.CacheTimeOut > DateTime.Now)
+                return;
+
+            var agencyToTrack = await CacheManager.TryGetAgencyByType(agencyType);
+            _trackedLaunches.TrackedAgencies.Add(agencyToTrack);
+
+        }
+
+        public static void RemoveTrackedAgency(AgencyType agencyType)
+        {
+             _trackedLaunches.TrackedAgencies.RemoveAt(_trackedLaunches.TrackedAgencies.FindIndex(x => x.AgencyType == agencyType));
+        }
+
+        public static bool IsAgencyBeingTracked(AgencyType type)
+        {
+            return _trackedLaunches.TrackedAgencies.Any(x => x.AgencyType == type);
+        }
+
+        public static List<TrackedAgency> TryGetAllTrackedAgencies()
+        {
+            var updatedAgencies = new List<TrackedAgency>();
+
+            if (_trackedLaunches.TrackedAgencies == null)
+            {
+                _trackedLaunches.TrackedAgencies = new List<TrackedAgency>();
+            }
+
+            foreach (var trackedAgency in _trackedLaunches.TrackedAgencies)
+            {
+                if (trackedAgency.CacheTimeOut < DateTime.Now)
+                {
+                    updatedAgencies.Add(CacheManager.TryGetAgencyByType(trackedAgency.AgencyType).GetAwaiter().GetResult());
+                }
+            }
+
+            foreach (var updatedAgency in updatedAgencies)
+            {
+                _trackedLaunches.TrackedAgencies[
+                    _trackedLaunches.TrackedAgencies.FindIndex(x => x.AgencyType == updatedAgency.AgencyType)] = updatedAgency;
+            }
+
+            return _trackedLaunches?.TrackedAgencies;
+        }
+
         public static async void RemoveTrackedLaunch(int id)
         {
             var launchToRemove = await CacheManager.TryGetLaunchById(id);
@@ -61,7 +118,11 @@ namespace LaunchPal.Manager
 
         public static void ClearAllTrackedLaunches()
         {
-            _trackedLaunches = new CacheTracking { TrackingList = new List<LaunchData>() };
+            _trackedLaunches = new CacheTracking
+            {
+                TrackingList = new List<LaunchData>(),
+                TrackedAgencies = new List<TrackedAgency>()
+            };
         }
 
         public static void GenerateNotificationsForAllTrackedLaunches()
@@ -69,6 +130,13 @@ namespace LaunchPal.Manager
             foreach (var trackedLaunch in _trackedLaunches.TrackingList)
             {
                 DependencyService.Get<INotify>().AddNotification(trackedLaunch, NotificationType.TrackedLaunch);
+            }
+            foreach (var trackedAgency in _trackedLaunches.TrackedAgencies)
+            {
+                foreach (var trackedLaunch in trackedAgency.ScheduledLaunchData)
+                {
+                    DependencyService.Get<INotify>().AddNotification(trackedLaunch, NotificationType.TrackedLaunch);
+                }
             }
         }
 
@@ -80,6 +148,13 @@ namespace LaunchPal.Manager
             foreach (var trackedLaunch in _trackedLaunches.TrackingList)
             {
                 DependencyService.Get<INotify>().UpdateNotification(trackedLaunch, NotificationType.TrackedLaunch);
+            }
+            foreach (var trackedAgency in _trackedLaunches.TrackedAgencies)
+            {
+                foreach (var trackedLaunch in trackedAgency.ScheduledLaunchData)
+                {
+                    DependencyService.Get<INotify>().AddNotification(trackedLaunch, NotificationType.TrackedLaunch);
+                }
             }
         }
 
