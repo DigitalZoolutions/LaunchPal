@@ -2,70 +2,70 @@
 
 namespace LaunchPal.Enums
 {
-    public enum AgencyAbbreviation
+    public enum AgencyType
     {
         Nasa,
         Esa,
-        Fka,
-        Cnsa,
-        Isro,
-        SpX,
-        Ula,
-        Oa,
-        Bo,
+        Roscosmos,
+        ChinaSpaceAdministration,
+        IndianSpaceOrganization,
+        SpaceX,
+        UnitedLaunchAlliance,
+        OrbitalATK,
+        BlueOrigin,
     }
 
 
     public static class AgencyEnum
     {
-        public static string ToAbbreviationString(this AgencyAbbreviation me)
+        public static string ToAbbreviationString(this AgencyType me)
         {
             switch (me)
             {
-                case AgencyAbbreviation.Nasa:
+                case AgencyType.Nasa:
                     return "NASA";
-                case AgencyAbbreviation.Esa:
+                case AgencyType.Esa:
                     return "ESA";
-                case AgencyAbbreviation.Fka:
+                case AgencyType.Roscosmos:
                     return "FKA";
-                case AgencyAbbreviation.Cnsa:
+                case AgencyType.ChinaSpaceAdministration:
                     return "CNSA";
-                case AgencyAbbreviation.Isro:
+                case AgencyType.IndianSpaceOrganization:
                     return "ISRO";
-                case AgencyAbbreviation.SpX:
+                case AgencyType.SpaceX:
                     return "SpX";
-                case AgencyAbbreviation.Ula:
+                case AgencyType.UnitedLaunchAlliance:
                     return "ULA";
-                case AgencyAbbreviation.Oa:
+                case AgencyType.OrbitalATK:
                     return "OA";
-                case AgencyAbbreviation.Bo:
+                case AgencyType.BlueOrigin:
                     return "BO";
                 default:
                     throw new ArgumentOutOfRangeException(nameof(me), me, null);
             }
         }
 
-        public static string ToFriendlyString(this AgencyAbbreviation me)
+        public static string ToFriendlyString(this AgencyType me)
         {
             switch (me)
             {
-                case AgencyAbbreviation.Nasa:
+                case AgencyType.Nasa:
                     return "NASA";
-                case AgencyAbbreviation.Esa:
-                    return "European Space Agency";
-                case AgencyAbbreviation.Fka:
-                    return "Russian Federal Space Agency";
-                case AgencyAbbreviation.Cnsa:
-                    return "China National Space Administration";
-                case AgencyAbbreviation.Isro:
-                    return "Indian Space Research Organization";
-                case AgencyAbbreviation.SpX:
+                case AgencyType.Esa:
+                    return "ESA";
+                case AgencyType.Roscosmos:
+                    return "ROSCOSMOS";
+                case AgencyType.ChinaSpaceAdministration:
+                    return "CNSA";
+                case AgencyType.IndianSpaceOrganization:
+                    return "ISRO";
+                case AgencyType.SpaceX:
                     return "SpaceX";
-                case AgencyAbbreviation.Ula:
-                    return "United Launch Alliance";
-                case AgencyAbbreviation.Oa:
+                case AgencyType.UnitedLaunchAlliance:
+                    return "ULA";
+                case AgencyType.OrbitalATK:
                     return "Orbital ATK";
-                case AgencyAbbreviation.Bo:
+                case AgencyType.BlueOrigin:
                     return "Blue Origin";
                 default:
                     throw new ArgumentOutOfRangeException(nameof(me), me, null);

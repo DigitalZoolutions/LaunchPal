@@ -12,7 +12,8 @@ namespace LaunchPal.Enums
         Go,
         Hold,
         Success,
-        Failed
+        Failed,
+        Unknown
     }
 
     public static class LaunchStatusEnum
@@ -21,6 +22,8 @@ namespace LaunchPal.Enums
         {
             switch (id)
             {
+                case 0:
+                    return LaunchStatus.Unknown;
                 case 1:
                     return LaunchStatus.Go;
                 case 2:
@@ -46,6 +49,8 @@ namespace LaunchPal.Enums
                     return "Launch was a success";
                 case LaunchStatus.Failed:
                     return "Launch failed";
+                case LaunchStatus.Unknown:
+                    return "Unknown";
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -65,6 +70,8 @@ namespace LaunchPal.Enums
                     return "Launch was a success";
                 case LaunchStatus.Failed:
                     return "Launch failed";
+                case LaunchStatus.Unknown:
+                    return "Unknown";
                 default:
                     throw new ArgumentOutOfRangeException();
             }
