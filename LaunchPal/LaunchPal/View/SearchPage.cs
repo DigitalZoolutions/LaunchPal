@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using LaunchPal.Enums;
 using LaunchPal.Helper;
 using LaunchPal.Interface;
 using LaunchPal.Model;
@@ -21,10 +22,10 @@ namespace LaunchPal.View
             Content = GenerateView();
         }
 
-        public SearchPage(List<LaunchData> launchList)
+        public SearchPage(List<LaunchData> launchList, OrderBy order)
         {
             Title = "Launch list";
-            Context = new SearchViewModel(launchList);
+            Context = new SearchViewModel(launchList, order);
             Context.SearchResult.ItemTapped += SearchResult_ItemTapped;
             BackgroundColor = Theme.BackgroundColor;
             Content = GenerateView();
