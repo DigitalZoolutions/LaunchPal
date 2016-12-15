@@ -42,6 +42,7 @@ namespace LaunchPal.Manager
             CacheTimeOut = DateTime.Now
         };
 
+        public static List<TrackedAgency> TrackedAgencies { get; set; } = new List<TrackedAgency>();
         #endregion
 
         public static async Task<LaunchData> TryGetNextLaunch()
@@ -176,6 +177,63 @@ namespace LaunchPal.Manager
             }
         }
 
+        public static async Task<TrackedAgency> TryGetAgencyByType(AgencyType agencyType)
+        {
+            var trackedAgency = TrackedAgencies.FirstOrDefault(x => x.AgencyType == agencyType);
+
+            if (trackedAgency?.CacheTimeOut > DateTime.Now)
+                return trackedAgency;
+
+            var agencyLaunches = await ApiManager.TryGetLaunchesBasedOnAgency(agencyType.ToAbbreviationString());
+
+            var scheduledLaunches = new List<LaunchData>();
+            var planedLaunches = new List<LaunchData>();
+
+            foreach (var agencyLaunch in agencyLaunches)
+            {
+                var newLaunch = await ApiManager.NextLaunchById(agencyLaunch.Id);
+
+                var launchData = new LaunchData
+                {
+                    Launch = newLaunch
+                };
+
+                switch (LaunchStatusEnum.GetLaunchStatusById(launchData.Launch.Status))
+                {
+                    case LaunchStatus.Go:
+                        scheduledLaunches.Add(launchData);
+                        continue;
+                    case LaunchStatus.Hold:
+                        planedLaunches.Add(launchData);
+                        continue;
+                    case LaunchStatus.Unknown:
+                        if (launchData.Launch.Net > DateTime.Now.AddDays(-7) && launchData.Launch.Net.TimeOfDay.Ticks != 0)
+                        {
+                            scheduledLaunches.Add(launchData);
+                        }
+                        else
+                        {
+                            planedLaunches.Add(launchData);
+                        }
+                        continue;
+                    default:
+                        continue;
+                }
+            }
+
+            var newTrackedAgency = new TrackedAgency
+            {
+                AgencyType = agencyType,
+                ScheduledLaunchData = scheduledLaunches.OrderBy(x => x.Launch.Net).ToList(),
+                PlanedLaunchData = planedLaunches.OrderBy(x => x.Launch.Net).ToList(),
+                CacheTimeOut = GetCacheTimeOutForLaunches(scheduledLaunches.OrderBy(x => x.Launch.Net).FirstOrDefault()?.Launch?.Net ?? DateTime.Now.AddDays(1))
+            };
+
+            TrackedAgencies.Add(newTrackedAgency);
+
+            return newTrackedAgency;
+        }
+
         public static async Task<List<Person>> TryGetAstronautsInSpace()
         {
             if (People?.CacheTimeOut > DateTime.Now)
@@ -288,6 +346,7 @@ namespace LaunchPal.Manager
                 NewsFeeds = new List<NewsFeed>(),
                 CacheTimeOut = DateTime.Now
             };
+            TrackedAgencies = new List<TrackedAgency>();
         }
 
         #endregion
