@@ -191,11 +191,9 @@ namespace LaunchPal.Manager
 
             foreach (var agencyLaunch in agencyLaunches)
             {
-                var newLaunch = await ApiManager.NextLaunchById(agencyLaunch.Id);
-
                 var launchData = new LaunchData
                 {
-                    Launch = newLaunch
+                    Launch = agencyLaunch
                 };
 
                 switch (LaunchStatusEnum.GetLaunchStatusById(launchData.Launch.Status))
