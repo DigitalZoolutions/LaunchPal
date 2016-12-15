@@ -117,7 +117,7 @@ namespace LaunchPal.ViewModel
         {
             _endDate = TimeConverter.DetermineTimeSettings(launchData.Launch.Net, App.Settings.UseLocalTime);
 
-            if (launchData.Launch.Status == 2)
+            if (launchData.Launch.Status == 2 || launchData.Launch.Status == 0 && launchData.Launch.Net.TimeOfDay.Ticks == 0)
             {
                 this.LaunchTime = "TBD";
                 this.MissionClock = "TBD";
