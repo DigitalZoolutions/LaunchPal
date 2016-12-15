@@ -107,11 +107,20 @@ namespace LaunchPal.Manager
             {
                 var trackingDataString = DependencyService.Get<IStoreCache>().LoadCache(CacheType.TrackingData);
                 var trackingData = trackingDataString.ConvertToObject<CacheTracking>();
-                TrackingManager.TrySetTrackedLaunches(trackingData ?? new CacheTracking {TrackingList = new List<LaunchData>()});
+                TrackingManager.TrySetTrackedLaunches(trackingData ?? 
+                    new CacheTracking
+                    {
+                        TrackingList = new List<LaunchData>(),
+                        TrackedAgencies = new List<TrackedAgency>()
+                    });
             }
             catch (Exception)
             {
-                TrackingManager.TrySetTrackedLaunches(new CacheTracking {TrackingList = new List<LaunchData>()});
+                TrackingManager.TrySetTrackedLaunches(new CacheTracking
+                {
+                    TrackingList = new List<LaunchData>(),
+                    TrackedAgencies = new List<TrackedAgency>()
+                });
             }
         }
 
