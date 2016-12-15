@@ -20,6 +20,12 @@ namespace LaunchPal.Manager
 
         public static CacheTracking TryGetTrackedLaunches()
         {
+            if (_trackedLaunches.TrackingList == null)
+                _trackedLaunches.TrackingList = new List<LaunchData>();
+
+            if (_trackedLaunches.TrackedAgencies == null)
+                _trackedLaunches.TrackedAgencies = new List<TrackedAgency>();
+
             var itemsToRemove = _trackedLaunches.TrackingList
                 .Where(trackedLaunch => DateTime.Now > trackedLaunch.CacheTimeOut)
                 .ToList();
@@ -29,11 +35,7 @@ namespace LaunchPal.Manager
                 _trackedLaunches.TrackingList.Remove(launchToRemove);
             }
 
-            return _trackedLaunches?.TrackingList.Count > 0 || _trackedLaunches?.TrackedAgencies.Count > 0 ? _trackedLaunches : new CacheTracking
-            {
-                TrackingList = new List<LaunchData>(),
-                TrackedAgencies = new List<TrackedAgency>()
-            };
+            return _trackedLaunches;
         }
 
         public static bool IsLaunchBeingTracked(int id)
@@ -81,6 +83,16 @@ namespace LaunchPal.Manager
 
         public static List<TrackedAgency> TryGetAllTrackedAgencies()
         {
+            if (!App.Settings.SuccessfullIap)
+            {
+                _trackedLaunches.TrackedAgencies = new List<TrackedAgency>
+                {
+                    CacheManager.TryGetAgencyByType(AgencyType.Nasa).GetAwaiter().GetResult(),
+                    CacheManager.TryGetAgencyByType(AgencyType.Esa).GetAwaiter().GetResult(),
+                    CacheManager.TryGetAgencyByType(AgencyType.Roscosmos).GetAwaiter().GetResult()
+                };
+            }
+
             var updatedAgencies = new List<TrackedAgency>();
 
             if (_trackedLaunches.TrackedAgencies == null)
