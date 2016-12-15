@@ -34,20 +34,22 @@ namespace LaunchPal.Droid.Helper
             PendingIntent = new Dictionary<int, PendingIntent>();
         }
 
-        public void AddNotification(LaunchData launch, NotificationType type)
+        public void AddNotification(LaunchData launchData, NotificationType type)
         {
+            DeleteNotification(launchData.Launch.Id, type);
+
             Intent alarmIntent = new Intent(Forms.Context, typeof(AlarmReceiver));
-            alarmIntent.PutExtra("id", launch.Launch.Id.ToString());
+            alarmIntent.PutExtra("id", launchData.Launch.Id.ToString());
             alarmIntent.PutExtra("title", "Launch Alert!");
-            alarmIntent.PutExtra("message", $"{launch?.Launch?.Name} is about to launch.{Environment.NewLine}" +
-                                          $"Time: {TimeConverter.SetStringTimeFormat(launch.Launch.Net, LaunchPal.App.Settings.UseLocalTime).Replace(" Local", "")}");
+            alarmIntent.PutExtra("message", $"{launchData?.Launch?.Name} is about to launch.{Environment.NewLine}" +
+                                          $"Time: {TimeConverter.SetStringTimeFormat(launchData.Launch.Net, LaunchPal.App.Settings.UseLocalTime).Replace(" Local", "")}");
 
-            PendingIntent pendingIntent = Android.App.PendingIntent.GetBroadcast(Forms.Context, launch.Launch.Id, alarmIntent, PendingIntentFlags.UpdateCurrent);
+            PendingIntent pendingIntent = Android.App.PendingIntent.GetBroadcast(Forms.Context, launchData.Launch.Id, alarmIntent, PendingIntentFlags.UpdateCurrent);
 
-            PendingIntent.Add(launch.Launch.Id, pendingIntent);
+            PendingIntent.Add(launchData.Launch.Id, pendingIntent);
 
             //TODO: For demo set after 5 seconds.
-            AlarmManager.Set(AlarmType.ElapsedRealtime, SetTriggerTime(TimeConverter.DetermineTimeSettings(launch.Launch.Net, App.Settings.UseLocalTime)), pendingIntent);
+            AlarmManager.Set(AlarmType.ElapsedRealtime, SetTriggerTime(TimeConverter.DetermineTimeSettings(launchData.Launch.Net, App.Settings.UseLocalTime)), pendingIntent);
         }
 
         private long SetTriggerTime(DateTime net)
@@ -58,18 +60,17 @@ namespace LaunchPal.Droid.Helper
             return SystemClock.ElapsedRealtime() + (long)(net.AddMinutes(-App.Settings.NotifyBeforeLaunch.ToIntValue()) - DateTime.Now).TotalMilliseconds;
         }
 
-        public void UpdateNotification(LaunchData launch, NotificationType type)
+        public void UpdateNotification(LaunchData launchData, NotificationType type)
         {
-            DeleteNotification(launch.Launch.Id, type);
+            DeleteNotification(launchData.Launch.Id, type);
 
-            AddNotification(launch, type);
+            AddNotification(launchData, type);
         }
 
         public void DeleteNotification(int index, NotificationType type)
         {
             PendingIntent pendingIntent;
-            var result = PendingIntent.TryGetValue(index, out pendingIntent);
-            if (result)
+            if (PendingIntent.TryGetValue(index, out pendingIntent))
             {
                 AlarmManager.Cancel(pendingIntent);
                 PendingIntent.Remove(index);
