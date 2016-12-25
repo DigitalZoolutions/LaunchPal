@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using LaunchPal.Helper;
 using LaunchPal.Model;
 using LaunchPal.View.HelperPages;
@@ -19,25 +20,18 @@ namespace LaunchPal.View
 
             this.Appearing += async (sender, args) =>
             {
-                await WaitAndExecute(100, () =>
-                {
-                    Context = new NewsViewModel();
-                    Content = GenerateView();
-                });
-            };
-        }
+                Context = await Task.Run(() => new NewsViewModel().GenerateViewModel());
 
-        private Xamarin.Forms.View GenerateView()
-        {
-            if (Context.ExceptionType != null)
-            {
-                return Context.GenerateErrorView(this);
-            }
-            else
-            {
-                Context.NewsList.ItemTapped += NewsListOnItemTapped;
-                return Context.NewsList;
-            }
+                if (Context.ExceptionType != null)
+                {
+                    Content = Context.GenerateErrorView(this);
+                }
+                else
+                {
+                    Context.NewsList.ItemTapped += NewsListOnItemTapped;
+                    Content = Context.NewsList;
+                }
+            };
         }
 
         private void NewsListOnItemTapped(object sender, ItemTappedEventArgs itemTappedEventArgs)
