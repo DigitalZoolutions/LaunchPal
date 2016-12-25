@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using LaunchPal.Manager;
 using LaunchPal.Model;
 using LaunchPal.Template;
@@ -23,13 +24,20 @@ namespace LaunchPal.ViewModel
             }
         }
 
-        public NewsViewModel()
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public async Task<NewsViewModel> GenerateViewModel()
         {
             List<NewsFeed> news = new List<NewsFeed>();
 
             try
             {
-                news = CacheManager.TryGetNewsFeed().GetAwaiter().GetResult();
+                news = await CacheManager.TryGetNewsFeed();
             }
             catch (Exception ex)
             {
@@ -37,13 +45,8 @@ namespace LaunchPal.ViewModel
             }
 
             NewsList = new NewsListTemplate(news);
-        }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            return this;
         }
     }
 }
