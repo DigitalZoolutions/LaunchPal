@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using LaunchPal.Manager;
 using Xamarin.Forms;
 using LaunchPal.Extension;
@@ -47,6 +48,7 @@ namespace LaunchPal.ViewModel
         public List<TrackedAgency> TrackedAgency { get; set; }
         public string AstronoutsInSpaceLabel { get; set; }
         public int AstronautsInSpace { get; set; }
+        public bool StatusHold { get; set; }
 
         private DateTime _endDate;
         private string _launchTimerText;
@@ -54,28 +56,30 @@ namespace LaunchPal.ViewModel
 
         public OverviewViewModel()
         {
+            
+        }
+
+        public OverviewViewModel(Exception ex)
+        {
+            SetError(ex);
+        }
+
+        public async Task<OverviewViewModel> GenerateViewModel()
+        {
             Launch nextLaunch = new Launch();
             List<LaunchData> upcomingLaunches = new List<LaunchData>();
             try
             {
-                nextLaunch = CacheManager.TryGetNextLaunch().GetAwaiter().GetResult().Launch;
-                upcomingLaunches = CacheManager.TryGetUpcomingLaunches().GetAwaiter().GetResult();
-                AstronautsInSpace = CacheManager.TryGetAstronautsInSpace().GetAwaiter().GetResult().Count;
+                nextLaunch = (await CacheManager.TryGetNextLaunch()).Launch;
+                upcomingLaunches = await CacheManager.TryGetUpcomingLaunches();
+                AstronautsInSpace = (await CacheManager.TryGetAstronautsInSpace()).Count;
             }
             catch (Exception ex)
             {
                 SetError(ex);
             }
 
-            if (nextLaunch.Status == 2)
-            {
-                LaunchTimerText = "TBD";
-            }
-            else
-            {
-                Device.StartTimer(TimeSpan.FromMilliseconds(100), OnTimerTick);
-            }
-
+            StatusHold = nextLaunch.Status == 2;
             LaunchName = nextLaunch?.Name;
             LaunchId = nextLaunch?.Id ?? 0;
             _endDate = TimeConverter.DetermineTimeSettings(nextLaunch?.Net ?? DateTime.MinValue, App.Settings.UseLocalTime);
@@ -87,15 +91,23 @@ namespace LaunchPal.ViewModel
             AstronoutsInSpaceLabel = "Astronauts in space";
             TrackedLaunches = TrackingManager.TryGetTrackedLaunches().TrackingList;
             TrackedAgency = TrackingManager.TryGetAllTrackedAgencies();
+
+            return this;
         }
 
-        public OverviewViewModel(Exception ex)
+        public void StartCoundDownClock()
         {
-            SetError(ex);
+            Device.StartTimer(new TimeSpan(0, 0, 1), OnTimerTick);
         }
 
         private bool OnTimerTick()
         {
+            if (StatusHold)
+            {
+                LaunchTimerText = "TBD";
+                return false;
+            }
+
             // Using local time
             var timeLeft = _endDate - DateTime.Now;
 
