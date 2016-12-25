@@ -26,18 +26,21 @@ namespace LaunchPal.Droid
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
             base.OnCreate(bundle);
-            billingService = new InAppBillingServiceConnection(this,
-                "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvr7MDRR1hINCrRbp/1Uj8eJGiCKnfOU9Q1WCYueuDqPL9B5eIMlyebexeMFIzlf2HwfRVc2SUDzrRbv7EY3ry/vBrOucx2JgjqL72srs7AYkA5WtXMAEZ/tvRx8oa0etl3QmzL0gRHyljDgtchCMhRKkUYX8wg0nysFGOdrnvTqyKCPf1D5hP/TFoQn1ujey8bzYUT7g0W+WvP9K8ObnsOxvWeVqUD/UYaTnizIgqdHawGi2ODiZQR8F593F128FILFipWezhov2VES98EfYq3w3HQ0kiGjroc7l1H/SEqSfeL1DvWaFqUJz9c9NvFhYbbxYhLfAs0YUf3F/Yqx6WwIDAQAB");
-            billingService.OnConnected += async () =>
-            {
 
-                // Load inventory or available products
-                await GetInventory();
+            #region IAP
+            //billingService = new InAppBillingServiceConnection(this,
+            //    "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvr7MDRR1hINCrRbp/1Uj8eJGiCKnfOU9Q1WCYueuDqPL9B5eIMlyebexeMFIzlf2HwfRVc2SUDzrRbv7EY3ry/vBrOucx2JgjqL72srs7AYkA5WtXMAEZ/tvRx8oa0etl3QmzL0gRHyljDgtchCMhRKkUYX8wg0nysFGOdrnvTqyKCPf1D5hP/TFoQn1ujey8bzYUT7g0W+WvP9K8ObnsOxvWeVqUD/UYaTnizIgqdHawGi2ODiZQR8F593F128FILFipWezhov2VES98EfYq3w3HQ0kiGjroc7l1H/SEqSfeL1DvWaFqUJz9c9NvFhYbbxYhLfAs0YUf3F/Yqx6WwIDAQAB");
+            //billingService.OnConnected += async () =>
+            //{
 
-                // Load any items already purchased
-                LoadPurchasedItems();
-            };
-            billingService.Connect();
+            //    // Load inventory or available products
+            //    await GetInventory();
+
+            //    // Load any items already purchased
+            //    LoadPurchasedItems();
+            //};
+            //billingService.Connect();
+            #endregion
 
             var appVersion =
                 $"{PackageManager.GetPackageInfo(PackageName, 0).VersionName}.{PackageManager.GetPackageInfo(PackageName, 0).VersionCode}";
