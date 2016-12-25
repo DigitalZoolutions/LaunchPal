@@ -66,9 +66,11 @@ namespace LaunchPal.Manager
             if (agency?.CacheTimeOut > DateTime.Now)
                 return;
 
-            var agencyToTrack = await CacheManager.TryGetAgencyByType(agencyType);
-            _trackedLaunches.TrackedAgencies.Add(agencyToTrack);
-
+            await Task.Run(async () =>
+            {
+                var agencyToTrack = await CacheManager.TryGetAgencyByType(agencyType);
+                _trackedLaunches.TrackedAgencies.Add(agencyToTrack);
+            });
         }
 
         public static void RemoveTrackedAgency(AgencyType agencyType)
