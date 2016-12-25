@@ -9,13 +9,21 @@ namespace LaunchPal.View.HelperPages
     {
         internal static Xamarin.Forms.View GenerateWaitingMessage(string message)
         {
-            return new ContentView
+            return new StackLayout()
             {
-                Content = new Label
-                {
-                    Text = message,
-                    TextColor = Theme.HeaderColor,
-                    FontSize = 24
+                Children = {
+                    new Label
+                    {
+                        Text = message,
+                        TextColor = Theme.HeaderColor,
+                        FontSize = 22,
+                    },
+                    new ActivityIndicator
+                    {
+                        IsEnabled = true,
+                        IsVisible = true,
+                        IsRunning = true
+                    }
                 },
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center
