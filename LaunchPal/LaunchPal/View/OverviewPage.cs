@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using LaunchPal.CustomElement;
 using LaunchPal.Enums;
 using LaunchPal.Helper;
@@ -26,19 +27,7 @@ namespace LaunchPal.View
 
             this.Appearing += async (sender, args) =>
             {
-                await WaitAndExecute(100, () =>
-                {
-                    Context = new OverviewViewModel();
-                    BindingContext = Context;
-
-                    if (Context.ExceptionType != null)
-                    {
-                        Content = Context.GenerateErrorView(this);
-                        return;
-                    }
-
-                    PopulatePage();
-                });
+                await PrepareViewModel();
             };
         }
 
@@ -47,33 +36,39 @@ namespace LaunchPal.View
             Icon = "";
             Title = "Overview";
             BackgroundColor = Theme.BackgroundColor;
-            Padding = 10;
 
             Content = GenerateWaitingMessage("Downloading data...");
 
             this.Appearing += async (sender, args) =>
             {
-                await WaitAndExecute(100, () =>
+                if (ex != null)
                 {
-                    if (ex != null)
-                    {
-                        Context = new OverviewViewModel(ex);
-                        Content = Context.GenerateErrorView(this);
-                        return;
-                    }
+                    Context = new OverviewViewModel(ex);
+                    Content = Context.GenerateErrorView(this);
+                    return;
+                }
 
-                    Context = new OverviewViewModel();
-                    BindingContext = Context;
-
-                    if (Context.ExceptionType != null)
-                    {
-                        Content = Context.GenerateErrorView(this);
-                        return;
-                    }
-
-                    PopulatePage();
-                });
+                await PrepareViewModel();
             };
+        }
+
+        private async Task PrepareViewModel()
+        {
+
+            Context = await Task.Run(() => new OverviewViewModel().GenerateViewModel());
+            BindingContext = Context;
+
+            if (Context.ExceptionType != null)
+            {
+                Content = Context.GenerateErrorView(this);
+            }
+            else
+            {
+                Context.StartCoundDownClock();
+                PopulatePage();
+            }
+
+
         }
 
         private void PopulatePage()
@@ -260,6 +255,8 @@ namespace LaunchPal.View
                 Padding = 10,
                 Content = relativeLayout
             };
+            
+
         }
 
         #region Action Triggers
