@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Graphics.Display;
+using Windows.UI.ViewManagement;
 using LaunchPal.Enums;
 using LaunchPal.Interface;
 using LaunchPal.Windows.Helper;
@@ -14,8 +15,6 @@ namespace LaunchPal.Windows.Helper
 {
     class DeviceOrientationImplementation : IDeviceOrientation
     {
-        public DeviceOrientationImplementation() { }
-
         public DeviceOrientations GetOrientation()
         {
             var orientation = DisplayInformation.GetForCurrentView().CurrentOrientation;

@@ -94,7 +94,7 @@ namespace LaunchPal.View
 
             sendButton.Clicked += async (sender, args) =>
             {
-                await DependencyService.Get<ISendMail>().SendMail(title.Text, body.Text);
+                await DependencyService.Get<ISendMail>().SendMail(title.Text.Remove(0, 17), body.Text);
             };
 
             Content = new ScrollView

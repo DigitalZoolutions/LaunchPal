@@ -45,20 +45,20 @@ namespace LaunchPal.ViewModel
 
             foreach (var stackTrace in _stackTraceList.AsEnumerable().Reverse())
             {
-                StackTrace += stackTrace + "\n";
+                StackTrace += stackTrace + Environment.NewLine;
             }
 
             if (ExceptionType == typeof(HttpRequestException))
             {
-                ExceptionTitle = "Error fetching data";
+                ExceptionTitle = "Hold Hold Hold - Telemetry down";
                 ExceptionOriginalMessage = exception.Message;
-                ExceptionMessage = exception.Message + " Please check your connection and try again, cached data will still show up in the app.";
+                ExceptionMessage = "The connection is down, please reestablish and try again.";
             }
             else
             {
-                ExceptionTitle = "Unhandleded error occured";
+                ExceptionTitle = "Hold Hold Hold - Anomaly detected";
                 ExceptionOriginalMessage = exception.Message;
-                ExceptionMessage = exception.Message;
+                ExceptionMessage = "There has been a issue, please send a report to the investigation team.";
             }
         }
 

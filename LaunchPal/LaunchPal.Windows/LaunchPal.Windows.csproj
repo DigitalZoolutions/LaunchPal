@@ -22,6 +22,7 @@
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
     <PackageCertificateThumbprint>5F12E2063F8F71C962BB6075941BD08115B0C900</PackageCertificateThumbprint>
+    <AppxBundle>Always</AppxBundle>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -115,8 +116,10 @@
     <Compile Include="Helper\CheckPurchaseImplementation.cs" />
     <Compile Include="Helper\DeviceOrientationImplementation.cs" />
     <Compile Include="Helper\LiveTileImplementation.cs" />
+    <Compile Include="Helper\MailSender.cs" />
     <Compile Include="Helper\NotificationImplementation.cs" />
     <Compile Include="Helper\StorageManagerImplementation.cs" />
+    <Compile Include="Helper\UseNativeFunctionsImplementation.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -128,22 +131,55 @@
     </AppxManifest>
     <None Include="LaunchPal.Windows_StoreKey.pfx" />
     <None Include="packages.config" />
+    <None Include="packages.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Windows_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\BadgeLogo.scale-100.png" />
-    <Content Include="Assets\BadgeLogo.scale-140.png" />
     <Content Include="Assets\Logo.scale-100.png" />
     <Content Include="Assets\Logo.scale-140.png" />
+    <Content Include="Assets\Logo.scale-180.png" />
     <Content Include="Assets\Logo.scale-80.png" />
+    <Content Include="Assets\Menu\Launch.png" />
+    <Content Include="Assets\Menu\LaunchBlack.png" />
+    <Content Include="Assets\Menu\MenuIcon.png" />
+    <Content Include="Assets\Menu\Overview.png" />
+    <Content Include="Assets\Menu\OverviewBlack.png" />
+    <Content Include="Assets\Menu\PeopleInSpace.png" />
+    <Content Include="Assets\Menu\PeopleInSpaceBlack.png" />
+    <Content Include="Assets\Menu\Plus.png" />
+    <Content Include="Assets\Menu\PlusBlack.png" />
+    <Content Include="Assets\Menu\Search.png" />
+    <Content Include="Assets\Menu\SearchBlack.png" />
+    <Content Include="Assets\Menu\Settings.png" />
+    <Content Include="Assets\Menu\SettingsBlack.png" />
+    <Content Include="Assets\Menu\SpaceNews.png" />
+    <Content Include="Assets\Menu\SpaceNewsBlack.png" />
+    <Content Include="Assets\Menu\Support.png" />
+    <Content Include="Assets\Menu\SupportBlack.png" />
     <Content Include="Assets\SmallLogo.scale-100.png" />
+    <Content Include="Assets\SmallLogo.scale-140.png" />
+    <Content Include="Assets\SmallLogo.scale-180.png" />
     <Content Include="Assets\SmallLogo.scale-80.png" />
     <Content Include="Assets\SplashScreen.scale-100.png" />
+    <Content Include="Assets\SplashScreen.scale-140.png" />
+    <Content Include="Assets\SplashScreen.scale-180.png" />
+    <Content Include="Assets\Square310x310Logo.scale-100.png" />
+    <Content Include="Assets\Square310x310Logo.scale-140.png" />
+    <Content Include="Assets\Square310x310Logo.scale-180.png" />
+    <Content Include="Assets\Square310x310Logo.scale-80.png" />
     <Content Include="Assets\Square70x70Logo.scale-100.png" />
+    <Content Include="Assets\Square70x70Logo.scale-140.png" />
+    <Content Include="Assets\Square70x70Logo.scale-180.png" />
+    <Content Include="Assets\Square70x70Logo.scale-80.png" />
     <Content Include="Assets\StoreLogo.scale-100.png" />
     <Content Include="Assets\StoreLogo.scale-140.png" />
+    <Content Include="Assets\StoreLogo.scale-180.png" />
     <Content Include="Assets\Wide310x150Logo.scale-100.png" />
     <Content Include="Assets\Wide310x150Logo.scale-140.png" />
+    <Content Include="Assets\Wide310x150Logo.scale-180.png" />
+    <Content Include="Assets\Wide310x150Logo.scale-80.png" />
     <None Include="Package.StoreAssociation.xml" />
   </ItemGroup>
   <ItemGroup>

@@ -13,7 +13,8 @@ namespace LaunchPal.Extension
         internal static DateTime MondayOfWeek(this DateTime dateTime)
         {
             var delta = DayOfWeek.Monday - dateTime.DayOfWeek;
-            return dateTime.AddDays(delta == 1 ? -6 : delta);
+            var mondayThisWeek = dateTime.AddDays(delta == 1 ? -6 : delta);
+            return mondayThisWeek;
         }
 
         /// <summary>
@@ -23,7 +24,8 @@ namespace LaunchPal.Extension
         /// <returns></returns>
         internal static DateTime FirstDayOfMonth(this DateTime dateTime)
         {
-            return new DateTime(dateTime.Year, dateTime.Month, 1, 0, 0, 1);
+            var firstDayInMonth = new DateTime(dateTime.Year, dateTime.Month, 1, 0, 0, 1);
+            return firstDayInMonth;
         }
 
         /// <summary>
@@ -33,7 +35,8 @@ namespace LaunchPal.Extension
         /// <returns></returns>
         internal static DateTime LastDayOfMonth(this DateTime dateTime)
         {
-            return new DateTime(dateTime.Year, dateTime.Month, 1, 23, 59, 59).AddMonths(1).AddDays(-1);
+            var lastDayInMonth = new DateTime(dateTime.Year, dateTime.Month, 1, 23, 59, 59).AddMonths(1).AddDays(-1);
+            return lastDayInMonth;
         }
 
         /// <summary>

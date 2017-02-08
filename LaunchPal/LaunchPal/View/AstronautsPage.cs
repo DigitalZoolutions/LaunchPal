@@ -88,23 +88,25 @@ namespace LaunchPal.View
 
             var austronaut = (itemTappedEventArgs.Item as Person);
 
-            var url = Device.Idiom == TargetIdiom.Phone ? austronaut?.Twitter.Insert(8, "mobile.") : austronaut?.Twitter;
-            var title = $"Twitter - {austronaut?.Name}";
+            string url;
+            string title;
 
-            if (string.IsNullOrEmpty(url))
+            if (!string.IsNullOrEmpty(austronaut?.Twitter))
             {
-                url = Device.Idiom == TargetIdiom.Phone ? austronaut?.Biolink.Insert(10, ".m") : austronaut?.Biolink;
+                url = Device.Idiom == TargetIdiom.Phone ? austronaut?.Twitter?.Insert(8, "mobile.") : austronaut?.Twitter;
+                title = $"Twitter - {austronaut?.Name}";
+            }
+            else if (!string.IsNullOrEmpty(austronaut?.Biolink))
+            {
+                url = Device.Idiom == TargetIdiom.Phone ? austronaut?.Biolink?.Insert(10, ".m") : austronaut?.Biolink;
                 title = $"Wiki - {austronaut?.Name}";
             }
-                
-
-            if (string.IsNullOrEmpty(url))
+            else
             {
                 DisplayAlert("No aditional information", "This astronaut has no aditional information to link to.", "Continue");
                 return;
             }
                 
-
             if (App.Settings.SuccessfullIap)
             {
                 var mainPage = this.Parent.Parent as MainPage;

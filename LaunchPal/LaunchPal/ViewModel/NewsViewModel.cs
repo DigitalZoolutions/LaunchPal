@@ -42,6 +42,7 @@ namespace LaunchPal.ViewModel
             catch (Exception ex)
             {
                 SetError(ex);
+                return this;
             }
 
             NewsList = new NewsListTemplate(news);

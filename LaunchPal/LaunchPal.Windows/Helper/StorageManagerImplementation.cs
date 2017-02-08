@@ -20,29 +20,139 @@ namespace LaunchPal.Windows.Helper
         private static readonly StorageFolder LocalRoamingFolder = ApplicationData.Current.RoamingFolder;
 
 
-        public Task<bool> SaveCache(string objectToStore, CacheType type)
+        public async Task<bool> SaveCache(string stringToStore, CacheType type)
         {
-            throw new NotImplementedException();
+            var fileName = type.GetFileNameFromCacheType();
+
+            try
+            {
+                StorageFile file;
+
+                // Check if file exist in local folder and if it does replace it
+                // C:\Users\three\AppData\Local\Packages\c49b095b-93a9-472f-a151-0629a4c64267_a9ekxv88vhe1y\LocalState
+                if (type == CacheType.SettingsData)
+                {
+                    file = await LocalRoamingFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+                }
+                else
+                {
+                    file = await LocalCacheFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+                }
+
+                // Write file to folder
+                await FileIO.WriteTextAsync(file, stringToStore);
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public string LoadSettings(CacheType type)
         {
-            throw new NotImplementedException();
+            var fileName = type.GetFileNameFromCacheType();
+
+            try
+            {
+                // Check if file exist and read from it
+                var file = type == CacheType.SettingsData ?
+                    LocalRoamingFolder.GetFileAsync(fileName).GetAwaiter().GetResult() :
+                    LocalCacheFolder.GetFileAsync(fileName).GetAwaiter().GetResult();
+
+                return FileIO.ReadTextAsync(file).GetAwaiter().GetResult();
+            }
+            catch (FileNotFoundException)
+            {
+                return "";
+            }
         }
 
         public string LoadCache(CacheType type)
         {
-            throw new NotImplementedException();
+            var fileName = type.GetFileNameFromCacheType();
+
+            try
+            {
+                // Check if file exist and read from it
+                var file = type == CacheType.SettingsData ?
+                    LocalRoamingFolder.GetFileAsync(fileName).GetAwaiter().GetResult() :
+                    LocalCacheFolder.GetFileAsync(fileName).GetAwaiter().GetResult();
+
+                return FileIO.ReadTextAsync(file).GetAwaiter().GetResult();
+            }
+            catch (FileNotFoundException)
+            {
+                return "";
+            }
         }
 
-        public Task ClearAllCache()
+        public async Task ClearAllCache()
         {
-            throw new NotImplementedException();
+            try
+            {
+                // Clear Settings data
+                var fileName = CacheType.SettingsData.GetFileNameFromCacheType();
+                var fileToClear = await LocalRoamingFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+                await FileIO.WriteTextAsync(fileToClear, "");
+
+                // Clear Launch data
+                fileName = CacheType.LaunchData.GetFileNameFromCacheType();
+                fileToClear = await LocalCacheFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+                await FileIO.WriteTextAsync(fileToClear, "");
+
+                // Clear News data
+                fileName = CacheType.NewsData.GetFileNameFromCacheType();
+                fileToClear = await LocalRoamingFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+                await FileIO.WriteTextAsync(fileToClear, "");
+
+                // Clear Tracking data
+                fileName = CacheType.TrackingData.GetFileNameFromCacheType();
+                fileToClear = await LocalRoamingFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+                await FileIO.WriteTextAsync(fileToClear, "");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                throw;
+            }
         }
 
-        public Task ClearCache(CacheType type)
+        public async Task ClearCache(CacheType type)
         {
-            throw new NotImplementedException();
+            string fileName;
+            StorageFile fileToClear;
+
+            switch (type)
+            {
+                case CacheType.LaunchData:
+                    // Clear Launch data
+                    fileName = CacheType.LaunchData.GetFileNameFromCacheType();
+                    fileToClear = await LocalCacheFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+                    await FileIO.WriteTextAsync(fileToClear, "");
+                    break;
+                case CacheType.SettingsData:
+                    // Clear Settings data
+                    fileName = CacheType.SettingsData.GetFileNameFromCacheType();
+                    fileToClear = await LocalRoamingFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+                    await FileIO.WriteTextAsync(fileToClear, "");
+                    break;
+                case CacheType.NewsData:
+                    // Clear News data
+                    fileName = CacheType.NewsData.GetFileNameFromCacheType();
+                    fileToClear = await LocalRoamingFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+                    await FileIO.WriteTextAsync(fileToClear, "");
+                    break;
+                case CacheType.TrackingData:
+                    // Clear Tracking data
+                    fileName = CacheType.TrackingData.GetFileNameFromCacheType();
+                    fileToClear = await LocalRoamingFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+                    await FileIO.WriteTextAsync(fileToClear, "");
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
         }
     }
 }

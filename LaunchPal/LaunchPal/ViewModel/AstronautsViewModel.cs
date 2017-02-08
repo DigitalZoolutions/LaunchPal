@@ -23,6 +23,7 @@ namespace LaunchPal.ViewModel
             catch (Exception ex)
             {
                 SetError(ex);
+                return;
             }
 
             NumberOfAstronautsInSpace = astronouts.Count;

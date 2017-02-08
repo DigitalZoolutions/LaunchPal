@@ -11,6 +11,7 @@ namespace LaunchPal.View
         public MenuPage()
         {
             this.Title = "Menu";
+            this.Icon = Device.OnPlatform("", "", "Assets/Menu/MenuIcon.png");
             this.BackgroundColor = Theme.NavBackgroundColor;
 
             var layout = new StackLayout

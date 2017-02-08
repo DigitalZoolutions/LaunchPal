@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest">
-  <Identity Name="48046Threezool.LaunchPal" Publisher="CN=9D303B81-1815-49A7-8132-B7BC184851CE" Version="4.0.1.0" />
+  <Identity Name="48046Threezool.LaunchPal" Publisher="CN=9D303B81-1815-49A7-8132-B7BC184851CE" Version="5.2.2.3" />
   <Properties>
     <DisplayName>LaunchPal</DisplayName>
     <PublisherDisplayName>Digitalzoolutions</PublisherDisplayName>
@@ -15,9 +15,11 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="LaunchPal.Windows.App">
-      <m2:VisualElements DisplayName="LaunchPal" Square150x150Logo="Assets\Logo.png" Square30x30Logo="Assets\SmallLogo.png" Description="LaunchPal.Windows" ForegroundText="light" BackgroundColor="transparent" ToastCapable="true">
-        <m2:LockScreen Notification="badgeAndTileText" BadgeLogo="Assets\BadgeLogo.png" />
-        <m2:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square70x70Logo="Assets\Square70x70Logo.png">
+      <m2:VisualElements DisplayName="LaunchPal" Square150x150Logo="Assets\Logo.png" Square30x30Logo="Assets\SmallLogo.png" Description="Keeps track of rocket launches and provide notification and video feeds." ForegroundText="dark" BackgroundColor="transparent" ToastCapable="true">
+        <m2:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square70x70Logo="Assets\Square70x70Logo.png" ShortName="LaunchPal" DefaultSize="square150x150Logo" Square310x310Logo="Assets\Square310x310Logo.png">
+          <m2:ShowNameOnTiles>
+            <m2:ShowOn Tile="wide310x150Logo" />
+          </m2:ShowNameOnTiles>
         </m2:DefaultTile>
         <m2:SplashScreen Image="Assets\SplashScreen.png" BackgroundColor="transparent" />
         <m2:InitialRotationPreference>
@@ -26,14 +28,8 @@
           <m2:Rotation Preference="portraitFlipped" />
           <m2:Rotation Preference="landscapeFlipped" />
         </m2:InitialRotationPreference>
+        <m2:ApplicationView MinWidth="default" />
       </m2:VisualElements>
-      <Extensions>
-        <Extension Category="windows.backgroundTasks" EntryPoint="LaunchPal.Windows.App">
-          <BackgroundTasks>
-            <Task Type="pushNotification" />
-          </BackgroundTasks>
-        </Extension>
-      </Extensions>
     </Application>
   </Applications>
   <Capabilities>

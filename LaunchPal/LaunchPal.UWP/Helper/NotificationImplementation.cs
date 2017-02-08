@@ -132,6 +132,7 @@ namespace LaunchPal.UWP.Helper
 
         public void UpdateNotification(LaunchData launchData, NotificationType type)
         {
+            DeleteNotification(launchData.Launch.Id, type);
             AddNotification(launchData, type);
         }
 
@@ -156,7 +157,7 @@ namespace LaunchPal.UWP.Helper
                 case NotificationType.NextLaunch:
                     return "NextLaunchAlerts";
                 case NotificationType.TrackedLaunch:
-                    return "TrackedLaunchAlerts";
+                    return "TrackedLaunches";
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }

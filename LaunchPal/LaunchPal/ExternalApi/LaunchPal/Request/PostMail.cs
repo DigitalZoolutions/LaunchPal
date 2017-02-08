@@ -8,7 +8,7 @@ namespace LaunchPal.ExternalApi.LaunchPal.Request
         internal static async Task<bool> SendNewMail(Mail newMail)
         {
             const string apiUrl = "Mail/Post";
-            return await HttpCaller.PostLaunchpalApi<bool>(apiUrl + newMail);
+            return await HttpCaller.PostLaunchpalApiAsync<bool>(apiUrl + newMail);
         }
     }
 }

@@ -74,15 +74,11 @@ namespace LaunchPal.ViewModel
             try
             {
                 launchData = CacheManager.TryGetNextLaunch().Result;
-                if (launchData.Forecast == null && App.Settings.SuccessfullIap)
-                {
-                    launchData.Forecast = ApiManager.GetForecastByCoordinates(launchData.Launch.Location.Pads[0].Latitude, launchData.Launch.Location.Pads[0].Longitude).GetAwaiter().GetResult();
-                    CacheManager.TryStoreUpdatedLaunchData(launchData);
-                }
             }
             catch (Exception ex)
             {
                 SetError(ex);
+                return;
             }
 
             PrepareViewModelData(launchData);
@@ -95,11 +91,6 @@ namespace LaunchPal.ViewModel
             try
             {
                 launchData = CacheManager.TryGetLaunchById(launchId).Result;
-                if (launchData.Forecast == null && (launchData.Launch.Net - DateTime.Now).TotalDays < 5 && App.Settings.SuccessfullIap)
-                {
-                    launchData.Forecast = ApiManager.GetForecastByCoordinates(launchData.Launch.Location.Pads[0].Latitude, launchData.Launch.Location.Pads[0].Longitude).GetAwaiter().GetResult();
-                    CacheManager.TryStoreUpdatedLaunchData(launchData);
-                }
                 if (launchData?.Launch == null)
                 {
                     throw new HttpRequestException();
@@ -108,6 +99,7 @@ namespace LaunchPal.ViewModel
             catch (Exception ex)
             {
                 SetError(ex);
+                return;
             }
 
             PrepareViewModelData(launchData);
@@ -139,7 +131,7 @@ namespace LaunchPal.ViewModel
             {
                 this.RocketImage = SetRocketImage(launchData);
             }
-            this.Agency = SetAgencyText(launchData);
+            this.Agency = SetAgencyText(launchData.Launch);
             this.MissionType = SetMissionTypeText(launchData);
             this.LaunchSite = SetLaunchSiteName(launchData);
             this.LaunchPad = SetLaunchPad(launchData);
@@ -205,15 +197,38 @@ namespace LaunchPal.ViewModel
             return $"{days}{hours}{difference.Minutes:0#;0#} min, {difference.Seconds:0#;0#} sec";
         }
 
-        private static string SetAgencyText(LaunchData launchData)
+        private static string SetAgencyText(Launch launchData)
         {
-            if (launchData.Mission?.Agencies?.Length > 0 && !string.IsNullOrEmpty(launchData.Mission.Agencies?[0].Name))
+            if (launchData?.Rocket?.Agencies.Count > 0 && !string.IsNullOrEmpty(launchData?.Rocket?.Agencies?[0].Name))
             {
-                return launchData.Mission.Agencies[0].Name;
+                var agencyText = "";
+
+                for (int i = 0; i < launchData?.Rocket?.Agencies.Count; i++)
+                {
+                    agencyText += launchData?.Rocket?.Agencies[i].Name;
+                    if (i != (launchData?.Rocket?.Agencies.Count -1))
+                    {
+                        agencyText += $",{Environment.NewLine}";
+                    }
+                }
+
+                return agencyText;
             }
             else
             {
-                return "No agency recorded";
+                return "No launch agency recorded";
+            }
+        }
+
+        private static string SetAgencyText(Mission missionData)
+        {
+            if (missionData?.Agencies?.Length > 0 && !string.IsNullOrEmpty(missionData.Agencies?[0].Name))
+            {
+                return missionData.Agencies[0].Name;
+            }
+            else
+            {
+                return "No mission agency recorded";
             }
         }
 

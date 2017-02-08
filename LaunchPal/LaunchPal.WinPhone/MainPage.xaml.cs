@@ -12,6 +12,10 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using LaunchPal.View;
+using LaunchPal.WinPhone.Models;
+using Newtonsoft.Json;
+using Application = Xamarin.Forms.Application;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -31,6 +35,15 @@ namespace LaunchPal.WinPhone
             LoadApplication(new LaunchPal.App());
         }
 
+        public MainPage(string launchId)
+        {
+            this.InitializeComponent();
+
+            this.NavigationCacheMode = NavigationCacheMode.Required;
+
+            LoadApplication(new LaunchPal.App(int.Parse(launchId)));
+        }
+
         /// <summary>
         /// Invoked when this page is about to be displayed in a Frame.
         /// </summary>
@@ -38,6 +51,13 @@ namespace LaunchPal.WinPhone
         /// This parameter is typically used to configure the page.</param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            var toastData = JsonConvert.DeserializeObject<NotificationData>(e.Parameter?.ToString());
+
+            if (!String.IsNullOrEmpty(toastData?.LaunchId))
+            {
+                Application.Current.MainPage = new View.MainPage(int.Parse(toastData.LaunchId));
+            }
+
             // TODO: Prepare page for display here.
 
             // TODO: If your application contains multiple pages, ensure that you are

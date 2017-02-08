@@ -13,8 +13,6 @@ namespace LaunchPal.UWP.Helper
 {
     class DeviceOrientationImplementation : IDeviceOrientation
     {
-        public DeviceOrientationImplementation() { }
-
         public DeviceOrientations GetOrientation()
         {
             var orientation = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().Orientation;

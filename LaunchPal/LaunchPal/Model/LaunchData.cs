@@ -15,7 +15,7 @@ namespace LaunchPal.Model
 
     public class LaunchRangeList
     {
-        public List<LaunchData> LaunchPairs { get; set; }
+        public List<LaunchData> LaunchData { get; set; }
         public DateTime CacheTimeOut { get; set; }
     }
 }

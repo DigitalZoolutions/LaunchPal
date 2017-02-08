@@ -33,9 +33,9 @@ namespace LaunchPal.ViewModel
             SearchResult = new SearchListTemplate(launchList, order);
         }
 
-        public void SearchForLaucnhes(string searchString)
+        public async void SearchForLaucnhes(string searchString)
         {
-            SearchResult = new SearchListTemplate(CacheManager.TryGetLaunchesBySearchString(searchString).Result, OrderBy.Net);
+            SearchResult = new SearchListTemplate(await CacheManager.TryGetLaunchesBySearchString(searchString), OrderBy.Net);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

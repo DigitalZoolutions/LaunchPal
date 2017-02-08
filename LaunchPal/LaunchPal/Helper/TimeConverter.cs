@@ -35,7 +35,7 @@ namespace LaunchPal.Helper
         /// <returns>Returns true if in range</returns>
         public static bool CheckDateIsInRange(DateTime date1, DateTime date2, TimeSpan diff)
         {
-            return date1 < date2.Subtract(diff) && date1 > date2.Subtract(-diff);
+            return date1 < date2.Subtract(-diff) && date1 > date2.Subtract(diff);
         }
 
 

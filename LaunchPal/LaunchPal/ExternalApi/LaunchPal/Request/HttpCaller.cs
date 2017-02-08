@@ -18,7 +18,7 @@ namespace LaunchPal.ExternalApi.LaunchPal.Request
         /// <typeparam name="T">Type of object expected to be returned</typeparam>
         /// <param name="url">The REST API Url to fetch the data</param>
         /// <returns>Object specified by T</returns>
-        internal static async Task<T> GetLaunchpalApi<T>(string url) where T : LaunchPalBase
+        internal static async Task<T> GetLaunchpalApiAsync<T>(string url) where T : LaunchPalBase
         {
             // The API call
             T result;
@@ -63,7 +63,7 @@ namespace LaunchPal.ExternalApi.LaunchPal.Request
         /// <typeparam name="T">Type of object expected to be returned</typeparam>
         /// <param name="url">The REST API Url to fetch the data</param>
         /// <returns>Object specified by T</returns>
-        internal static async Task<bool> PostLaunchpalApi<T>(string url)
+        internal static async Task<bool> PostLaunchpalApiAsync<T>(string url)
         {
             // The API call
             using (var client = new HttpClient())

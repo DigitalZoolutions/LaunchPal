@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:m3="http://schemas.microsoft.com/appx/2014/manifest" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest">
-  <Identity Name="48046Threezool.LaunchPal" Publisher="CN=9D303B81-1815-49A7-8132-B7BC184851CE" Version="4.0.1.0" />
+  <Identity Name="48046Threezool.LaunchPal" Publisher="CN=9D303B81-1815-49A7-8132-B7BC184851CE" Version="5.2.2.3" />
   <mp:PhoneIdentity PhoneProductId="944a61c4-7bc7-48d4-9d9c-23b4c48881a4" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>LaunchPal</DisplayName>
@@ -16,7 +16,12 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="LaunchPal.WinPhone.App">
-      <m3:VisualElements DisplayName="LaunchPal" Square150x150Logo="Assets\SquareLogo.png" Square44x44Logo="Assets\SmallLogo.png" Description="LaunchPal.WinPhone" ForegroundText="light" BackgroundColor="transparent" ToastCapable="true">
+      <m3:VisualElements DisplayName="LaunchPal" Square150x150Logo="Assets\SquareLogo.png" Square44x44Logo="Assets\SmallLogo.png" Description="Keeps track of rocket launches and provide notification and video feeds." ForegroundText="light" BackgroundColor="transparent" ToastCapable="true">
+        <m3:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square71x71Logo="Assets\Square71x71Logo.png">
+          <m3:ShowNameOnTiles>
+            <m3:ShowOn Tile="wide310x150Logo" />
+          </m3:ShowNameOnTiles>
+        </m3:DefaultTile>
         <m3:SplashScreen Image="Assets\SplashScreen.png" BackgroundColor="transparent" />
         <m3:InitialRotationPreference>
           <m3:Rotation Preference="portrait" />

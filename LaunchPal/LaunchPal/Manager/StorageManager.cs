@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LaunchPal.Enums;
+using LaunchPal.Extension;
 using LaunchPal.ExternalApi.PeopleInSpace.JsonObject;
 using LaunchPal.Helper;
 using LaunchPal.Interface;
@@ -78,7 +79,7 @@ namespace LaunchPal.Manager
                 cacheData.LaunchRangeList = new LaunchRangeList
                 {
                     CacheTimeOut = DateTime.Now,
-                    LaunchPairs = new List<LaunchData>()
+                    LaunchData = new List<LaunchData>()
                 };
                 cacheData.PeopleInSpace = new CachePeople()
                 {
@@ -138,13 +139,13 @@ namespace LaunchPal.Manager
             }
         }
 
-        internal static async void ClearCache()
+        internal static async void ClearCacheAsync()
         {
             CacheManager.ClearCache();
             await DependencyService.Get<IStoreCache>().ClearAllCache();
         }
 
-        internal static async void ClearTracking()
+        internal static async void ClearTrackingAsync()
         {
             TrackingManager.ClearAllTrackedLaunches();
             DependencyService.Get<INotify>().ClearNotifications(NotificationType.TrackedLaunch);

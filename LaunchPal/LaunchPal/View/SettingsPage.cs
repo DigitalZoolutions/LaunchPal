@@ -161,7 +161,7 @@ namespace LaunchPal.View
                 }
 
                 StorageManager.SaveAllData();
-                DependencyService.Get<IControlAppFunction>().ExitApp();
+                DependencyService.Get<IUseNativeFunctions>().ExitApp();
             };
 
             var trackAgencyLabel = SubtitleLabel("Select what agancies to track");
@@ -408,7 +408,7 @@ namespace LaunchPal.View
 
             clearCacheButton.Clicked += (sender, args) =>
             {
-                StorageManager.ClearCache();
+                StorageManager.ClearCacheAsync();
             };
 
             // Clear cache button
@@ -423,7 +423,7 @@ namespace LaunchPal.View
 
             ClearTrackingsButton.Clicked += (sender, args) =>
             {
-                StorageManager.ClearTracking();
+                StorageManager.ClearTrackingAsync();
                 App.Settings.TrackedLaunchOnHomescreen = null;
                 DependencyService.Get<INotify>().ClearNotifications(NotificationType.TrackedLaunch);
                 DependencyService.Get<ICreateTile>().SetLaunch();

@@ -6,6 +6,7 @@ using LaunchPal.Enums;
 using LaunchPal.Extension;
 using LaunchPal.ExternalApi;
 using LaunchPal.ExternalApi.LaunchLibrary.JsonObject;
+using LaunchPal.ExternalApi.OpenWeatherMap.JsonObject;
 using LaunchPal.ExternalApi.PeopleInSpace.JsonObject;
 using LaunchPal.Helper;
 using LaunchPal.Interface;
@@ -27,7 +28,7 @@ namespace LaunchPal.Manager
         public static LaunchRangeList CachedLaunches { get; private set; } = new LaunchRangeList
         {
             CacheTimeOut = DateTime.Now.AddDays(-1),
-            LaunchPairs = new List<LaunchData>()
+            LaunchData = new List<LaunchData>()
         };
 
         public static CacheNews CachedCacheNewsFeed { get; private set; } = new CacheNews
@@ -49,15 +50,18 @@ namespace LaunchPal.Manager
         {
             if (DateTime.Now < NextLaunch?.CacheTimeOut)
                 return NextLaunch;
-
+            
             var nextLaunch = await ApiManager.NextLaunch();
             var nextMission = await ApiManager.MissionByLaunchId(nextLaunch.Id);
+            Forecast forecast = null;
+            if (App.Settings.SuccessfullIap && nextLaunch.Net > DateTime.Now && nextLaunch.Net < DateTime.Now.AddDays(4))
+                forecast = await ApiManager.GetForecastByCoordinates(nextLaunch.Location.Pads[0].Latitude, nextLaunch.Location.Pads[0].Longitude);
 
             NextLaunch = new LaunchData
             {
                 Launch = nextLaunch,
                 Mission = nextMission,
-                Forecast = null,
+                Forecast = forecast,
                 CacheTimeOut = GetCacheTimeOutForLaunches(nextLaunch.Net)
             };
 
@@ -70,10 +74,10 @@ namespace LaunchPal.Manager
 
         public static async Task<LaunchData> TryGetLaunchById(int id)
         {
-            if (NextLaunch.Launch.Id == id)
+            if (NextLaunch.Launch.Id == id && DateTime.Now < NextLaunch?.CacheTimeOut)
                 return NextLaunch;
 
-            var selectedLaunch = CachedLaunches.LaunchPairs.FirstOrDefault(x => x.Launch.Id == id);
+            var selectedLaunch = CachedLaunches.LaunchData.FirstOrDefault(x => x.Launch.Id == id);
 
             if (selectedLaunch != null)
             {
@@ -82,42 +86,55 @@ namespace LaunchPal.Manager
                     if (selectedLaunch.Mission != null)
                         return selectedLaunch;
 
-                    selectedLaunch.Mission = ApiManager.MissionById(selectedLaunch.Launch.Id).Result;
+                    selectedLaunch.Mission = await ApiManager.MissionById(selectedLaunch.Launch.Id);
                     return selectedLaunch;
                 }
 
-                CachedLaunches.LaunchPairs.Remove(selectedLaunch);
+                CachedLaunches.LaunchData.Remove(selectedLaunch);
             }
 
             var newLaunch = await ApiManager.NextLaunchById(id);
             var newMission = await ApiManager.MissionByLaunchId(newLaunch.Id);
+            Forecast forecast = null;
+            if (App.Settings.SuccessfullIap && newLaunch.Net > DateTime.Now && newLaunch.Net < DateTime.Now.AddDays(4))
+                forecast = await ApiManager.GetForecastByCoordinates(newLaunch.Location.Pads[0].Latitude, newLaunch.Location.Pads[0].Longitude);
 
-            var newLaunchPair = new LaunchData
+            var newLaunchData = new LaunchData
             {
                 Launch = newLaunch,
                 Mission = newMission,
-                Forecast = null,
+                Forecast = forecast,
                 CacheTimeOut = GetCacheTimeOutForLaunches(newLaunch.Net)
             };
 
-            TrackingManager.UpdateTrackedLaunches(newLaunchPair);
+            TrackingManager.UpdateTrackedLaunches(newLaunchData);
 
-            CachedLaunches.LaunchPairs.Add(newLaunchPair);
-            return newLaunchPair;
+            CachedLaunches.LaunchData.Add(newLaunchData);
+            return newLaunchData;
         }
 
         public static async Task<List<LaunchData>> TryGetUpcomingLaunches()
         {
             if (DateTime.Now < CachedLaunches?.CacheTimeOut)
-                return CachedLaunches.LaunchPairs.ToList();
+            {
+                var launchesToUpdate = new List<LaunchData>();
 
-            var upcomingLaunches =
-                await ApiManager.LaunchesByDate(
-                    DateTime.Now.FirstDayOfMonth(), 
-                    DateTime.Now.LastDayOfMonth().AddDays(14)
-                    );
+                foreach (var cachedLaunch in CachedLaunches.LaunchData.ToList())
+                {
+                    if (DateTime.Now > cachedLaunch.CacheTimeOut)
+                    {
+                        launchesToUpdate.Add(await TryGetLaunchById(cachedLaunch.Launch.Id));
+                    }
+                }
 
-            var launchPairs = upcomingLaunches.Select(upcomingLaunch => new LaunchData
+                return CachedLaunches.LaunchData.ToList();
+            }
+
+            var upcomingLaunches = await ApiManager.LaunchesByDate(
+                    DateTime.Now.FirstDayOfMonth().AddDays(-3), 
+                    DateTime.Now.LastDayOfMonth().AddDays(14));
+
+            var launchData = upcomingLaunches.Select(upcomingLaunch => new LaunchData
             {
                 Launch = upcomingLaunch,
                 Mission = null,
@@ -125,35 +142,35 @@ namespace LaunchPal.Manager
                 CacheTimeOut = upcomingLaunch.Net.AddHours(1)
             }).ToList();
 
-            TrackingManager.UpdateTrackedLaunches(launchPairs);
+            TrackingManager.UpdateTrackedLaunches(launchData);
 
             CachedLaunches = new LaunchRangeList
             {
-                LaunchPairs = launchPairs,
+                LaunchData = launchData,
                 CacheTimeOut = DateTime.Now.AddDays(7)
             };
 
-            return launchPairs;
+            return launchData;
         }
 
         public static async Task<List<LaunchData>> TryGetLaunchesBySearchString(string searchString)
         {
             var searchResult = await ApiManager.SearchLaunches(searchString, 50);
 
-            var launchPairs = searchResult.Select(upcomingLaunch => new LaunchData
+            var launchData = searchResult.Select(upcomingLaunch => new LaunchData
             {
                 Launch = upcomingLaunch,
                 CacheTimeOut = GetCacheTimeOutForLaunches(upcomingLaunch.Net)
             }).ToList();
 
-            TrackingManager.UpdateTrackedLaunches(launchPairs);
+            TrackingManager.UpdateTrackedLaunches(launchData);
 
-            foreach (var launchPair in launchPairs)
+            foreach (var launchPair in launchData)
             {
-                CachedLaunches.LaunchPairs.Add(launchPair);
+                CachedLaunches.LaunchData.Add(launchPair);
             }
 
-            return launchPairs;
+            return launchData;
         }
 
         public static void TryStoreUpdatedLaunchData(LaunchData launchdata)
@@ -166,7 +183,7 @@ namespace LaunchPal.Manager
                 TrackingManager.UpdateTrackedLaunches(NextLaunch);
             }
 
-            foreach (var cachedLaunch in CachedLaunches.LaunchPairs)
+            foreach (var cachedLaunch in CachedLaunches.LaunchData)
             {
                 if (cachedLaunch.Launch.Id != launchdata.Launch.Id)
                     continue;
@@ -284,7 +301,7 @@ namespace LaunchPal.Manager
             if (cachedRocket?.CacheTimeOut < DateTime.Now)
                 return cachedRocket.Rocket;
 
-            var cachedLaunch = CachedLaunches.LaunchPairs.FirstOrDefault(x => x.Launch.Rocket.Id == rocketId);
+            var cachedLaunch = CachedLaunches.LaunchData.FirstOrDefault(x => x.Launch.Rocket.Id == rocketId);
 
             if (cachedLaunch?.CacheTimeOut < DateTime.Now)
             {
@@ -336,7 +353,7 @@ namespace LaunchPal.Manager
             CachedLaunches = new LaunchRangeList
             {
                 CacheTimeOut = DateTime.Now.AddDays(-1),
-                LaunchPairs = new List<LaunchData>()
+                LaunchData = new List<LaunchData>()
 
             };
             CachedCacheNewsFeed = new CacheNews

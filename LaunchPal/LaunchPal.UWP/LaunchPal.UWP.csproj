@@ -105,10 +105,10 @@
     <Compile Include="Enums\DeviceEnum.cs" />
     <Compile Include="Helper\CheckPurchaseImplementation.cs" />
     <Compile Include="Helper\DeviceOrientationImplementation.cs" />
-    <Compile Include="Helper\IControlAppFunctionImplementation.cs" />
     <Compile Include="Helper\MailSender.cs" />
     <Compile Include="Helper\NotificationImplementation.cs" />
     <Compile Include="Helper\StorageManagerImplementation.cs" />
+    <Compile Include="Helper\UseNativeFunctionsImplementation.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>

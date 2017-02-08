@@ -63,6 +63,7 @@ namespace LaunchPal.Windows
                 rootFrame.CacheSize = 1;
 
                 Xamarin.Forms.Forms.Init(e);
+                Xamarin.FormsMaps.Init("NbOGZGgTBV0t87CtxyDh~J6ZX_x5EHjNi3UcQFeJkwA~AiUat14TdfzbD0guovERlUvjP4QHb5tKh1WygTBs_98qUKR1yeQzMR19PJZgb5_A");
 
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {

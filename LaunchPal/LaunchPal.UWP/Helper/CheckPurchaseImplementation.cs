@@ -16,7 +16,11 @@ namespace LaunchPal.UWP.Helper
     {
         public bool HasPurchasedPlus()
         {
+#if DEBUG
+            var licenseInformation = CurrentAppSimulator.LicenseInformation;
+#else
             var licenseInformation = CurrentApp.LicenseInformation;
+#endif
 
             var iap1 = licenseInformation.ProductLicenses["LaunchPal Plus"].IsActive;
             var iap2 = licenseInformation.ProductLicenses["LaunchPal_Plus"].IsActive;
@@ -31,7 +35,11 @@ namespace LaunchPal.UWP.Helper
 
             try
             {
+#if DEBUG
+                var result = CurrentAppSimulator.RequestProductPurchaseAsync("LaunchPal Plus").GetAwaiter().GetResult();
+#else
                 var result = CurrentApp.RequestProductPurchaseAsync("LaunchPal Plus").GetAwaiter().GetResult();
+#endif
 
                 switch (result.Status)
                 {

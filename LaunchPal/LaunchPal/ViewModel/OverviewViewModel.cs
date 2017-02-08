@@ -77,6 +77,7 @@ namespace LaunchPal.ViewModel
             catch (Exception ex)
             {
                 SetError(ex);
+                return this;
             }
 
             StatusHold = nextLaunch.Status == 2;

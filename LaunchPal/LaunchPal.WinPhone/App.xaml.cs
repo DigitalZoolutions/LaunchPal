@@ -15,6 +15,8 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
+using LaunchPal.WinPhone.Models;
+using Newtonsoft.Json;
 
 // The Blank Application template is documented at http://go.microsoft.com/fwlink/?LinkId=234227
 
@@ -52,6 +54,8 @@ namespace LaunchPal.WinPhone
             }
 #endif
 
+            string launchString = e.Arguments;
+
             Frame rootFrame = Window.Current.Content as Frame;
 
             // Do not repeat app initialization when the Window already has content,
@@ -65,6 +69,7 @@ namespace LaunchPal.WinPhone
                 rootFrame.CacheSize = 1;
 
                 Xamarin.Forms.Forms.Init(e);
+                Xamarin.FormsMaps.Init("NbOGZGgTBV0t87CtxyDh~J6ZX_x5EHjNi3UcQFeJkwA~AiUat14TdfzbD0guovERlUvjP4QHb5tKh1WygTBs_98qUKR1yeQzMR19PJZgb5_A");
 
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
@@ -97,6 +102,11 @@ namespace LaunchPal.WinPhone
                 {
                     throw new Exception("Failed to create initial page");
                 }
+            }
+
+            if (!string.IsNullOrEmpty(e.Arguments))
+            {
+                rootFrame.Navigate(typeof(MainPage), e.Arguments);
             }
 
             // Ensure the current window is active

@@ -100,24 +100,5 @@ namespace LaunchPal.View
             };
             Detail.Navigation.PushAsync(new SettingsPage());
         }
-
-        protected override bool OnBackButtonPressed()
-        {
-            var result = Detail.GetType().ToString();
-
-            if (Detail.GetType().ToString() == "Klaim.HomePage")
-            {
-
-            }
-            
-
-            var root = Parent.Parent as MainPage;
-
-            if (root?.GetType() != typeof(MainPage))
-                return false;
-
-            root.NavigateTo(new OverviewPage());
-            return true;
-        }
     }
 }

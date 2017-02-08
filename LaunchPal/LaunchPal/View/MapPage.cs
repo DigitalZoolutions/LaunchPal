@@ -1,4 +1,5 @@
-﻿using Xamarin.Forms;
+﻿using System.Globalization;
+using Xamarin.Forms;
 using Xamarin.Forms.Maps;
 
 namespace LaunchPal.View
@@ -9,11 +10,8 @@ namespace LaunchPal.View
         {
             Title = "Launch Site";
 
-            double latitude;
-            double longitude;
-
-            double.TryParse(latitudeString, out latitude);
-            double.TryParse(longitudeString, out longitude);
+            double latitude = GetDouble(latitudeString, 0);
+            double longitude = GetDouble(longitudeString, 0);
 
             var position = new Position(latitude, longitude);
 
@@ -38,6 +36,23 @@ namespace LaunchPal.View
             stack.Children.Add(map);
             Content = stack;
 
+        }
+
+        public static double GetDouble(string value, double defaultValue)
+        {
+            double result;
+
+            //Try parsing in the current culture
+            if (!double.TryParse(value, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out result) &&
+                //Then try in US english
+                !double.TryParse(value, System.Globalization.NumberStyles.Any, new CultureInfo("en-US"), out result) &&
+                //Then in neutral language
+                !double.TryParse(value, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out result))
+            {
+                result = defaultValue;
+            }
+
+            return result;
         }
     }
 }

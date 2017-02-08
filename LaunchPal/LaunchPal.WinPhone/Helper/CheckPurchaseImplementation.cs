@@ -12,25 +12,22 @@ namespace LaunchPal.WinPhone.Helper
     {
         public bool HasPurchasedPlus()
         {
-            try
-            {
-                return CurrentApp.LicenseInformation.ProductLicenses["LaunchPal Plus"].IsActive ||
-                    CurrentApp.LicenseInformation.ProductLicenses["LaunchPal_Plus"].IsActive;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            var licenseInformation = CurrentApp.LicenseInformation;
+
+            var iap1 = licenseInformation.ProductLicenses["LaunchPal Plus"].IsActive;
+            var iap2 = licenseInformation.ProductLicenses["LaunchPal_Plus"].IsActive;
+
+            return iap1 || iap2;
         }
 
-        public async Task<bool> PurchasePlus()
+        public bool PurchasePlus()
         {
             if (HasPurchasedPlus())
                 return true;
 
             try
             {
-                var result = await CurrentApp.RequestProductPurchaseAsync("LaunchPal Plus");
+                var result = CurrentApp.RequestProductPurchaseAsync("LaunchPal Plus").GetAwaiter().GetResult();
 
                 switch (result.Status)
                 {

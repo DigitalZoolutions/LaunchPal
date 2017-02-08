@@ -49,6 +49,8 @@ namespace LaunchPal.View
                 }
 
                 await PrepareViewModel();
+
+                InvalidateMeasure();
             };
         }
 
@@ -256,7 +258,6 @@ namespace LaunchPal.View
                 Content = relativeLayout
             };
             
-
         }
 
         #region Action Triggers

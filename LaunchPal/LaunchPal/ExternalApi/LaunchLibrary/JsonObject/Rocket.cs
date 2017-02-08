@@ -20,6 +20,9 @@ namespace LaunchPal.ExternalApi.LaunchLibrary.JsonObject
         [JsonProperty("family")]
         public Family Family { get; set; }
 
+        [JsonProperty("agencies")]
+        public List<Agency> Agencies { get; set; }
+
         [JsonProperty("infoURL")]
         public string InfoUrl { get; set; }
 
