@@ -580,7 +580,7 @@ namespace LaunchPal.View
                                         },
                                         new Label
                                         {
-                                            Text = $"Planed Launches: {trackedAgency.PlanedLaunchData.Count}",
+                                            Text = $"Planned Launches: {trackedAgency.PlanedLaunchData.Count}",
                                             VerticalOptions = LayoutOptions.Center,
                                             TextColor = Theme.TextColor,
                                             FontSize = 14,
